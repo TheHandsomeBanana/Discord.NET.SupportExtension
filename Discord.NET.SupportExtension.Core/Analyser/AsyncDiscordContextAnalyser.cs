@@ -10,7 +10,7 @@ namespace Discord.NET.SupportExtension.Core.Analyser {
     internal class AsyncDiscordContextAnalyser {
 
         public async Task<DiscordItemModel[]> ExecuteAsync(SyntaxNode syntaxNode) {
-
+            return null;
         }
     }
 }

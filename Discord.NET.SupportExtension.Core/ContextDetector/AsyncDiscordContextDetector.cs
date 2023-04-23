@@ -14,7 +14,7 @@ namespace Discord.NET.SupportExtension.Core.ContextDetector {
         }
 
         public async Task<DiscordCompletionContext> ExecuteAsync(SyntaxNode syntaxNode) {
-
+            return DiscordCompletionContext.Server;
         }
     }
 }

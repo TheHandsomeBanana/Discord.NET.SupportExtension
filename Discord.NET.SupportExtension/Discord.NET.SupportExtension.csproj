@@ -52,9 +52,13 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>DiscordSupportPackage.vsct</DependentUpon>
     </Compile>
+    <Compile Include="Helper\UIHelper.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="DiscordSupportPackage.cs" />
     <Compile Include="ViewModels\ConfigureServerImageViewModel.cs" />
+    <Compile Include="Views\ConfigureServerImageView.xaml.cs">
+      <DependentUpon>ConfigureServerImageView.xaml</DependentUpon>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <None Include="source.extension.vsixmanifest">
@@ -63,12 +67,16 @@
   </ItemGroup>
   <ItemGroup>
     <Reference Include="Microsoft.CSharp" />
+    <Reference Include="PresentationCore" />
+    <Reference Include="PresentationFramework" />
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Design" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xaml" />
     <Reference Include="System.Xml" />
+    <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.DependencyInjection">
@@ -120,9 +128,7 @@
       <IncludeOutputGroupsInVSIXLocalOnly>DebugSymbolsProjectOutputGroup%3b</IncludeOutputGroupsInVSIXLocalOnly>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Views\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <VSCTCompile Include="DiscordSupportPackage.vsct">
       <Generator>VsctGenerator</Generator>
@@ -141,6 +147,12 @@
     <Content Include="Resources\discordicon_black_32.png" />
     <Content Include="Resources\discordicon_black_48.png" />
     <Content Include="Resources\discordicon_black_512.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Page Include="Views\ConfigureServerImageView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(VSToolsPath)\VSSDK\Microsoft.VsSDK.targets" Condition="'$(VSToolsPath)' != ''" />

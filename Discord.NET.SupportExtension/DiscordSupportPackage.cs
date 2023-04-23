@@ -48,7 +48,7 @@ namespace Discord.NET.SupportExtension {
             DIBuilder builder = new DIBuilder();
             new Core.DIConfig().Configure(builder);
             new DIConfig().Configure(builder);
-            DIContainer.BuildServiceProvider(builder);
+            //DIContainer.BuildServiceProvider(builder);
         }
 
         #region Package Members
@@ -64,7 +64,7 @@ namespace Discord.NET.SupportExtension {
             // When initialized asynchronously, the current thread may be a background thread at this point.
             // Do any initialization that requires the UI thread after switching to the UI thread.
             await this.JoinableTaskFactory.SwitchToMainThreadAsync(cancellationToken);
-            await Discord.NET.SupportExtension.GenerateServerImageConfigurationCommand.InitializeAsync(this);
+            await GenerateServerImageConfigurationCommand.InitializeAsync(this);
         }
 
         #endregion

@@ -1,4 +1,7 @@
-﻿using Microsoft.VisualStudio.Shell;
+﻿using Discord.NET.SupportExtension.Helper;
+using Discord.NET.SupportExtension.ViewModels;
+using Discord.NET.SupportExtension.Views;
+using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 using System;
 using System.ComponentModel.Design;
@@ -80,18 +83,8 @@ namespace Discord.NET.SupportExtension {
         /// <param name="sender">Event sender.</param>
         /// <param name="e">Event args.</param>
         private void Execute(object sender, EventArgs e) {
-            ThreadHelper.ThrowIfNotOnUIThread();
-            string message = string.Format(CultureInfo.CurrentCulture, "Inside {0}.MenuItemCallback()", this.GetType().FullName);
-            string title = "Command1";
-
-            // Show a message box to prove we were here
-            VsShellUtilities.ShowMessageBox(
-                this.package,
-                message,
-                title,
-                OLEMSGICON.OLEMSGICON_INFO,
-                OLEMSGBUTTON.OLEMSGBUTTON_OK,
-                OLEMSGDEFBUTTON.OLEMSGDEFBUTTON_FIRST);
+            ConfigureServerImageView view = new ConfigureServerImageView() { DataContext = new ConfigureServerImageViewModel() };
+            UIHelper.Show(view);
         }
     }
 }
