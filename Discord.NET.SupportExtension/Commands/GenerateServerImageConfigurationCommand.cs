@@ -16,16 +16,6 @@ namespace Discord.NET.SupportExtension {
     /// </summary>
     internal sealed class GenerateServerImageConfigurationCommand {
         /// <summary>
-        /// Command ID.
-        /// </summary>
-        public const int CommandId = 0x0100;
-
-        /// <summary>
-        /// Command menu group (command set GUID).
-        /// </summary>
-        public static readonly Guid CommandSet = new Guid("c97d316c-21f9-4def-9731-4d63790b08fd");
-
-        /// <summary>
         /// VS Package that provides this command, not null.
         /// </summary>
         private readonly AsyncPackage package;
@@ -40,8 +30,8 @@ namespace Discord.NET.SupportExtension {
             this.package = package ?? throw new ArgumentNullException(nameof(package));
             commandService = commandService ?? throw new ArgumentNullException(nameof(commandService));
 
-            var menuCommandID = new CommandID(CommandSet, CommandId);
-            var menuItem = new MenuCommand(this.Execute, menuCommandID);
+            var menuCommandID = new CommandID(PackageGuids.CommandSet, PackageIds.GenerateServerImageConfigurationCommand);
+            var menuItem = new OleMenuCommand(this.Execute, menuCommandID);
             commandService.AddCommand(menuItem);
         }
 
@@ -85,6 +75,7 @@ namespace Discord.NET.SupportExtension {
         private void Execute(object sender, EventArgs e) {
             ConfigureServerImageView view = new ConfigureServerImageView() { DataContext = new ConfigureServerImageViewModel() };
             UIHelper.Show(view);
+
         }
     }
 }

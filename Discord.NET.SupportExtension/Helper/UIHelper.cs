@@ -1,4 +1,8 @@
-﻿using Microsoft.Internal.VisualStudio.PlatformUI;
+﻿using HB.NETF.Common.DependencyInjection;
+using HB.NETF.Services.Logging;
+using HB.NETF.Services.Logging.Factory;
+using Microsoft;
+using Microsoft.Internal.VisualStudio.PlatformUI;
 using Microsoft.Internal.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 using System;
@@ -16,12 +20,10 @@ namespace Discord.NET.SupportExtension.Helper {
             Microsoft.VisualStudio.Shell.ThreadHelper.ThrowIfNotOnUIThread();
 
             IVsUIShell uiShell = (IVsUIShell)Package.GetService(typeof(IVsUIShell));
-
-            IntPtr hwnd;
-            uiShell.GetDialogOwnerHwnd(out hwnd);
-            uiShell.EnableModeless(0);
+            Assumes.Present(uiShell);
+            
+            uiShell.GetDialogOwnerHwnd(out IntPtr hwnd);
             WindowHelper.ShowModal(window, hwnd);
-            uiShell.EnableModeless(1);
         }
     }
 }

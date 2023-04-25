@@ -1,4 +1,5 @@
-﻿using HB.NETF.Common;
+﻿using Discord.NET.SupportExtension.Helper;
+using HB.NETF.Common;
 using HB.NETF.Common.DependencyInjection;
 using HB.NETF.Discord.NET.Toolkit;
 using HB.NETF.Services.Logging;
@@ -44,11 +45,13 @@ namespace Discord.NET.SupportExtension {
         public static string EventLogPath = DiscordEnvironment.LogPath + "\\" + callerTime.ToString("yyyy.MM.dd_HH.mm.ss") + ".log";
 
         public DiscordSupportPackage() {
+            UIHelper.Package = this;
+
             // Setup DI Container
             DIBuilder builder = new DIBuilder();
             new Core.DIConfig().Configure(builder);
             new DIConfig().Configure(builder);
-            //DIContainer.BuildServiceProvider(builder);
+            DIContainer.BuildServiceProvider(builder);
         }
 
         #region Package Members
