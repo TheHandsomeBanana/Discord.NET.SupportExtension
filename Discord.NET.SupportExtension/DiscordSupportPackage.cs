@@ -40,18 +40,19 @@ namespace Discord.NET.SupportExtension {
 
         static DiscordSupportPackage() {
             callerTime = DateTime.Now;
+
+            // Setup DI Container
+            // Needs to be in static ctor --> package instantiated after IntelliSense
+            DIBuilder builder = new DIBuilder();
+            new Core.DIConfig().Configure(builder);
+            new DIConfig().Configure(builder);
+            DIContainer.BuildServiceProvider(builder);
         }
 
         public static string EventLogPath = DiscordEnvironment.LogPath + "\\" + callerTime.ToString("yyyy.MM.dd_HH.mm.ss") + ".log";
 
         public DiscordSupportPackage() {
             UIHelper.Package = this;
-
-            // Setup DI Container
-            DIBuilder builder = new DIBuilder();
-            new Core.DIConfig().Configure(builder);
-            new DIConfig().Configure(builder);
-            DIContainer.BuildServiceProvider(builder);
         }
 
         #region Package Members

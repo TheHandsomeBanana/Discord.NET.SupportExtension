@@ -12,4 +12,15 @@ namespace Discord.NET.SupportExtension.Core.Interface {
         Role,
         Channel
     }
+
+    public enum DiscordChannelContext {
+        Undefined,
+        Text,
+        Voice,
+        Category,
+        DM,
+        Group,
+        Forum,
+        Guild,
+    }
 }
