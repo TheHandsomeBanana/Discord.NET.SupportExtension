@@ -1,5 +1,4 @@
 ﻿using EnvDTE;
-using Microsoft.Build.Framework;
 using Microsoft.CodeAnalysis;
 using Microsoft.VisualStudio.ComponentModelHost;
 using Microsoft.VisualStudio.Language.Intellisense.AsyncCompletion.Data;
@@ -19,6 +18,9 @@ using System.Threading.Tasks;
 using Microsoft.VisualStudio.Language.Intellisense;
 using Microsoft.VisualStudio.TextManager.Interop;
 using System.Collections.Immutable;
+using Discord.NET.SupportExtension.Core.Interface;
+using HB.NETF.Common.DependencyInjection;
+using HB.NETF.Services.Logging;
 
 namespace Discord.NET.SupportExtension.MEF {
     internal class AsyncDiscordCompletionSource : IAsyncCompletionSource {
@@ -32,15 +34,30 @@ namespace Discord.NET.SupportExtension.MEF {
         }
 
         public async Task<CompletionContext> GetCompletionContextAsync(IAsyncCompletionSession session, CompletionTrigger trigger, SnapshotPoint triggerLocation, SnapshotSpan applicableToSpan, CancellationToken token) {
-            
-            
-            List<string> strList = new List<string>();
-            strList.Add("addition");
-            strList.Add("adaptation");
-            strList.Add("subtraction");
-            strList.Add("summation");
+            Microsoft.CodeAnalysis.Document document = VSWorkspace.CurrentSolution.GetDocument(DocumentIdentifier);
+            if (document == null)
+                return default;
 
-            return new CompletionContext(strList.Select(e => new CompletionItem(e, this)).ToImmutableArray());
+            ILogger logger = DIContainer.ServiceProvider.GetService(typeof(ILogger)) as ILogger;
+            if (logger == null) // Logger not present => IntelliSense crash
+                return default;
+            
+            IAsyncDiscordCompletionEngine engine = DIContainer.ServiceProvider.GetService(typeof(IAsyncDiscordCompletionEngine)) as IAsyncDiscordCompletionEngine;            
+
+            try {
+                Assumes.Present(engine);
+                SemanticModel semanticModel = await document.GetSemanticModelAsync(token);
+                SyntaxToken triggerToken = (await document.GetSyntaxRootAsync(token)).FindToken(triggerLocation);
+
+                IDiscordCompletionItem[] completions = await engine.ProcessCompletionAsync(VSWorkspace.CurrentSolution, semanticModel, triggerToken);
+
+                return new CompletionContext(completions.Select(e => new CompletionItem(GetCompletionItemDisplayName(e), this)).ToImmutableArray());
+            }
+            catch (Exception ex) {
+                logger.LogCritical("IntelliSense adaption failed. " + ex.ToString());
+            }
+
+            return default;
         }
 
         public async Task<object> GetDescriptionAsync(IAsyncCompletionSession session, CompletionItem item, CancellationToken token) {
@@ -64,5 +81,8 @@ namespace Discord.NET.SupportExtension.MEF {
                 _isDisposed = true;
             }
         }
+
+        private string GetCompletionItemDisplayName(IDiscordCompletionItem item) => $"{item.Name} [{item.Id}] ({item.CompletionContext})";
+
     }
 }
