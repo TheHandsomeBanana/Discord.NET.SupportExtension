@@ -45,6 +45,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Commands\GenerateServerImageCommand.cs" />
     <Compile Include="Commands\GenerateServerImageConfigurationCommand.cs" />
     <Compile Include="DIConfig.cs" />
     <Compile Include="DiscordSupportPackage1.cs">

@@ -50,11 +50,18 @@
               <CommandFlag>DefaultInvisible</CommandFlag>
               <CommandFlag>DynamicVisibility</CommandFlag>
           If you do not want an image next to your command, remove the Icon node /> -->
-			<Button guid="CommandSet" id="GenerateServerImageConfigurationCommand" priority="0x010" type="Button">
+			<Button guid="CommandSet" id="GenerateServerImageCommand" priority="0x0100" type="Button">
 				<Parent guid="GroupSet" id="CSharpProjectMenuGroup" />
 				<Icon guid="discordImages" id="bmpPic1" />
 				<Strings>
 					<ButtonText>Generate Server Image</ButtonText>
+				</Strings>
+			</Button>
+			<Button guid="CommandSet" id="GenerateServerImageConfigurationCommand" priority="0x010" type="Button">
+				<Parent guid="GroupSet" id="CSharpProjectMenuGroup" />
+				<Icon guid="discordImages" id="bmpPic1" />
+				<Strings>
+					<ButtonText>Configure Server Image</ButtonText>
 				</Strings>
 			</Button>
 		</Buttons>
@@ -67,6 +74,7 @@
             inside a button definition. An important aspect of this declaration is that the element id
             must be the actual index (1-based) of the bitmap inside the bitmap strip. -->
 			<Bitmap guid="discordImages" href="Resources\discordicon_black_16.png" />
+			<Bitmap guid="guidImages" href="Commands\Resources\GenerateServerImageCommand.png" usedList="bmpPic1, bmpPic2, bmpPicSearch, bmpPicX, bmpPicArrows, bmpPicStrikethrough" />
 		</Bitmaps>
 	</Commands>
 
@@ -87,6 +95,7 @@
 		<!-- This is the guid used to group the menu commands together -->
 		<GuidSymbol name="CommandSet" value="{c97d316c-21f9-4def-9731-4d63790b08fd}">
 			<IDSymbol name="GenerateServerImageConfigurationCommand" value="0x010" />
+			<IDSymbol name="GenerateServerImageCommand" value="0x020"/>
 		</GuidSymbol>
 
 		<GuidSymbol name="discordImages" value="{b4157286-21f9-4e49-9731-6016213b4f08}">

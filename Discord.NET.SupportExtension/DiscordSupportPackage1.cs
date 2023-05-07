@@ -31,6 +31,7 @@ namespace Discord.NET.SupportExtension
     {
         public const int CSharpProjectMenuGroup = 0x0100;
         public const int GenerateServerImageConfigurationCommand = 0x0010;
+        public const int GenerateServerImageCommand = 0x0020;
         public const int bmpPic1 = 0x0001;
     }
 }
