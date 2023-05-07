@@ -20,7 +20,7 @@ namespace Discord.NET.SupportExtension.Core {
             AsyncDiscordContextDetector contextDetector = new AsyncDiscordContextDetector(semanticModel);
             DiscordCompletionContext foundContext = await contextDetector.ExecuteAsync(token.Parent);
 
-            AsyncDiscordContextAnalyser analyser = new AsyncDiscordContextAnalyser();
+            AsyncDiscordContextAnalyser analyser = new AsyncDiscordContextAnalyser(semanticModel, semanticModel.SyntaxTree, solution, project);
             completionItems = (await analyser.ExecuteAsync(token.Parent))?.Select(e => e.ToCompletionItem()) ?? new IDiscordCompletionItem[0];
             return completionItems.ToArray();
         }

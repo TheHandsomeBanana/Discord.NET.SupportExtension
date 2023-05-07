@@ -16,34 +16,34 @@ namespace Discord.NET.SupportExtension.Core.ContextDetector {
     internal class AsyncDiscordContextDetector : IAsyncCodeAnalyser<DiscordCompletionContext> {
         private SemanticModel SemanticModel;
 
-        private ILogger logger;
+        private ILogger<AsyncDiscordContextDetector> logger;
 
         private const int MAXRECURSION = 5;
-        private DiscordCompletionContext _context;
-        private bool _hasContext;
-        private SyntaxNode _currNode;
-        private SemanticModel _semanticModel;
+        private DiscordCompletionContext context;
+        private bool hasContext;
+        private SyntaxNode currentNode;
+        private SemanticModel semanticModel;
 
         public DiscordChannelContext? ChannelType { get; private set; }
 
         public AsyncDiscordContextDetector(SemanticModel sm) {
-            _semanticModel = sm;
-            ILoggerFactory loggerFactory = DIContainer.GetService<ILoggerFactory>();
+            semanticModel = sm;
 
-            logger = loggerFactory.CreateLogger(nameof(AsyncDiscordContextDetector), b => b.WithNoTargets());
+            ILoggerFactory loggerFactory = DIContainer.GetService<ILoggerFactory>();
+            logger = loggerFactory.CreateLogger<AsyncDiscordContextDetector>();
         }
 
         public async Task<DiscordCompletionContext> ExecuteAsync(SyntaxNode node) {
-            _currNode = node.Parent;
-            if (_currNode.IsKind(SyntaxKind.NumericLiteralExpression))
-                _currNode = _currNode.Parent;
+            currentNode = node.Parent;
+            if (currentNode.IsKind(SyntaxKind.NumericLiteralExpression))
+                currentNode = currentNode.Parent;
 
-            for (int i = 0; i < MAXRECURSION && !(_currNode is BlockSyntax) && _currNode != null; i++) {
-                if (_currNode is ExpressionSyntax)
-                    await ResolveNodeAsync(_currNode);
-
-                if (_hasContext)
-                    return _context;
+            for (int i = 0; i < MAXRECURSION && !(currentNode is BlockSyntax) && currentNode != null; i++) {
+                if (currentNode is ExpressionSyntax || currentNode is AttributeSyntax)
+                    await ResolveNodeAsync(currentNode);
+                
+                if (hasContext)
+                    return context;
             }
 
             return DiscordCompletionContext.Undefined;
@@ -70,11 +70,17 @@ namespace Discord.NET.SupportExtension.Core.ContextDetector {
                 case SwitchStatementSyntax switchStatement:
                     await ResolveNodeAsync(switchStatement.Expression);
                     break;
+                case AttributeArgumentListSyntax attributeArgument:
+                    await ResolveNodeAsync(attributeArgument.Parent);
+                    break;
+                case AttributeSyntax attribute:
+                    await ResolveNodeAsync(attribute.Name);
+                    break;
             }
         }
 
         private void CheckForContext(ExpressionSyntax expression) {
-            INamedTypeSymbol contextTypeSymbol = _semanticModel.GetTypeInfo(expression).Type as INamedTypeSymbol;
+            INamedTypeSymbol contextTypeSymbol = semanticModel.GetTypeInfo(expression).Type as INamedTypeSymbol;
 
             if (contextTypeSymbol?.Name == "Task") // Overwrite symbol with generic type
                 contextTypeSymbol = contextTypeSymbol.TypeArguments[0] as INamedTypeSymbol;
@@ -85,18 +91,18 @@ namespace Discord.NET.SupportExtension.Core.ContextDetector {
             // Set context with found interface
             if (DiscordNameCollection.Contains(contextTypeSymbol.ToDisplayString())) {
                 SetContext(contextTypeSymbol);
-                _hasContext = true;
+                hasContext = true;
                 return;
             }
 
             // If interface not found check inheritance 
             foreach (INamedTypeSymbol interfaceSymbol in contextTypeSymbol.AllInterfaces) {
                 SetContext(interfaceSymbol);
-                if (_context != DiscordCompletionContext.Undefined) {
-                    if (_context == DiscordCompletionContext.Channel)
+                if (context != DiscordCompletionContext.Undefined) {
+                    if (context == DiscordCompletionContext.Channel)
                         HandleChannelType(contextTypeSymbol);
 
-                    _hasContext = true;
+                    hasContext = true;
                     return;
                 }
             }
@@ -105,16 +111,20 @@ namespace Discord.NET.SupportExtension.Core.ContextDetector {
         private void SetContext(ITypeSymbol interfaceSymbol) {
             switch (interfaceSymbol.ToDisplayString()) {
                 case DiscordNameCollection.IGUILD:
-                    _context = DiscordCompletionContext.Server;
+                case DiscordNameCollection.SERVERID:
+                case DiscordNameCollection.SERVERIDLIST:
+                case DiscordNameCollection.SERVERNAME:
+                case DiscordNameCollection.SERVERNAMELIST:
+                    context = DiscordCompletionContext.Server;
                     break;
                 case DiscordNameCollection.IUSER:
-                    _context = DiscordCompletionContext.User;
+                    context = DiscordCompletionContext.User;
                     break;
                 case DiscordNameCollection.IROLE:
-                    _context = DiscordCompletionContext.Role;
+                    context = DiscordCompletionContext.Role;
                     break;
                 case DiscordNameCollection.ICHANNEL:
-                    _context = DiscordCompletionContext.Channel;
+                    context = DiscordCompletionContext.Channel;
                     break;
             }
         }
