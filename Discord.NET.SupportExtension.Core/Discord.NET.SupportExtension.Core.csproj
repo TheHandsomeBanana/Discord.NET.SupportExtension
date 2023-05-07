@@ -151,6 +151,10 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\HB\HB.NETF.Code.Analysis\HB.NETF.Code.Analysis.csproj">
+      <Project>{41c3c462-030e-45c3-8c92-48175905c624}</Project>
+      <Name>HB.NETF.Code.Analysis</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\HB\HB.NETF.Common\HB.NETF.Common.csproj">
       <Project>{7A6DD6BD-D679-4AD7-94F6-4AE5189BF75A}</Project>
       <Name>HB.NETF.Common</Name>
