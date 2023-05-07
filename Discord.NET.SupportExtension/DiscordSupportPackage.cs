@@ -42,7 +42,7 @@ namespace Discord.NET.SupportExtension {
             callerTime = DateTime.Now;
 
             // Setup DI Container
-            // Needs to be in static ctor --> package instantiated after IntelliSense
+            // Needs to be in static ctor --> package instantiated after IntelliSense loadup
             DIBuilder builder = new DIBuilder();
             new Core.DIConfig().Configure(builder);
             new DIConfig().Configure(builder);
@@ -69,7 +69,7 @@ namespace Discord.NET.SupportExtension {
             // Do any initialization that requires the UI thread after switching to the UI thread.
             await this.JoinableTaskFactory.SwitchToMainThreadAsync(cancellationToken);
             await GenerateServerImageConfigurationCommand.InitializeAsync(this);
-    await Discord.NET.SupportExtension.Commands.GenerateServerImageCommand.InitializeAsync(this);
+            await Discord.NET.SupportExtension.Commands.GenerateServerImageCommand.InitializeAsync(this);
         }
 
         #endregion

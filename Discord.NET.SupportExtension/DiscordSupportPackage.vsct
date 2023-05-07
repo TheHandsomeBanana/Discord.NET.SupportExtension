@@ -57,7 +57,7 @@
 					<ButtonText>Generate Server Image</ButtonText>
 				</Strings>
 			</Button>
-			<Button guid="CommandSet" id="GenerateServerImageConfigurationCommand" priority="0x010" type="Button">
+			<Button guid="CommandSet" id="GenerateServerImageConfigurationCommand" priority="0x0200" type="Button">
 				<Parent guid="GroupSet" id="CSharpProjectMenuGroup" />
 				<Icon guid="discordImages" id="bmpPic1" />
 				<Strings>
@@ -74,7 +74,6 @@
             inside a button definition. An important aspect of this declaration is that the element id
             must be the actual index (1-based) of the bitmap inside the bitmap strip. -->
 			<Bitmap guid="discordImages" href="Resources\discordicon_black_16.png" />
-			<Bitmap guid="guidImages" href="Commands\Resources\GenerateServerImageCommand.png" usedList="bmpPic1, bmpPic2, bmpPicSearch, bmpPicX, bmpPicArrows, bmpPicStrikethrough" />
 		</Bitmaps>
 	</Commands>
 

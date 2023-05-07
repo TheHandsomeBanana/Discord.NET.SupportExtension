@@ -1,8 +1,8 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <PackageManifest Version="2.0.0" xmlns="http://schemas.microsoft.com/developer/vsx-schema/2011" xmlns:d="http://schemas.microsoft.com/developer/vsx-schema-design/2011">
     <Metadata>
-        <Identity Id="DiscordSupportExtension.MEF.01ca41c6-ea50-403a-9f05-2a2359a76d03" Version="1.0" Language="en-US" Publisher="Merwa Stefan" />
-        <DisplayName>DiscordSupportExtension.MEF</DisplayName>
+        <Identity Id="Discord.NET.SupportExtension.Mef.01ca41c6-ea50-403a-9f05-2a2359a76d03" Version="1.0" Language="en-US" Publisher="Merwa Stefan" />
+        <DisplayName>Discord.NET.SupportExtension.Mef</DisplayName>
         <Description>Empty VSIX Project.</Description>
     </Metadata>
     <Installation>

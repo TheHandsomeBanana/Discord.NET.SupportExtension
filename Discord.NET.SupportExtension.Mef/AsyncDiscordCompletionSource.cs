@@ -21,6 +21,7 @@ using System.Collections.Immutable;
 using Discord.NET.SupportExtension.Core.Interface;
 using HB.NETF.Common.DependencyInjection;
 using HB.NETF.Services.Logging;
+using HB.NETF.Services.Logging.Factory;
 
 namespace Discord.NET.SupportExtension.MEF {
     internal class AsyncDiscordCompletionSource : IAsyncCompletionSource {
@@ -38,10 +39,12 @@ namespace Discord.NET.SupportExtension.MEF {
             if (document == null)
                 return default;
 
-            ILogger logger = DIContainer.ServiceProvider.GetService(typeof(ILogger)) as ILogger;
-            if (logger == null) // Logger not present => IntelliSense crash
+            ILoggerFactory loggerFactory = DIContainer.GetService<ILoggerFactory>();
+            if (loggerFactory == null) // LoggerFactory not present => Extension crash
                 return default;
-            
+
+            ILogger<AsyncDiscordCompletionSource> logger = loggerFactory.CreateLogger<AsyncDiscordCompletionSource>();
+
             IAsyncDiscordCompletionEngine engine = DIContainer.ServiceProvider.GetService(typeof(IAsyncDiscordCompletionEngine)) as IAsyncDiscordCompletionEngine;            
 
             try {
