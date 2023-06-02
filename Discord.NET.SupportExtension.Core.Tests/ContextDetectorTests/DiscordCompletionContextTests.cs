@@ -10,18 +10,18 @@ using System.Threading.Tasks;
 namespace Discord.NET.SupportExtension.Core.Tests.ContextDetectorTests {
     [TestClass]
     public class DiscordCompletionContextTests : TestBase {
-        private DiscordCompletionContextTestEngine _discordCaseTestEngine;
-        private DiscordChannelContextTestEngine _discordContextChannelTestEngine;
+        private DiscordCompletionContextTestEngine completionContextTests;
+        private DiscordChannelContextTestEngine channelContextTests;
 
         [TestInitialize]
         public void Initialize() {
-            _discordCaseTestEngine = new DiscordCompletionContextTestEngine(@"P:\DEPRECATED_Projects\DiscordISCaseTester\DiscordCaseTester.sln", "DiscordISCaseTester");
-            _discordContextChannelTestEngine = new DiscordChannelContextTestEngine(@"P:\DEPRECATED_Projects\DiscordISCaseTester\DiscordCaseTester.sln", "DiscordISCaseTester");
+            completionContextTests = new DiscordCompletionContextTestEngine(@"P:\Projects\DOTNET\TestSolution\TestSolution.sln", "DiscordSupportExtensionTestCases");
+            channelContextTests = new DiscordChannelContextTestEngine(@"P:\Projects\DOTNET\TestSolution\TestSolution.sln", "DiscordSupportExtensionTestCases");
         }
 
         [TestMethod] // Special Test for Channel Type Detection
         public async Task ChannelContextTests() {
-            _discordContextChannelTestEngine.Add("ChannelFindings.cs")
+            channelContextTests.Add("ChannelFindings.cs")
                         .Add("0", DiscordChannelContext.Guild)
                         .Add("1", DiscordChannelContext.Guild)
                         .Add("2", DiscordChannelContext.Text)
@@ -36,7 +36,7 @@ namespace Discord.NET.SupportExtension.Core.Tests.ContextDetectorTests {
                         .Add("11", DiscordChannelContext.Forum)
                         .Add("12", DiscordChannelContext.Text);
 
-            await _discordContextChannelTestEngine.RunEngineAsync();
+            await channelContextTests.RunEngineAsync();
         }
 
 
@@ -46,35 +46,35 @@ namespace Discord.NET.SupportExtension.Core.Tests.ContextDetectorTests {
 
         [TestMethod]
         public async Task GuildTests() {
-            _discordCaseTestEngine.Add("GuildFindings.cs", DiscordCompletionContext.Server)
+            completionContextTests.Add("GuildFindings.cs", DiscordCompletionContext.Server)
                 .Add("0").Add("1").Add("2").Add("3").Add("4").Add("5").Add("6").Add("7").Add("8").Add("9").Add("10")
                 .Add("11").Add("12").Add("13").Add("14").Add("15").Add("16").Add("17").Add("18").Add("19");
 
-            await _discordCaseTestEngine.RunEngineAsync();
+            await completionContextTests.RunEngineAsync();
         }
 
         [TestMethod]
         public async Task UserTests() {
-            _discordCaseTestEngine.Add("UserFindings.cs", DiscordCompletionContext.User)
+            completionContextTests.Add("UserFindings.cs", DiscordCompletionContext.User)
                 .Add("0").Add("1").Add("2").Add("3").Add("4").Add("5");
 
-            await _discordCaseTestEngine.RunEngineAsync();
+            await completionContextTests.RunEngineAsync();
         }
 
         [TestMethod]
         public async Task RoleTests() {
-            _discordCaseTestEngine.Add("RoleFindings.cs", DiscordCompletionContext.Role)
+            completionContextTests.Add("RoleFindings.cs", DiscordCompletionContext.Role)
                 .Add("1").Add("2").Add("3").Add("4").Add("5").Add("6");
 
-            await _discordCaseTestEngine.RunEngineAsync();
+            await completionContextTests.RunEngineAsync();
         }
 
         [TestMethod]
         public async Task ChannelTests() {
-            _discordCaseTestEngine.Add("ChannelFindings.cs", DiscordCompletionContext.Channel)
+            completionContextTests.Add("ChannelFindings.cs", DiscordCompletionContext.Channel)
                 .Add("0").Add("1").Add("2").Add("3").Add("4").Add("5").Add("6");
 
-            await _discordCaseTestEngine.RunEngineAsync();
+            await completionContextTests.RunEngineAsync();
         }
     }
 }

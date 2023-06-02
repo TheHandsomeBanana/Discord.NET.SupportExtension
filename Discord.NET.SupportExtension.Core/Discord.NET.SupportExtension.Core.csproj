@@ -142,6 +142,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Analyser\AsyncDiscordContextAnalyser.cs" />
+    <Compile Include="Analyser\AsyncDiscordServerIdAnalyser.cs" />
     <Compile Include="AsyncDiscordCompletionEngine.cs" />
     <Compile Include="Completions\DiscordCompletionItem.cs" />
     <Compile Include="ContextDetector\AsyncDiscordContextDetector.cs" />
@@ -166,6 +167,14 @@
     <ProjectReference Include="..\..\HB\HB.NETF.Services.Logging\HB.NETF.Services.Logging.csproj">
       <Project>{B99CA5A1-866C-44ED-826D-DF14C4DF05CE}</Project>
       <Name>HB.NETF.Services.Logging</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\HB\HB.NETF.Services.Security\HB.NETF.Services.Security.csproj">
+      <Project>{884D9597-BFBB-41C0-BDCF-37D1EF0DDF3A}</Project>
+      <Name>HB.NETF.Services.Security</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\HB\HB.NETF.Services.Storage\HB.NETF.Services.Storage.csproj">
+      <Project>{04DDD1D4-FFBA-4854-A8B7-DBAE1203E5ED}</Project>
+      <Name>HB.NETF.Services.Storage</Name>
     </ProjectReference>
     <ProjectReference Include="..\Discord.NET.SupportExtension.Core.Interface\Discord.NET.SupportExtension.Core.Interface.csproj">
       <Project>{2a1e6d26-6f60-446c-9b0d-e04e7b3fe6d5}</Project>

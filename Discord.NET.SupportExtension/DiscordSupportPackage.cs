@@ -1,4 +1,5 @@
-﻿using Discord.NET.SupportExtension.Helper;
+﻿using Discord.NET.SupportExtension.Commands;
+using Discord.NET.SupportExtension.Helper;
 using HB.NETF.Common;
 using HB.NETF.Common.DependencyInjection;
 using HB.NETF.Discord.NET.Toolkit;
@@ -9,6 +10,7 @@ using HB.NETF.Services.Security.Cryptography.Interfaces;
 using HB.NETF.Services.Storage;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.VisualStudio.Shell;
+using Microsoft.VisualStudio.Shell.Interop;
 using System;
 using System.Runtime.InteropServices;
 using System.Threading;
@@ -35,24 +37,19 @@ namespace Discord.NET.SupportExtension {
     [PackageRegistration(UseManagedResourcesOnly = true, AllowsBackgroundLoading = true)]
     [Guid(PackageGuids.DiscordSupportPackageString)]
     [ProvideMenuResource("Menus.ctmenu", 1)]
+    [ProvideAutoLoad(UIContextGuids.SolutionExists, PackageAutoLoadFlags.BackgroundLoad)] // Auto load if solution exists
     public sealed class DiscordSupportPackage : AsyncPackage {
-        private static DateTime callerTime;
-
-        static DiscordSupportPackage() {
-            callerTime = DateTime.Now;
-
-            // Setup DI Container
-            // Needs to be in static ctor --> package instantiated after IntelliSense loadup
-            DIBuilder builder = new DIBuilder();
-            new Core.DIConfig().Configure(builder);
-            new DIConfig().Configure(builder);
-            DIContainer.BuildServiceProvider(builder);
-        }
-
-        public static string EventLogPath = DiscordEnvironment.LogPath + "\\" + callerTime.ToString("yyyy.MM.dd_HH.mm.ss") + ".log";
+        
+        public static string EventLogPath = DiscordEnvironment.LogPath + "\\" + DateTime.Now.ToString("yyyy.MM.dd_HHmmss") + ".log";
 
         public DiscordSupportPackage() {
             UIHelper.Package = this;
+
+            // Setup DI Container
+            DIBuilder builder = new DIBuilder();
+            new DIConfig().Configure(builder);
+            new Core.DIConfig().Configure(builder);
+            DIContainer.BuildServiceProvider(builder);
         }
 
         #region Package Members
@@ -68,8 +65,9 @@ namespace Discord.NET.SupportExtension {
             // When initialized asynchronously, the current thread may be a background thread at this point.
             // Do any initialization that requires the UI thread after switching to the UI thread.
             await this.JoinableTaskFactory.SwitchToMainThreadAsync(cancellationToken);
+            UIHelper.InitOutputLog();
             await GenerateServerImageConfigurationCommand.InitializeAsync(this);
-            await Discord.NET.SupportExtension.Commands.GenerateServerImageCommand.InitializeAsync(this);
+            await GenerateServerImageCommand.InitializeAsync(this);
         }
 
         #endregion

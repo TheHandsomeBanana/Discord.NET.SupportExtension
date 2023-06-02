@@ -9,7 +9,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Discord.NET.SupportExtension.MEF {
+namespace Discord.NET.SupportExtension.MEF.CompletionSource {
     [Export(typeof(IAsyncCompletionSourceProvider))]
     [ContentType("CSharp")]
     [Name("Discord Provider")]

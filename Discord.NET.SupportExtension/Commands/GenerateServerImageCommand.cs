@@ -1,4 +1,8 @@
-﻿using Microsoft.VisualStudio.Shell;
+﻿using Discord.NET.SupportExtension.Helper;
+using HB.NETF.Common.DependencyInjection;
+using HB.NETF.Discord.NET.Toolkit.DataService;
+using HB.NETF.Discord.NET.Toolkit.DataService.Models;
+using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 using System;
 using System.ComponentModel.Design;
@@ -70,18 +74,16 @@ namespace Discord.NET.SupportExtension.Commands {
         /// <param name="sender">Event sender.</param>
         /// <param name="e">Event args.</param>
         private void Execute(object sender, EventArgs e) {
-            ThreadHelper.ThrowIfNotOnUIThread();
-            string message = string.Format(CultureInfo.CurrentCulture, "Inside {0}.MenuItemCallback()", this.GetType().FullName);
-            string title = "GenerateServerImageCommand";
+            IDiscordDataServiceWrapper discordDataService = DIContainer.GetService<IDiscordDataServiceWrapper>();
+            discordDataService.BuildUp(new TokenModel("Banana Bot", "OTQ4NjcyNzU0MjcyNTgzNzIx.GRdeNy.IpVIt7L_lgFXGWMVHnP8O2DUhZ8ZHs5Qtfqln4", DateTime.Now));
 
-            // Show a message box to prove we were here
-            VsShellUtilities.ShowMessageBox(
-                this.package,
-                message,
-                title,
-                OLEMSGICON.OLEMSGICON_INFO,
-                OLEMSGBUTTON.OLEMSGBUTTON_OK,
-                OLEMSGDEFBUTTON.OLEMSGDEFBUTTON_FIRST);
+            package.JoinableTaskFactory.Run(async () => {
+                await discordDataService.DownloadDataAsync();
+            });
+
+
+            ThreadHelper.ThrowIfNotOnUIThread();
+            UIHelper.ShowInfo("Server Image generated.", "Success");
         }
     }
 }

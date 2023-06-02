@@ -10,7 +10,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Task = System.Threading.Tasks.Task;
 
-namespace Discord.NET.SupportExtension {
+namespace Discord.NET.SupportExtension.Commands {
     /// <summary>
     /// Command handler
     /// </summary>

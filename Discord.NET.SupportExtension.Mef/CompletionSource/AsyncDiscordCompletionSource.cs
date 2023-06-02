@@ -22,8 +22,10 @@ using Discord.NET.SupportExtension.Core.Interface;
 using HB.NETF.Common.DependencyInjection;
 using HB.NETF.Services.Logging;
 using HB.NETF.Services.Logging.Factory;
+using Microsoft.VisualStudio.Core.Imaging;
+using Discord.NET.SupportExtension.Mef;
 
-namespace Discord.NET.SupportExtension.MEF {
+namespace Discord.NET.SupportExtension.MEF.CompletionSource {
     internal class AsyncDiscordCompletionSource : IAsyncCompletionSource {
         private bool _isDisposed;
         public VisualStudioWorkspace VSWorkspace { get; set; }
@@ -45,7 +47,7 @@ namespace Discord.NET.SupportExtension.MEF {
 
             ILogger<AsyncDiscordCompletionSource> logger = loggerFactory.CreateLogger<AsyncDiscordCompletionSource>();
 
-            IAsyncDiscordCompletionEngine engine = DIContainer.ServiceProvider.GetService(typeof(IAsyncDiscordCompletionEngine)) as IAsyncDiscordCompletionEngine;            
+            IAsyncDiscordCompletionEngine engine = DIContainer.GetService<IAsyncDiscordCompletionEngine>();
 
             try {
                 Assumes.Present(engine);
@@ -54,7 +56,12 @@ namespace Discord.NET.SupportExtension.MEF {
 
                 IDiscordCompletionItem[] completions = await engine.ProcessCompletionAsync(VSWorkspace.CurrentSolution, semanticModel, triggerToken);
 
-                return new CompletionContext(completions.Select(e => new CompletionItem(GetCompletionItemDisplayName(e), this)).ToImmutableArray());
+                if (completions.Length > 0)
+                    logger.LogInformation($"{completions.Length} completions added.");
+
+                return new CompletionContext(completions.Select(e =>
+                    new CompletionItem(e.Id, this, DiscordImage, DiscordFilters, GetCompletionSuffix(e))).ToImmutableArray()
+                );
             }
             catch (Exception ex) {
                 logger.LogCritical("IntelliSense adaption failed. " + ex.ToString());
@@ -85,7 +92,8 @@ namespace Discord.NET.SupportExtension.MEF {
             }
         }
 
-        private string GetCompletionItemDisplayName(IDiscordCompletionItem item) => $"{item.Name} [{item.Id}] ({item.CompletionContext})";
-
+        private static readonly ImageElement DiscordImage = new ImageElement(new ImageId(PackageImageIds.discordImages, PackageImageIds.bmpPic1), "Discord");
+        private static readonly ImmutableArray<CompletionFilter> DiscordFilters = new CompletionFilter[] { new CompletionFilter("Discord", "D", DiscordImage) }.ToImmutableArray();
+        private string GetCompletionSuffix(IDiscordCompletionItem item) => $"[{item.Name}] ({item.CompletionContext})";
     }
 }

@@ -54,6 +54,7 @@
       <DependentUpon>DiscordSupportPackage.vsct</DependentUpon>
     </Compile>
     <Compile Include="Helper\UIHelper.cs" />
+    <Compile Include="Models\ConfigurationModel\ServerImageConfigurationModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="DiscordSupportPackage.cs" />
     <Compile Include="ViewModels\ConfigureServerImageViewModel.cs" />

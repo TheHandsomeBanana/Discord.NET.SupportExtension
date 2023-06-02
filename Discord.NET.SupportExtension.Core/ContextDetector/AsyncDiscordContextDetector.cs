@@ -13,12 +13,12 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace Discord.NET.SupportExtension.Core.ContextDetector {
-    internal class AsyncDiscordContextDetector : IAsyncCodeAnalyser<DiscordCompletionContext> {
+    internal class AsyncDiscordContextDetector : IAsyncCodeAnalyser<DiscordCompletionContext>, IAsyncNodeResolver {
         private SemanticModel SemanticModel;
 
         private ILogger<AsyncDiscordContextDetector> logger;
 
-        private const int MAXRECURSION = 5;
+        private const int MAXRECURSION = 2;
         private DiscordCompletionContext context;
         private bool hasContext;
         private SyntaxNode currentNode;
@@ -50,7 +50,7 @@ namespace Discord.NET.SupportExtension.Core.ContextDetector {
         }
 
         // Recursive node detection
-        private async Task ResolveNodeAsync(SyntaxNode node) {
+        public async Task ResolveNodeAsync(SyntaxNode node) {
             switch (node) {
                 case InvocationExpressionSyntax invocation:
                     CheckForContext(invocation);

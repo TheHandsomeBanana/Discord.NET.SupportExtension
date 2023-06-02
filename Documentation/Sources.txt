@@ -1,0 +1,2 @@
+Get VisualStudioWorkspace ==> https://stackoverflow.com/questions/24200125/how-to-get-workspace-from-visualstudioworkspace
+Async Completion API ==> https://github.com/microsoft/vs-editor-api/issues/9
