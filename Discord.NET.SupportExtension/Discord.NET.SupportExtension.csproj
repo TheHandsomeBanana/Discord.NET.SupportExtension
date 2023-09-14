@@ -54,7 +54,7 @@
       <DependentUpon>DiscordSupportPackage.vsct</DependentUpon>
     </Compile>
     <Compile Include="Helper\UIHelper.cs" />
-    <Compile Include="Models\ConfigurationModel\ServerImageConfigurationModel.cs" />
+    <Compile Include="Models\ConfigurationModel\ConfigureServerImageModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="DiscordSupportPackage.cs" />
     <Compile Include="ViewModels\ConfigureServerImageViewModel.cs" />
@@ -63,6 +63,30 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <Resource Include="Resources\ExitButton.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Content Include="Resources\Fonts\ABCGintoNord-Black.otf">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\Fonts\ABCGintoNord-Ultra.otf">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\Fonts\ABCGintoNord-Bold.otf">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\Fonts\ABCGintoNord-Medium.otf">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\Fonts\ABCGintoNord-Regular.otf">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\Fonts\ABCGintoNordVariable.ttf">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\Fonts\ABCGintoNormal-Black.otf">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <None Include="source.extension.vsixmanifest">
       <SubType>Designer</SubType>
     </None>
@@ -114,6 +138,10 @@
       <Project>{04ddd1d4-ffba-4854-a8b7-dbae1203e5ed}</Project>
       <Name>HB.NETF.Services.Storage</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\HB\HB.NETF.VisualStudio\HB.NETF.VisualStudio.csproj">
+      <Project>{f017e1b9-c8e3-4c09-bc41-4c6e6f8e7c98}</Project>
+      <Name>HB.NETF.VisualStudio</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\HB\HB.NETF.WPF\HB.NETF.WPF.csproj">
       <Project>{c77b5e3f-16f0-4bdf-993c-179b2adfd44b}</Project>
       <Name>HB.NETF.WPF</Name>
@@ -144,18 +172,66 @@
     </VSCTCompile>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Resources\discordicon_16.png" />
-    <Content Include="Resources\discordicon_256.png" />
-    <Content Include="Resources\discordicon_32.png" />
-    <Content Include="Resources\discordicon_48.png" />
-    <Content Include="Resources\discordicon_512.png" />
-    <Content Include="Resources\discordicon_black_16.png" />
-    <Content Include="Resources\discordicon_black_256.png" />
-    <Content Include="Resources\discordicon_black_32.png" />
-    <Content Include="Resources\discordicon_black_48.png" />
-    <Content Include="Resources\discordicon_black_512.png" />
+    <Resource Include="Resources\DataGeneratorBlack.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\DataGeneratorBlue.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\DataGeneratorWhite.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\discord-mark-blue.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\discord-mark-white.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\discordicon_16.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\discordicon_256.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\discordicon_32.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\discordicon_48.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\discordicon_512.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\discordicon_black_16.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\discordicon_black_256.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\discordicon_black_32.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\discordicon_black_48.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\discordicon_black_512.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\DiscordLogoTextBlue.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\DiscordLogoTextBlueOld.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\DiscordLogoTextWhite.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
   </ItemGroup>
   <ItemGroup>
+    <Page Include="Themes\Discord.NET.SupportExtension.Design.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Views\ConfigureServerImageView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

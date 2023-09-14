@@ -4,9 +4,102 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:Discord.NET.SupportExtension.Views"
-             mc:Ignorable="d" 
-             d:DesignHeight="450" d:DesignWidth="800" WindowStartupLocation="CenterScreen" SizeToContent="WidthAndHeight" WindowStyle="None">
+             Background="#313338" ResizeMode="NoResize" ShowInTaskbar="False" WindowStyle="None" Width="1280" Height="720"
+        Loaded="Window_Loaded">
+
+    <Window.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="pack://application:,,,/Discord.NET.SupportExtension;component/Themes/Discord.NET.SupportExtension.Design.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Window.Resources>
+
+
     <Grid>
-            
+        <Grid.RowDefinitions>
+            <RowDefinition Height="25*"/>
+            <RowDefinition Height="381*"/>
+            <RowDefinition Height="44*"/>
+        </Grid.RowDefinitions>
+
+        <Rectangle Fill="{StaticResource DiscordDark}" MouseLeftButtonDown="Rectangle_MouseLeftButtonDown" HorizontalAlignment="Center" Width="1280"/>
+        <Image Source="../Resources/DiscordLogoTextWhite.png" Margin="10,5,0,5" HorizontalAlignment="Left" Grid.Row="0" RenderOptions.BitmapScalingMode="HighQuality"/>
+        <Label HorizontalAlignment="Center" VerticalAlignment="Center" Content="Data Generator" FontFamily="ABC Ginto Nord Medium" Foreground="White" FontSize="20"/>
+        <Button Style="{StaticResource ExitButton}" Grid.Row="0" HorizontalAlignment="Right" 
+                        x:Name="btnExitGenerator"       
+                        Command="{Binding ExitCommand}">
+            <Image Source="../Resources/ExitButton.png" Margin="5 5 5 5"/>
+        </Button>
+
+
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center" Grid.Row="2">
+            <Button Style="{StaticResource CommandButton}" x:Name="btnGenerateData" Margin="0 0 5 0" Content="Generate"
+                    Command="{Binding GenerateCommand}">
+
+            </Button>
+            <Button Style="{StaticResource CommandButton}" x:Name="btnSave" Margin="10 0 5 0" Content="Save"
+                    Command="{Binding SaveCommand}">
+
+            </Button>
+            <Button Style="{StaticResource CommandButton}" x:Name="btnCancel" Margin="10 0 10 0" Content="Cancel"
+                    Command="{Binding ExitCommand}">
+
+            </Button>
+        </StackPanel>
+
+
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Grid.Row="1">
+            <Border BorderThickness="0 0 2 0" BorderBrush="{StaticResource DiscordDark}" Margin="0 20 0 0" Padding="10 5 10 10" Width="320">
+                <StackPanel Orientation="Vertical">
+                    <Label Style="{StaticResource HeadLabel}" Content="Settings" Margin="0 0 0 10"/>
+                    <CheckBox Name="cbSaveTokens" Style="{StaticResource CheckBoxLarge}" IsChecked="{Binding SaveTokens}" Margin="0,0,0,10">
+                        <TextBlock Text="Save Tokens"></TextBlock>
+                    </CheckBox>
+
+                    <ComboBox Name="cbxTokenEncryptionMethod" SelectedIndex="{Binding TokenEncryptionMethod}" Visibility="{Binding IsChecked, ElementName=cbSaveTokens, Converter={StaticResource b2v}}" Margin="0 0 0 10">
+                        <ComboBoxItem Name="cbiTokenDataProtectionAPI" Content="Windows Data Protection API">
+
+                        </ComboBoxItem>
+
+                        <ComboBoxItem Name="cbiTokenAESEncryption" Content="AES Encryption">
+
+                        </ComboBoxItem>
+                    </ComboBox>
+
+                    <StackPanel Orientation="Horizontal" Visibility="{Binding Path=TokenAESEncryptionPanelVisibility, FallbackValue=Collapsed}" Margin="0 0 0 10">
+                        <TextBox x:Name="tbTokenAESKey" Width="200" Margin="0 0 10 0">
+
+                        </TextBox>
+                        <Button Style="{StaticResource CommandButtonSmall}" Content="Create">
+
+                        </Button>
+                    </StackPanel>
+
+                    <CheckBox Name="cbEncryptData" Style="{StaticResource CheckBoxLarge}" IsChecked="{Binding EncryptData}" Margin="0,0,0,10">
+                        <TextBlock Text="Encrypt Data"></TextBlock>
+                    </CheckBox>
+
+                    <ComboBox Name="cbxDataEncryptionMethod" SelectedIndex="{Binding DataEncryptionMethod}" Visibility="{Binding IsChecked, ElementName=cbEncryptData, Converter={StaticResource b2v}}" Margin="0 0 0 10">
+                        <ComboBoxItem Name="cbiDataDataProtectionAPI" Content="Windows Data Protection API">
+
+                        </ComboBoxItem>
+
+                        <ComboBoxItem Name="cbiDataAESEncryption" Content="AES Encryption">
+
+                        </ComboBoxItem>
+                    </ComboBox>
+
+                    <StackPanel Orientation="Horizontal" Visibility="{Binding Path=DataAESEncryptionPanelVisibility, FallbackValue=Collapsed}" Margin="0 0 0 10">
+                        <TextBox x:Name="tbDataAESKey" Width="200" Margin="0 0 10 0">
+
+                        </TextBox>
+                        <Button Style="{StaticResource CommandButtonSmall}" Content="Create">
+
+                        </Button>
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+        </StackPanel>
     </Grid>
 </Window>

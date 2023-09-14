@@ -75,7 +75,7 @@ namespace Discord.NET.SupportExtension.Commands {
         /// <param name="e">Event args.</param>
         private void Execute(object sender, EventArgs e) {
             IDiscordDataServiceWrapper discordDataService = DIContainer.GetService<IDiscordDataServiceWrapper>();
-            discordDataService.BuildUp(new TokenModel("Banana Bot", "OTQ4NjcyNzU0MjcyNTgzNzIx.GRdeNy.IpVIt7L_lgFXGWMVHnP8O2DUhZ8ZHs5Qtfqln4", DateTime.Now));
+            discordDataService.BuildUp(new TokenModel("Banana Bot", "", DateTime.Now));
 
             package.JoinableTaskFactory.Run(async () => {
                 await discordDataService.DownloadDataAsync();

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using HB.NETF.WPF.Base.ViewModelBase;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -20,6 +21,22 @@ namespace Discord.NET.SupportExtension.Views {
     public partial class ConfigureServerImageView : Window {
         public ConfigureServerImageView() {
             InitializeComponent();
+        }
+
+        private void Rectangle_MouseLeftButtonDown(object sender, MouseButtonEventArgs e) {
+            this.DragMove();
+        }
+
+        private void Window_Loaded(object sender, RoutedEventArgs e) {
+            if(DataContext is ICloseableWindow vm) {
+                vm.Close += () => {
+                    this.Close();
+                };
+
+                Closing += (s, c) => {
+                    c.Cancel = !vm.CanClose();
+                };
+            }
         }
     }
 }

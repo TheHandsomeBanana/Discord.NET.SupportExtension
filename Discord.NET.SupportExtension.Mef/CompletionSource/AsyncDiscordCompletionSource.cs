@@ -24,6 +24,7 @@ using HB.NETF.Services.Logging;
 using HB.NETF.Services.Logging.Factory;
 using Microsoft.VisualStudio.Core.Imaging;
 using Discord.NET.SupportExtension.Mef;
+using HB.NETF.VisualStudio.Workspace;
 
 namespace Discord.NET.SupportExtension.MEF.CompletionSource {
     internal class AsyncDiscordCompletionSource : IAsyncCompletionSource {
@@ -32,8 +33,7 @@ namespace Discord.NET.SupportExtension.MEF.CompletionSource {
         public DocumentId DocumentIdentifier { get; set; }
 
         public AsyncDiscordCompletionSource() {
-            IComponentModel componentModel = (IComponentModel)Package.GetGlobalService(typeof(SComponentModel));
-            VSWorkspace = componentModel.GetService<VisualStudioWorkspace>();
+            VSWorkspace = WorkspaceHelper.GetVisualStudioWorkspace();
         }
 
         public async Task<CompletionContext> GetCompletionContextAsync(IAsyncCompletionSession session, CompletionTrigger trigger, SnapshotPoint triggerLocation, SnapshotSpan applicableToSpan, CancellationToken token) {
@@ -77,7 +77,7 @@ namespace Discord.NET.SupportExtension.MEF.CompletionSource {
         public CompletionStartData InitializeCompletion(CompletionTrigger trigger, SnapshotPoint triggerLocation, CancellationToken token) {
             ThreadHelper.ThrowIfNotOnUIThread(); // DTE access should only be done in main thread
             if (DocumentIdentifier == null) {
-                _DTE dte = Package.GetGlobalService(typeof(DTE)) as _DTE;
+                DTE dte = WorkspaceHelper.GetDTE();
                 if (dte?.ActiveDocument != null)
                     DocumentIdentifier = VSWorkspace.CurrentSolution.GetDocumentIdsWithFilePath(dte.ActiveDocument.FullName).FirstOrDefault();
             }

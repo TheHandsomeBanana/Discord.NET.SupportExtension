@@ -1,4 +1,5 @@
 ﻿using Discord.NET.SupportExtension.Helper;
+using Discord.NET.SupportExtension.Models.ConfigurationModel;
 using Discord.NET.SupportExtension.ViewModels;
 using Discord.NET.SupportExtension.Views;
 using Microsoft.VisualStudio.Shell;
@@ -73,7 +74,7 @@ namespace Discord.NET.SupportExtension.Commands {
         /// <param name="sender">Event sender.</param>
         /// <param name="e">Event args.</param>
         private void Execute(object sender, EventArgs e) {
-            ConfigureServerImageView view = new ConfigureServerImageView() { DataContext = new ConfigureServerImageViewModel() };
+            ConfigureServerImageView view = new ConfigureServerImageView() { DataContext = new ConfigureServerImageViewModel(new ConfigureServerImageModel()) };
             UIHelper.Show(view);
 
         }

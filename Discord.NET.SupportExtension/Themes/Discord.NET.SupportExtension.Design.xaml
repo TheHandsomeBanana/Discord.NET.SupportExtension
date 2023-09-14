@@ -1,0 +1,126 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <BooleanToVisibilityConverter x:Key="b2v"/>
+
+    <SolidColorBrush x:Key="DiscordBlurple" Color="#5865F2"/>
+    <SolidColorBrush x:Key="DiscordBlack" Color="#23272A"/>
+    <SolidColorBrush x:Key="DiscordRed" Color="#ED4245"/>
+    <SolidColorBrush x:Key="DiscordBlurpleOverlay" Color="#464C92"/>
+    <SolidColorBrush x:Key="DiscordDark" Color="#1E1F22"/>
+    <SolidColorBrush x:Key="DiscordText" Color="#DBDEE1"/>
+
+    <Style x:Key="ExitButton" TargetType="Button">
+        <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="Foreground" Value="Black"/>
+        <Setter Property="FontSize" Value="15"/>
+        <Setter Property="FontFamily" Value="SegoeUI"/>
+        <Setter Property="Height" Value="auto"/>
+        <Setter Property="Width" Value="60"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Border Background="{TemplateBinding Background}">
+                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+        <Style.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="Background" Value="{StaticResource DiscordRed}"/>
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+    <Style x:Key="CommandButton" TargetType="Button">
+        <Setter Property="Background" Value="{StaticResource DiscordBlurple}"/>
+        <Setter Property="Foreground" Value="{StaticResource DiscordText}"/>
+        <Setter Property="BorderBrush" Value="White"/>
+        <Setter Property="BorderThickness" Value="0"/>
+        <Setter Property="FontSize" Value="20"/>
+        <Setter Property="FontFamily" Value="SegoeUI"/>
+        <Setter Property="Height" Value="40"/>
+        <Setter Property="Width" Value="120"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Border Background="{TemplateBinding Background}" BorderThickness="{TemplateBinding BorderThickness}" BorderBrush="{TemplateBinding BorderBrush}">
+                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+        <Style.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="Background" Value="{StaticResource DiscordBlurpleOverlay}"/>
+            </Trigger>
+            <Trigger Property="IsPressed" Value="True">
+                <Setter Property="BorderThickness" Value="1"/>
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+    <Style x:Key="CommandButtonSmall" TargetType="Button">
+        <Setter Property="Background" Value="{StaticResource DiscordBlurple}"/>
+        <Setter Property="Foreground" Value="{StaticResource DiscordText}"/>
+        <Setter Property="BorderBrush" Value="White"/>
+        <Setter Property="BorderThickness" Value="0"/>
+        <Setter Property="FontSize" Value="15"/>
+        <Setter Property="FontFamily" Value="SegoeUI"/>
+        <Setter Property="Height" Value="25"/>
+        <Setter Property="Width" Value="80"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Border Background="{TemplateBinding Background}" BorderThickness="{TemplateBinding BorderThickness}" BorderBrush="{TemplateBinding BorderBrush}">
+                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+        <Style.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="Background" Value="{StaticResource DiscordBlurpleOverlay}"/>
+            </Trigger>
+            <Trigger Property="IsPressed" Value="True">
+                <Setter Property="BorderThickness" Value="1"/>
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+    <Style x:Key="CheckBoxLarge" TargetType="CheckBox">
+        <Style.Resources>
+            <Style TargetType="ContentPresenter">
+                <Setter Property="LayoutTransform">
+                    <Setter.Value>
+                        <ScaleTransform ScaleX="0.5" ScaleY="0.5" />
+                    </Setter.Value>
+                </Setter>
+            </Style>
+            <Style TargetType="Path">
+                <Setter Property="FlowDirection" Value="LeftToRight"/>
+            </Style>
+            <Style TargetType="TextBlock">
+                <Setter Property="FlowDirection" Value="LeftToRight"/>
+            </Style>
+        </Style.Resources>
+        <Setter Property="LayoutTransform">
+            <Setter.Value>
+                <ScaleTransform ScaleX="1.5" ScaleY="1.5"/>
+            </Setter.Value>
+        </Setter>
+
+        <!--<Setter Property="FlowDirection" Value="RightToLeft"/>-->
+        <Setter Property="Foreground" Value="{StaticResource DiscordText}"/>
+        <Setter Property="FontSize" Value="20"/>
+        <Setter Property="VerticalContentAlignment" Value="Center"/>
+        <Setter Property="HorizontalAlignment" Value="Left"/>
+    </Style>
+
+    <Style x:Key="HeadLabel" TargetType="Label">
+        <Setter Property="FontSize" Value="20"/>
+        <Setter Property="Foreground" Value="White"/>
+        <Setter Property="Padding" Value="0 5 0 5"/>
+    </Style>
+</ResourceDictionary>

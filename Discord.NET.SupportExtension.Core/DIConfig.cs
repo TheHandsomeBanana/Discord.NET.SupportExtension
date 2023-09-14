@@ -17,7 +17,7 @@ namespace Discord.NET.SupportExtension.Core {
     public class DIConfig : IDependencyConfig {
         public void Configure(DIBuilder builder) {
             builder.Services.AddSingleton<IAsyncDiscordCompletionEngine, AsyncDiscordCompletionEngine>()
-                .AddSingleton<ISimplifiedMemoryService, MemoryService>()
+                .AddSingleton<ISimplifiedSerializerService, SerializerServiceService>()
                 .AddSingleton<IGenCryptoService<SimplifiedDiscordDataModel>, AesCryptoService<SimplifiedDiscordDataModel>>()
                 .AddSingleton<IDiscordDataServiceWrapper, DiscordDataServiceWrapper>();
         }

@@ -91,6 +91,10 @@
       <Project>{b99ca5a1-866c-44ed-826d-df14c4df05ce}</Project>
       <Name>HB.NETF.Services.Logging</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\HB\HB.NETF.VisualStudio\HB.NETF.VisualStudio.csproj">
+      <Project>{f017e1b9-c8e3-4c09-bc41-4c6e6f8e7c98}</Project>
+      <Name>HB.NETF.VisualStudio</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Discord.NET.SupportExtension.Core.Interface\Discord.NET.SupportExtension.Core.Interface.csproj">
       <Project>{2A1E6D26-6F60-446C-9B0D-E04E7B3FE6D5}</Project>
       <Name>Discord.NET.SupportExtension.Core.Interface</Name>
