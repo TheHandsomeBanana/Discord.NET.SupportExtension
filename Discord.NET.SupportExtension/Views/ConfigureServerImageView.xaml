@@ -50,7 +50,7 @@
 
 
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Grid.Row="1">
-            <Border BorderThickness="0 0 2 0" BorderBrush="{StaticResource DiscordDark}" Margin="0 20 0 0" Padding="10 5 10 10" Width="320">
+            <Border BorderThickness="0 0 2 0" BorderBrush="{StaticResource DiscordDark}" Margin="0 20 0 0" Padding="10 5 10 10" Width="330">
                 <StackPanel Orientation="Vertical">
                     <Label Style="{StaticResource HeadLabel}" Content="Settings" Margin="0 0 0 10"/>
                     <CheckBox Name="cbSaveTokens" Style="{StaticResource CheckBoxLarge}" IsChecked="{Binding SaveTokens}" Margin="0,0,0,10">
@@ -67,11 +67,15 @@
                         </ComboBoxItem>
                     </ComboBox>
 
-                    <StackPanel Orientation="Horizontal" Visibility="{Binding Path=TokenAESEncryptionPanelVisibility, FallbackValue=Collapsed}" Margin="0 0 0 10">
-                        <TextBox x:Name="tbTokenAESKey" Width="200" Margin="0 0 10 0">
+                    <StackPanel Orientation="Horizontal" Visibility="{Binding Path=TokenAESEncryptionPanelVisibility}" Margin="0 0 0 10">
+                        <Border Style="{StaticResource TextBlockBorder}" Margin="0 0 10 0">
+                            <TextBlock x:Name="tbTokenAESKey" Style="{StaticResource StdText}" Width="200"
+                                   Text="{Binding TokenAESKey}" ToolTip="{Binding TokenAESKey}">
 
-                        </TextBox>
-                        <Button Style="{StaticResource CommandButtonSmall}" Content="Create">
+                            </TextBlock>
+                        </Border>
+
+                        <Button Style="{StaticResource CommandButtonSmall}" Command="{Binding CreateTokenAESKeyFileCommand}" Content="Create">
 
                         </Button>
                     </StackPanel>
@@ -90,11 +94,15 @@
                         </ComboBoxItem>
                     </ComboBox>
 
-                    <StackPanel Orientation="Horizontal" Visibility="{Binding Path=DataAESEncryptionPanelVisibility, FallbackValue=Collapsed}" Margin="0 0 0 10">
-                        <TextBox x:Name="tbDataAESKey" Width="200" Margin="0 0 10 0">
+                    <StackPanel Orientation="Horizontal" Visibility="{Binding Path=DataAESEncryptionPanelVisibility}" Margin="0 0 0 10">
+                        <Border Style="{StaticResource TextBlockBorder}" Margin="0 0 10 0">
 
-                        </TextBox>
-                        <Button Style="{StaticResource CommandButtonSmall}" Content="Create">
+                            <TextBlock x:Name="tbDataAESKey" Style="{StaticResource StdText}" Width="200"
+                                   Text="{Binding DataAESKey}" ToolTip="{Binding DataAESKey}">
+
+                            </TextBlock>
+                        </Border>
+                        <Button Style="{StaticResource CommandButtonSmall}" Command="{Binding CreateDataAESKeyFileCommand}" Content="Create">
 
                         </Button>
                     </StackPanel>

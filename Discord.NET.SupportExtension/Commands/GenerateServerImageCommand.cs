@@ -1,12 +1,18 @@
 ﻿using Discord.NET.SupportExtension.Helper;
+using Discord.NET.SupportExtension.Models.ConfigurationModel;
+using EnvDTE;
 using HB.NETF.Common.DependencyInjection;
+using HB.NETF.Common.Serialization;
 using HB.NETF.Discord.NET.Toolkit.DataService;
 using HB.NETF.Discord.NET.Toolkit.DataService.Models;
+using HB.NETF.Services.Storage;
+using HB.NETF.VisualStudio.Workspace;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 using System;
 using System.ComponentModel.Design;
 using System.Globalization;
+using System.IO.Ports;
 using System.Threading;
 using System.Threading.Tasks;
 using Task = System.Threading.Tasks.Task;
@@ -21,6 +27,9 @@ namespace Discord.NET.SupportExtension.Commands {
         /// </summary>
         private readonly AsyncPackage package;
 
+        private static ISimplifiedSerializerService serializerService;
+
+
         /// <summary>
         /// Initializes a new instance of the <see cref="GenerateServerImageCommand"/> class.
         /// Adds our command handlers for menu (commands must exist in the command table file)
@@ -34,24 +43,21 @@ namespace Discord.NET.SupportExtension.Commands {
             var menuCommandID = new CommandID(PackageGuids.CommandSet, PackageIds.GenerateServerImageCommand);
             var menuItem = new MenuCommand(this.Execute, menuCommandID);
             commandService.AddCommand(menuItem);
+
+            serializerService = DIContainer.GetService<ISimplifiedSerializerService>();
         }
 
         /// <summary>
         /// Gets the instance of the command.
         /// </summary>
-        public static GenerateServerImageCommand Instance {
-            get;
-            private set;
-        }
+        public static GenerateServerImageCommand Instance { get; private set; }
+
+
 
         /// <summary>
         /// Gets the service provider from the owner package.
         /// </summary>
-        private Microsoft.VisualStudio.Shell.IAsyncServiceProvider ServiceProvider {
-            get {
-                return this.package;
-            }
-        }
+        private Microsoft.VisualStudio.Shell.IAsyncServiceProvider ServiceProvider { get => this.package; }
 
         /// <summary>
         /// Initializes the singleton instance of the command.
@@ -64,6 +70,7 @@ namespace Discord.NET.SupportExtension.Commands {
 
             OleMenuCommandService commandService = await package.GetServiceAsync(typeof(IMenuCommandService)) as OleMenuCommandService;
             Instance = new GenerateServerImageCommand(package, commandService);
+
         }
 
         /// <summary>
@@ -74,10 +81,13 @@ namespace Discord.NET.SupportExtension.Commands {
         /// <param name="sender">Event sender.</param>
         /// <param name="e">Event args.</param>
         private void Execute(object sender, EventArgs e) {
-            IDiscordDataServiceWrapper discordDataService = DIContainer.GetService<IDiscordDataServiceWrapper>();
-            discordDataService.BuildUp(new TokenModel("Banana Bot", "", DateTime.Now));
 
             package.JoinableTaskFactory.Run(async () => {
+                ConfigureServerImageModel model = await serializerService.ReadAsync<ConfigureServerImageModel>(ConfigHelper.GetConfigPath(), SerializerMode.Json);
+
+                IDiscordDataServiceWrapper discordDataService = DIContainer.GetService<IDiscordDataServiceWrapper>();
+                discordDataService.BuildUp();
+
                 await discordDataService.DownloadDataAsync();
             });
 

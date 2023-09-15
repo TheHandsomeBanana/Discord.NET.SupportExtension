@@ -5,6 +5,7 @@ using HB.NETF.Discord.NET.Toolkit.DataService;
 using HB.NETF.Discord.NET.Toolkit.DataService.Models.Simplified;
 using HB.NETF.Services.Security.Cryptography;
 using HB.NETF.Services.Security.Cryptography.Interfaces;
+using HB.NETF.Services.Security.Cryptography.Keys;
 using HB.NETF.Services.Storage;
 using Microsoft.Extensions.DependencyInjection;
 using System;
@@ -17,8 +18,8 @@ namespace Discord.NET.SupportExtension.Core {
     public class DIConfig : IDependencyConfig {
         public void Configure(DIBuilder builder) {
             builder.Services.AddSingleton<IAsyncDiscordCompletionEngine, AsyncDiscordCompletionEngine>()
-                .AddSingleton<ISimplifiedSerializerService, SerializerServiceService>()
-                .AddSingleton<IGenCryptoService<SimplifiedDiscordDataModel>, AesCryptoService<SimplifiedDiscordDataModel>>()
+                .AddSingleton<ISimplifiedSerializerService, SerializerService>()
+                .AddSingleton<ICryptoService<AesKey>, AesCryptoService>()
                 .AddSingleton<IDiscordDataServiceWrapper, DiscordDataServiceWrapper>();
         }
     }

@@ -53,6 +53,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>DiscordSupportPackage.vsct</DependentUpon>
     </Compile>
+    <Compile Include="Helper\ConfigHelper.cs" />
     <Compile Include="Helper\UIHelper.cs" />
     <Compile Include="Models\ConfigurationModel\ConfigureServerImageModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
