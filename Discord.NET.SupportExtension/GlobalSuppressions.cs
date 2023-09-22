@@ -6,3 +6,4 @@
 using System.Diagnostics.CodeAnalysis;
 
 [assembly: SuppressMessage("Usage", "VSTHRD010:Invoke single-threaded types on Main thread", Justification = "<Pending>", Scope = "member", Target = "~M:Discord.NET.SupportExtension.Helper.UIHelper.Show(System.Windows.Window)")]
+[assembly: SuppressMessage("Usage", "VSTHRD010:Invoke single-threaded types on Main thread", Justification = "<Pending>", Scope = "member", Target = "~M:Discord.NET.SupportExtension.Commands.GenerateServerImageConfigurationCommand.Execute(System.Object,System.EventArgs)")]

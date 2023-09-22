@@ -8,6 +8,7 @@ using HB.NETF.Services.Data.Handler;
 using HB.NETF.Services.Logging;
 using HB.NETF.Services.Logging.Factory;
 using HB.NETF.VisualStudio.UI;
+using HB.NETF.VisualStudio.Workspace;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
@@ -90,8 +91,10 @@ namespace Discord.NET.SupportExtension.Commands {
             ConfigureServerImageModel model = new ConfigureServerImageModel();
 
             try {
-                if (File.Exists(ConfigHelper.GetConfigPath()))
+                if (File.Exists(ConfigHelper.GetConfigPath())) {
                     model = streamHandler.ReadFromFile<ConfigureServerImageModel>(ConfigHelper.GetConfigPath());
+                    logger.LogInformation($"Configuration found and loaded from " + SolutionHelper.GetCurrentProject().Name);
+                }
                 else
                     logger.LogInformation("No configuration file found. Window loaded with empty configuration.");
             }
