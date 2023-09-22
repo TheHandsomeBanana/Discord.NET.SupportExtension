@@ -34,7 +34,7 @@ namespace Discord.NET.SupportExtension.Core.Analyser {
 
         public AsyncDiscordServerIdAnalyser(SemanticModel semanticModel, SyntaxTree syntaxTree, Solution solution, Project project) {
             ILoggerFactory loggerFactory = DIContainer.GetService<ILoggerFactory>();
-            logger = loggerFactory.CreateLogger<AsyncDiscordServerIdAnalyser>();
+            logger = loggerFactory.GetOrCreateLogger<AsyncDiscordServerIdAnalyser>();
 
             this.semanticModel = semanticModel;
             this.syntaxTree = syntaxTree;

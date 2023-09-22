@@ -1,0 +1,57 @@
+﻿<Window x:Class="Discord.NET.SupportExtension.Views.KeyEntryView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:Discord.NET.SupportExtension.Views"
+             mc:Ignorable="d" 
+             Background="#313338" ResizeMode="NoResize" ShowInTaskbar="False" WindowStyle="None" Width="500" Height="150"
+        Loaded="Window_Loaded">
+
+    <Window.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="pack://application:,,,/Discord.NET.SupportExtension;component/Themes/Discord.NET.SupportExtension.Design.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Window.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="37*"/>
+            <RowDefinition Height="78*"/>
+            <RowDefinition Height="35*"/>
+        </Grid.RowDefinitions>
+        <Rectangle Fill="{StaticResource DiscordDark}" MouseLeftButtonDown="Rectangle_MouseLeftButtonDown" HorizontalAlignment="Center" Width="500"/>
+
+        <Image Source="../Resources/DiscordLogoTextWhite.png" Margin="10,5,0,5" HorizontalAlignment="Left" Grid.Row="0" RenderOptions.BitmapScalingMode="HighQuality" Width="89"/>
+        <Label HorizontalAlignment="Center" VerticalAlignment="Center" Content="Key Extractor" FontFamily="ABC Ginto Nord Medium" Foreground="White" FontSize="13" Height="28" Width="112"/>
+        <Button Style="{StaticResource SmallExitButton}" Grid.Row="0" HorizontalAlignment="Left" 
+                        x:Name="btnExitGenerator"       
+                        Command="{Binding ExitCommand}" Margin="460,0,0,0" Width="40">
+            <Image Source="../Resources/ExitButton.png" Margin="5 5 5 5"/>
+        </Button>
+
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Center" Grid.Row="2" Margin="290,0,0,0" Height="24" Width="200">
+            <Button Style="{StaticResource CommandButtonSmall}" x:Name="btnUseKey" Margin="10 0 0 0" Content="Extract"
+                    Command="{Binding ExtractCommand}">
+
+            </Button>
+            <Button Style="{StaticResource CommandButtonSmall}" x:Name="btnCancel" Margin="10 0 0 0" Content="Cancel"
+                    Command="{Binding ExitCommand}">
+
+            </Button>
+        </StackPanel>
+
+        <StackPanel Orientation="Vertical" Grid.Row="1" Margin="10,0,10,10">
+            <Label Style="{StaticResource SmallHeadLabel}" Content="{Binding Name}" Margin="5 0 5 10"/>
+            <StackPanel Orientation="Horizontal">
+                <TextBox Style="{StaticResource TextBox}" Width="380" Margin="0 0 10 0" 
+                         Text="{Binding KeyPath}" ToolTip="{Binding KeyPath}">
+
+                </TextBox>
+                <Button Style="{StaticResource CommandButtonSmall}" Command="{Binding BrowseKeyCommand}" Content="Browse"></Button>
+            </StackPanel>
+        </StackPanel>
+    </Grid>
+</Window>

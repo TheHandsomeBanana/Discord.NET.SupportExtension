@@ -1,6 +1,6 @@
 ﻿using Discord.NET.SupportExtension.Core.Completions;
 using Discord.NET.SupportExtension.Core.Interface;
-using HB.NETF.Discord.NET.Toolkit.DataService.Models.Simplified;
+using HB.NETF.Discord.NET.Toolkit.EntityService.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Discord.NET.SupportExtension.Core.Helper {
     internal static class CompletionHelper {
-        public static IDiscordCompletionItem ToCompletionItem(this DiscordItemModel item) {
+        public static IDiscordCompletionItem ToCompletionItem(this DiscordEntityModel item) {
             return new DiscordCompletionItem {
                 Name = item.Name,
                 CompletionContext = item.ItemModelType.ToCompletionContext(),

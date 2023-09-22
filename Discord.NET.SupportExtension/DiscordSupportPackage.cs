@@ -7,7 +7,7 @@ using HB.NETF.Services.Logging;
 using HB.NETF.Services.Logging.Factory;
 using HB.NETF.Services.Security.Cryptography;
 using HB.NETF.Services.Security.Cryptography.Interfaces;
-using HB.NETF.Services.Storage;
+using HB.NETF.VisualStudio.UI;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
@@ -65,7 +65,7 @@ namespace Discord.NET.SupportExtension {
             // When initialized asynchronously, the current thread may be a background thread at this point.
             // Do any initialization that requires the UI thread after switching to the UI thread.
             await this.JoinableTaskFactory.SwitchToMainThreadAsync(cancellationToken);
-            UIHelper.InitOutputLog();
+            UIHelper.InitOutputLog("Discord Support Extension");
             await GenerateServerImageConfigurationCommand.InitializeAsync(this);
             await GenerateServerImageCommand.InitializeAsync(this);
         }

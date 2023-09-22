@@ -50,31 +50,28 @@
 
 
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Grid.Row="1">
-            <Border BorderThickness="0 0 2 0" BorderBrush="{StaticResource DiscordDark}" Margin="0 20 0 0" Padding="10 5 10 10" Width="330">
+            <Border BorderThickness="0 0 2 0" BorderBrush="{StaticResource DiscordDark}" Margin="0 20 0 0" Padding="10 5 10 10" Width="325">
                 <StackPanel Orientation="Vertical">
                     <Label Style="{StaticResource HeadLabel}" Content="Settings" Margin="0 0 0 10"/>
                     <CheckBox Name="cbSaveTokens" Style="{StaticResource CheckBoxLarge}" IsChecked="{Binding SaveTokens}" Margin="0,0,0,10">
                         <TextBlock Text="Save Tokens"></TextBlock>
                     </CheckBox>
 
-                    <ComboBox Name="cbxTokenEncryptionMethod" SelectedIndex="{Binding TokenEncryptionMethod}" Visibility="{Binding IsChecked, ElementName=cbSaveTokens, Converter={StaticResource b2v}}" Margin="0 0 0 10">
-                        <ComboBoxItem Name="cbiTokenDataProtectionAPI" Content="Windows Data Protection API">
+                    <ComboBox Name="cbxTokenEncryptionMethod" ItemsSource="{Binding EncryptionModeValues}" SelectedItem="{Binding TkenEncryptionMode}" Visibility="{Binding IsChecked, ElementName=cbSaveTokens, Converter={StaticResource b2v}}" Margin="0 0 0 10">
+                        <!--<ComboBoxItem Name="cbiTokenDataProtectionAPI" Content="Windows Data Protection API">
 
                         </ComboBoxItem>
 
                         <ComboBoxItem Name="cbiTokenAESEncryption" Content="AES Encryption">
 
-                        </ComboBoxItem>
+                        </ComboBoxItem>-->
                     </ComboBox>
 
                     <StackPanel Orientation="Horizontal" Visibility="{Binding Path=TokenAESEncryptionPanelVisibility}" Margin="0 0 0 10">
-                        <Border Style="{StaticResource TextBlockBorder}" Margin="0 0 10 0">
-                            <TextBlock x:Name="tbTokenAESKey" Style="{StaticResource StdText}" Width="200"
-                                   Text="{Binding TokenAESKey}" ToolTip="{Binding TokenAESKey}">
+                        <TextBlock x:Name="tbTokenAESKey" Style="{StaticResource TextBlock}" Width="200" Margin="0 0 10 0"
+                                   Text="{Binding TokenAESKey}" ToolTip="{Binding TokenAESKey}" >
 
-                            </TextBlock>
-                        </Border>
-
+                        </TextBlock>
                         <Button Style="{StaticResource CommandButtonSmall}" Command="{Binding CreateTokenAESKeyFileCommand}" Content="Create">
 
                         </Button>
@@ -84,30 +81,31 @@
                         <TextBlock Text="Encrypt Data"></TextBlock>
                     </CheckBox>
 
-                    <ComboBox Name="cbxDataEncryptionMethod" SelectedIndex="{Binding DataEncryptionMethod}" Visibility="{Binding IsChecked, ElementName=cbEncryptData, Converter={StaticResource b2v}}" Margin="0 0 0 10">
-                        <ComboBoxItem Name="cbiDataDataProtectionAPI" Content="Windows Data Protection API">
+                    <ComboBox Name="cbxDataEncryptionMethod" ItemsSource="{Binding EncryptionModeValues}" SelectedItem="{Binding DataEncryptionMode}" Visibility="{Binding IsChecked, ElementName=cbEncryptData, Converter={StaticResource b2v}}" Margin="0 0 0 10">
+                        <!--<ComboBoxItem Name="cbiDataDataProtectionAPI" Content="Windows Data Protection API">
 
                         </ComboBoxItem>
 
                         <ComboBoxItem Name="cbiDataAESEncryption" Content="AES Encryption">
 
-                        </ComboBoxItem>
+                        </ComboBoxItem>-->
                     </ComboBox>
 
                     <StackPanel Orientation="Horizontal" Visibility="{Binding Path=DataAESEncryptionPanelVisibility}" Margin="0 0 0 10">
-                        <Border Style="{StaticResource TextBlockBorder}" Margin="0 0 10 0">
-
-                            <TextBlock x:Name="tbDataAESKey" Style="{StaticResource StdText}" Width="200"
+                        <TextBlock x:Name="tbDataAESKey" Style="{StaticResource TextBlock}" Width="200" Margin="0 0 10 0"
                                    Text="{Binding DataAESKey}" ToolTip="{Binding DataAESKey}">
 
-                            </TextBlock>
-                        </Border>
+                        </TextBlock>
                         <Button Style="{StaticResource CommandButtonSmall}" Command="{Binding CreateDataAESKeyFileCommand}" Content="Create">
 
                         </Button>
                     </StackPanel>
                 </StackPanel>
             </Border>
+
+            <ListView Margin="0 20 0 0" ItemsSource="{Binding Tokens}" SelectedIndex="{Binding SelectedTokenIndex}">
+                
+            </ListView>
         </StackPanel>
     </Grid>
 </Window>

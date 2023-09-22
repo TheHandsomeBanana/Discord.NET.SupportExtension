@@ -9,6 +9,7 @@
     <SolidColorBrush x:Key="DiscordBlurpleOverlay" Color="#464C92"/>
     <SolidColorBrush x:Key="DiscordDark" Color="#1E1F22"/>
     <SolidColorBrush x:Key="DiscordText" Color="#DBDEE1"/>
+    <SolidColorBrush x:Key="DiscordTextBox" Color="#383A40"/>
 
     <Style x:Key="ExitButton" TargetType="Button">
         <Setter Property="Background" Value="Transparent"/>
@@ -31,6 +32,10 @@
                 <Setter Property="Background" Value="{StaticResource DiscordRed}"/>
             </Trigger>
         </Style.Triggers>
+    </Style>
+
+    <Style x:Key="SmallExitButton" BasedOn="{StaticResource ExitButton}" TargetType="Button">
+        <Setter Property="Width" Value="40"/>
     </Style>
 
     <Style x:Key="CommandButton" TargetType="Button">
@@ -124,9 +129,15 @@
         <Setter Property="Padding" Value="0 5 0 5"/>
     </Style>
 
-    <Style x:Key="StdText" TargetType="TextBlock">
+    <Style x:Key="SmallHeadLabel" TargetType="Label" BasedOn="{StaticResource HeadLabel}">
+        <Setter Property="FontSize" Value="16"/>
+    </Style>
+
+    <Style x:Key="TextBlock" TargetType="TextBlock">
         <Setter Property="FontSize" Value="12"/>
-        <Setter Property="Foreground" Value="White"/>
+        <Setter Property="Background" Value="{StaticResource DiscordTextBox}"/>
+        <Setter Property="Foreground" Value="{StaticResource DiscordText}"/>
+        <Setter Property="Padding" Value="4"/>
     </Style>
 
     <Style x:Key="TextBlockBorder" TargetType="Border">
@@ -137,4 +148,14 @@
         <Setter Property="BorderThickness" Value="1"/>
         <Setter Property="Background" Value="{StaticResource DiscordDark}"/>
     </Style>
+
+    <Style x:Key="TextBox" TargetType="TextBox">
+        <Setter Property="Background" Value="{StaticResource DiscordTextBox}"/>
+        <Setter Property="Foreground" Value="{StaticResource DiscordText}"/>
+        <Setter Property="BorderThickness" Value="0"/>
+        <Setter Property="HorizontalContentAlignment" Value="Left"/>
+        <Setter Property="VerticalContentAlignment" Value="Center"/>
+        <Setter Property="FontSize" Value="12"/>
+    </Style>
+    
 </ResourceDictionary>

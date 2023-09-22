@@ -53,14 +53,24 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>DiscordSupportPackage.vsct</DependentUpon>
     </Compile>
+    <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="Helper\ConfigHelper.cs" />
-    <Compile Include="Helper\UIHelper.cs" />
-    <Compile Include="Models\ConfigurationModel\ConfigureServerImageModel.cs" />
+    <Compile Include="Models\VMModels\ConfigureServerImageModel.cs" />
+    <Compile Include="Models\VMModels\KeyEntryModel.cs" />
+    <Compile Include="Models\VMModels\TokenEntryModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="DiscordSupportPackage.cs" />
     <Compile Include="ViewModels\ConfigureServerImageViewModel.cs" />
+    <Compile Include="ViewModels\KeyEntryViewModel.cs" />
+    <Compile Include="ViewModels\TokenEntryViewModel.cs" />
     <Compile Include="Views\ConfigureServerImageView.xaml.cs">
       <DependentUpon>ConfigureServerImageView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\KeyEntryView.xaml.cs">
+      <DependentUpon>KeyEntryView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\TokenEntryView.xaml.cs">
+      <DependentUpon>TokenEntryView.xaml</DependentUpon>
     </Compile>
   </ItemGroup>
   <ItemGroup>
@@ -127,6 +137,10 @@
       <Project>{35cfc0bf-8442-43cc-9f30-695e19532aee}</Project>
       <Name>HB.NETF.Discord.NET.Toolkit</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\HB\HB.NETF.Services.Data\HB.NETF.Services.Data.csproj">
+      <Project>{029481ce-57e0-4c7f-aa97-871d3f4c0f07}</Project>
+      <Name>HB.NETF.Services.Data</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\HB\HB.NETF.Services.Logging\HB.NETF.Services.Logging.csproj">
       <Project>{b99ca5a1-866c-44ed-826d-df14c4df05ce}</Project>
       <Name>HB.NETF.Services.Logging</Name>
@@ -134,10 +148,6 @@
     <ProjectReference Include="..\..\HB\HB.NETF.Services.Security\HB.NETF.Services.Security.csproj">
       <Project>{884d9597-bfbb-41c0-bdcf-37d1ef0ddf3a}</Project>
       <Name>HB.NETF.Services.Security</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\HB\HB.NETF.Services.Storage\HB.NETF.Services.Storage.csproj">
-      <Project>{04ddd1d4-ffba-4854-a8b7-dbae1203e5ed}</Project>
-      <Name>HB.NETF.Services.Storage</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\HB\HB.NETF.VisualStudio\HB.NETF.VisualStudio.csproj">
       <Project>{f017e1b9-c8e3-4c09-bc41-4c6e6f8e7c98}</Project>
@@ -234,6 +244,14 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\ConfigureServerImageView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\KeyEntryView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\TokenEntryView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

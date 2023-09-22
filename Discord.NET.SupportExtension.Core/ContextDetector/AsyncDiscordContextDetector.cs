@@ -30,7 +30,7 @@ namespace Discord.NET.SupportExtension.Core.ContextDetector {
             semanticModel = sm;
 
             ILoggerFactory loggerFactory = DIContainer.GetService<ILoggerFactory>();
-            logger = loggerFactory.CreateLogger<AsyncDiscordContextDetector>();
+            logger = loggerFactory.GetOrCreateLogger<AsyncDiscordContextDetector>();
         }
 
         public async Task<DiscordCompletionContext> ExecuteAsync(SyntaxNode node) {

@@ -45,7 +45,7 @@ namespace Discord.NET.SupportExtension.MEF.CompletionSource {
             if (loggerFactory == null) // LoggerFactory not present => Extension crash
                 return default;
 
-            ILogger<AsyncDiscordCompletionSource> logger = loggerFactory.CreateLogger<AsyncDiscordCompletionSource>();
+            ILogger<AsyncDiscordCompletionSource> logger = loggerFactory.GetOrCreateLogger<AsyncDiscordCompletionSource>();
 
             IAsyncDiscordCompletionEngine engine = DIContainer.GetService<IAsyncDiscordCompletionEngine>();
 
