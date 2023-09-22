@@ -43,15 +43,15 @@ namespace Discord.NET.SupportExtension.ViewModels {
     public class ConfigureServerImageViewModel : ViewModelBase, ICloseableWindow {
 
         #region Bindings
-        public ICommand GenerateCommand { get; }
-        public ICommand SaveCommand { get; }
-        public ICommand ExitCommand { get; }
-        public ICommand CreateDataAESKeyFileCommand { get; }
-        public ICommand CreateTokenAESKeyFileCommand { get; }
-        public ICommand LoadTokensCommand { get; }
-        public ICommand AddTokenCommand { get; }
-        public ICommand RemoveTokenCommand { get; }
-        public ICommand EditTokenCommand { get; }
+        public RelayCommand GenerateCommand { get; }
+        public RelayCommand SaveCommand { get; }
+        public RelayCommand ExitCommand { get; }
+        public RelayCommand CreateDataAESKeyFileCommand { get; }
+        public RelayCommand CreateTokenAESKeyFileCommand { get; }
+        public RelayCommand LoadTokensCommand { get; }
+        public RelayCommand AddTokenCommand { get; }
+        public RelayCommand RemoveTokenCommand { get; }
+        public RelayCommand EditTokenCommand { get; }
 
         #region UI Only
         private string dataAESKey;
@@ -84,9 +84,9 @@ namespace Discord.NET.SupportExtension.ViewModels {
                 OnPropertyChanged(nameof(EncryptData));
 
                 if (value)
-                    DataEncryptionMethod = 0;
+                    DataEncryptionMode = 0;
                 else
-                    DataEncryptionMethod = -1;
+                    DataEncryptionMode = null;
             }
         }
 
@@ -97,9 +97,9 @@ namespace Discord.NET.SupportExtension.ViewModels {
                 OnPropertyChanged(nameof(SaveTokens));
 
                 if (value)
-                    TokenEncryptionMethod = 0;
+                    TokenEncryptionMode = 0;
                 else
-                    TokenEncryptionMethod = -1;
+                    TokenEncryptionMode = null;
             }
         }
 
@@ -111,7 +111,7 @@ namespace Discord.NET.SupportExtension.ViewModels {
             set {
                 dataAESEncryptionPanelVisibility = value;
                 OnPropertyChanged(nameof(DataAESEncryptionPanelVisibility));
-                CreateDataAESKeyFileCommand.CanExecute(null);
+                CreateDataAESKeyFileCommand.OnCanExecuteChanged();
             }
         }
 
@@ -122,36 +122,13 @@ namespace Discord.NET.SupportExtension.ViewModels {
             set {
                 tokenAESEncryptionPanelVisibility = value;
                 OnPropertyChanged(nameof(TokenAESEncryptionPanelVisibility));
-                CreateDataAESKeyFileCommand.CanExecute(null);
+                CreateDataAESKeyFileCommand.OnCanExecuteChanged();
             }
         }
 
-        private Identifier<AesKey> dataKey;
-        public int DataEncryptionMethod {
-            get {
-                if (model.DataEncryptionMode == null)
-                    return -1;
+        public Array EncryptionModeValues => Enum.GetValues(typeof(EncryptionMode));
 
-                return (int)model.DataEncryptionMode;
-            }
-            set {
-                model.DataEncryptionMode = (EncryptionMode)value;
-                OnPropertyChanged(nameof(DataEncryptionMethod));
-
-                if (model.DataEncryptionMode == EncryptionMode.AES && EncryptData) {
-                    DataAESEncryptionPanelVisibility = Visibility.Visible;
-                    dataKey = identifierFactory.CreateIdentifier(aesCryptoService.GenerateKey(256));
-                    DataAESKey = Convert.ToBase64String(dataKey.Reference.Key);
-                }
-                else {
-                    DataAESEncryptionPanelVisibility = Visibility.Collapsed;
-                    DataAESKey = null;
-                    dataKey = null;
-                }
-            }
-        }
-
-        public Array EncryptionModeValues = Enum.GetValues(typeof(EncryptionMode));
+        private Identifier<AesKey> tokenKey;
         public EncryptionMode? TokenEncryptionMode {
             get {
                 return model.TokenEncryptionMode;
@@ -159,9 +136,11 @@ namespace Discord.NET.SupportExtension.ViewModels {
             set {
                 model.TokenEncryptionMode = value;
                 OnPropertyChanged(nameof(TokenEncryptionMode));
+                SetTokenModeDependent();
             }
         }
 
+        private Identifier<AesKey> dataKey;
         public EncryptionMode? DataEncryptionMode {
             get {
                 return model.DataEncryptionMode;
@@ -169,35 +148,9 @@ namespace Discord.NET.SupportExtension.ViewModels {
             set {
                 model.DataEncryptionMode = value;
                 OnPropertyChanged(nameof(DataEncryptionMode));
+                SetDataModeDependent();
             }
         }
-
-
-        private Identifier<AesKey> tokenKey;
-        public int TokenEncryptionMethod {
-            get {
-                if (model.TokenEncryptionMode == null)
-                    return -1;
-
-                return (int)model.TokenEncryptionMode;
-            }
-            set {
-                model.TokenEncryptionMode = (EncryptionMode)value;
-                OnPropertyChanged(nameof(TokenEncryptionMethod));
-
-                if (model.TokenEncryptionMode == EncryptionMode.AES && SaveTokens) {
-                    TokenAESEncryptionPanelVisibility = Visibility.Visible;
-                    tokenKey = identifierFactory.CreateIdentifier(aesCryptoService.GenerateKey(256));
-                    TokenAESKey = Convert.ToBase64String(tokenKey.Reference.Key);
-                }
-                else {
-                    TokenAESEncryptionPanelVisibility = Visibility.Collapsed;
-                    TokenAESKey = null;
-                    tokenKey = null;
-                }
-            }
-        }
-
         #endregion
 
         #region Token
@@ -210,8 +163,8 @@ namespace Discord.NET.SupportExtension.ViewModels {
             set {
                 selectedTokenIndex = value;
                 OnPropertyChanged(nameof(SelectedTokenIndex));
-                EditTokenCommand.CanExecute(null);
-                RemoveTokenCommand.CanExecute(null);
+                EditTokenCommand.OnCanExecuteChanged();
+                RemoveTokenCommand.OnCanExecuteChanged();
             }
         }
         #endregion
@@ -248,46 +201,6 @@ namespace Discord.NET.SupportExtension.ViewModels {
             this.model = model;
         }
 
-        private void EditToken(object obj) {
-            throw new NotImplementedException();
-        }
-
-        private void RemoveToken(object obj) {
-            throw new NotImplementedException();
-        }
-
-        private void AddToken(object obj) {
-            throw new NotImplementedException();
-        }
-
-        private void LoadTokens(object obj) {
-            switch(TokenEncryptionMethod) {
-
-            }
-            KeyEntryModel keyEntry = new KeyEntryModel("Token");
-            KeyEntryView keyEntryView = new KeyEntryView() { DataContext = new KeyEntryViewModel(keyEntry) };
-            this.logger.LogInformation("Requesting key for tokens.");
-            UIHelper.Show(keyEntryView);
-            if (keyEntry.IsCanceled) {
-                this.logger.LogInformation($"Request for tokens cancelled.");
-                return;
-            }
-
-            if (!keyEntry.ContainsKey()) {
-                this.logger.LogInformation($"No key found.");
-                return;
-            }
-
-            if (!keyEntry.Key.Identify(model.TokenKeyIdentifier.GetValueOrDefault())) {
-                string error = $"Wrong key for token provided.";
-                UIHelper.ShowError(error, "Wrong key");
-                this.logger.LogError(error);
-                return;
-            }
-
-            this.tokens = ReadTokens(keyEntry.Key.Reference);
-        }
-
         #region Command Callbacks
 
         private void GenerateServerImage(object o) {
@@ -309,7 +222,6 @@ namespace Discord.NET.SupportExtension.ViewModels {
             Close?.Invoke();
         }
 
-
         private void CreateDataAESKeyFile(object o) {
             CreateAESKeyFile(dataKey);
         }
@@ -318,7 +230,34 @@ namespace Discord.NET.SupportExtension.ViewModels {
             CreateAESKeyFile(tokenKey);
         }
 
+        private void EditToken(object obj) {
+            throw new NotImplementedException();
+        }
 
+        private void RemoveToken(object obj) {
+            throw new NotImplementedException();
+        }
+
+        private void AddToken(object obj) {
+            throw new NotImplementedException();
+        }
+
+        private void LoadTokens(object obj) {
+            switch (model.TokenEncryptionMode) {
+                case EncryptionMode.AES:
+                    PrepareStreamWithAes(out bool cancel);
+                    if (cancel)
+                        return;
+                    break;
+                case EncryptionMode.WindowsDataProtectionAPI:
+                    PrepareStreamWithWinAPI();
+                    break;
+
+            }
+
+
+            this.tokens = ReadTokens();
+        }
         #endregion
 
         public bool CanClose() => true;
@@ -333,16 +272,81 @@ namespace Discord.NET.SupportExtension.ViewModels {
             }
         }
 
-        private ObservableCollection<TokenModel> ReadTokens(AesKey key) {
-            //tokenService.ManipulateStream((o) => o.UseBase64().UseCryptography(EncryptionMode)
+        private void PrepareStreamWithAes(out bool cancel) {
+            cancel = false;
+            KeyEntryModel keyEntry = new KeyEntryModel("Token");
+            KeyEntryView keyEntryView = new KeyEntryView() { DataContext = new KeyEntryViewModel(keyEntry) };
+            this.logger.LogInformation("Requesting key for tokens.");
+            UIHelper.Show(keyEntryView);
+            if (keyEntry.IsCanceled) {
+                this.logger.LogInformation($"Request for tokens cancelled.");
+                cancel = true;
+                return;
+            }
 
+            if (!keyEntry.ContainsKey()) {
+                cancel = true;
+                this.logger.LogInformation($"No key found.");
+                return;
+            }
+
+            if (!keyEntry.Key.Identify(model.TokenKeyIdentifier.GetValueOrDefault())) {
+                cancel = true;
+                string error = $"Wrong key for token provided.";
+                UIHelper.ShowError(error, "Wrong key");
+                this.logger.LogError(error);
+                return;
+            }
+
+            tokenService.ManipulateStream((o) => o.UseBase64()
+            .UseCryptography(EncryptionMode.AES)
+            .ProvideKey(keyEntry.Key.Reference)
+            .Set());
+        }
+
+        private void PrepareStreamWithWinAPI() {
+            tokenService.ManipulateStream((o) => o.UseBase64()
+            .UseCryptography(EncryptionMode.WindowsDataProtectionAPI)
+            .Set());
+        }
+
+        private ObservableCollection<TokenModel> ReadTokens() {
             List<TokenModel> tokens = new List<TokenModel>();
             IEnumerable<string> files = Directory.GetFiles(DiscordEnvironment.TokenCache);
             foreach (string file in files) {
                 tokens.Add(tokenService.ReadToken(file));
             }
 
-            return new ObservableCollection<TokenModel>();
+            return new ObservableCollection<TokenModel>(tokens);
+        }
+
+        private void SetTokenModeDependent() {
+            if (model.TokenEncryptionMode == EncryptionMode.AES && SaveTokens) {
+                TokenAESEncryptionPanelVisibility = Visibility.Visible;
+                tokenKey = identifierFactory.CreateIdentifier(aesCryptoService.GenerateKey(256));
+                TokenAESKey = Convert.ToBase64String(tokenKey.Reference.Key);
+                model.TokenKeyIdentifier = tokenKey.Id;
+            }
+            else {
+                TokenAESEncryptionPanelVisibility = Visibility.Collapsed;
+                TokenAESKey = null;
+                tokenKey = null;
+                model.TokenKeyIdentifier = null;
+            }
+        }
+        private void SetDataModeDependent() {
+            if (model.DataEncryptionMode == EncryptionMode.AES && EncryptData) {
+                DataAESEncryptionPanelVisibility = Visibility.Visible;
+                dataKey = identifierFactory.CreateIdentifier(aesCryptoService.GenerateKey(256));
+                DataAESKey = Convert.ToBase64String(dataKey.Reference.Key);
+                model.DataKeyIdentifier = dataKey.Id;
+            }
+            else {
+                DataAESEncryptionPanelVisibility = Visibility.Collapsed;
+                DataAESKey = null;
+                dataKey = null;
+                model.DataKeyIdentifier = null;
+            }
         }
     }
 }

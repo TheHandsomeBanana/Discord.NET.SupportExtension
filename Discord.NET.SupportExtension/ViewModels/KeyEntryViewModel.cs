@@ -22,9 +22,9 @@ namespace Discord.NET.SupportExtension.ViewModels {
 
 
         #region Bindings
-        public ICommand ExtractCommand { get; }
-        public ICommand ExitCommand { get; }
-        public ICommand BrowseKeyCommand { get; }
+        public RelayCommand ExtractCommand { get; }
+        public RelayCommand ExitCommand { get; }
+        public RelayCommand BrowseKeyCommand { get; }
 
         #region UI Only
         private string keyPath;
@@ -33,7 +33,7 @@ namespace Discord.NET.SupportExtension.ViewModels {
             set {
                 keyPath = value;
                 OnPropertyChanged(nameof(KeyPath));
-                ExtractCommand.CanExecute(null);
+                ExtractCommand.OnCanExecuteChanged();
             }
         }
         #endregion

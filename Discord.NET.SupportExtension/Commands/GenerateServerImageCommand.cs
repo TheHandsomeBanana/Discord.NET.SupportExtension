@@ -5,14 +5,17 @@ using Discord.NET.SupportExtension.Views;
 using EnvDTE;
 using HB.NETF.Common.DependencyInjection;
 using HB.NETF.Common.Exceptions;
+using HB.NETF.Discord.NET.Toolkit;
 using HB.NETF.Discord.NET.Toolkit.EntityService;
 using HB.NETF.Discord.NET.Toolkit.EntityService.Cached.Handler;
 using HB.NETF.Discord.NET.Toolkit.EntityService.Handler;
 using HB.NETF.Discord.NET.Toolkit.EntityService.Models;
+using HB.NETF.Discord.NET.Toolkit.TokenService;
 using HB.NETF.Services.Data.Handler;
 using HB.NETF.Services.Data.Handler.Async;
 using HB.NETF.Services.Logging;
 using HB.NETF.Services.Logging.Factory;
+using HB.NETF.Services.Security.Cryptography.Keys;
 using HB.NETF.Services.Security.Cryptography.Settings;
 using HB.NETF.VisualStudio.UI;
 using HB.NETF.VisualStudio.Workspace;
@@ -24,6 +27,7 @@ using System.ComponentModel.Design;
 using System.Globalization;
 using System.IO;
 using System.IO.Ports;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Documents;
@@ -96,14 +100,16 @@ namespace Discord.NET.SupportExtension.Commands {
         /// <param name="e">Event args.</param>
 
         private ICachedDiscordEntityServiceHandler entityServiceHandler;
+        private IDiscordTokenService tokenService;
         private ILogger<GenerateServerImageCommand> logger;
         private void Execute(object sender, EventArgs e) {
             ThreadHelper.ThrowIfNotOnUIThread();
-
+            tokenService = DIContainer.GetService<IDiscordTokenService>();
 
             package.JoinableTaskFactory.Run(async () => {
 
-                List<TokenModel> tokens = new List<TokenModel>();
+                TokenModel[] tokens;
+
                 try {
                     ConfigureServerImageModel model = new ConfigureServerImageModel();
                     if (File.Exists(ConfigHelper.GetConfigPath()))
@@ -112,42 +118,59 @@ namespace Discord.NET.SupportExtension.Commands {
                     if (model.SaveTokens) {
                         switch (model.TokenEncryptionMode) {
                             case EncryptionMode.AES:
-                                HandleKeyExtractorUI(model.TokenKeyIdentifier, "Token", out bool cancel);
-                                if (cancel)
+                                AesKey tokenKey = HandleAesKeyExtractorUI(model.TokenKeyIdentifier, "Token");
+                                if (tokenKey == null)
                                     return;
+                                tokenService.ManipulateStream(o => o.UseBase64()
+                                .UseCryptography(EncryptionMode.AES)
+                                .ProvideKey(tokenKey)
+                                .Set());
                                 break;
                             case EncryptionMode.WindowsDataProtectionAPI:
+                                tokenService.ManipulateStream(o => o.UseBase64()
+                                .UseCryptography(EncryptionMode.WindowsDataProtectionAPI)
+                                .Set());
                                 break;
                         }
+
+                        tokens = ReadTokens().ToArray();
                     }
                     else {
-                        TokenEntryModel tokenEntryModel = new TokenEntryModel();
-                        TokenEntryView view = new TokenEntryView { DataContext = new TokenEntryViewModel(tokenEntryModel) };
+                        TokenEntryModel tokenEntry = new TokenEntryModel();
+                        TokenEntryView view = new TokenEntryView { DataContext = new TokenEntryViewModel(tokenEntry) };
                         UIHelper.Show(view);
+                        if (tokenEntry.IsCanceled)
+                            return;
+
+                        tokens = tokenEntry.Tokens;
                     }
+
+                    entityServiceHandler = DIContainer.GetService<ICachedDiscordEntityServiceHandler>();
+                    entityServiceHandler.Init(tokens);
 
                     if (model.EncryptData) {
                         switch (model.DataEncryptionMode) {
                             case EncryptionMode.AES:
-                                HandleKeyExtractorUI(model.DataKeyIdentifier, "Data", out bool cancel);
-                                if (cancel)
+                                AesKey dataKey = HandleAesKeyExtractorUI(model.DataKeyIdentifier, "Data");
+                                if (dataKey == null)
                                     return;
+
+                                entityServiceHandler.ManipulateStream(o => o.UseBase64()
+                                .UseCryptography(EncryptionMode.AES)
+                                .ProvideKey(dataKey)
+                                .Set());
                                 break;
                             case EncryptionMode.WindowsDataProtectionAPI:
+                                entityServiceHandler.ManipulateStream(o => o.UseBase64()
+                                .UseCryptography(EncryptionMode.WindowsDataProtectionAPI)
+                                .Set());
                                 break;
                         }
                     }
 
-
-
-
-
-
-                    entityServiceHandler = DIContainer.GetService<ICachedDiscordEntityServiceHandler>();
-                    entityServiceHandler.Init();
-
                     await entityServiceHandler.Refresh();
                     entityServiceHandler.Dispose();
+                    UIHelper.ShowInfo("Server Image generated.", "Success");
                 }
                 catch (InternalException ex) {
                     this.logger.LogError(ex.ToString());
@@ -155,28 +178,33 @@ namespace Discord.NET.SupportExtension.Commands {
                     return;
                 }
             });
-
-            UIHelper.ShowInfo("Server Image generated.", "Success");
         }
 
-        private void HandleKeyExtractorUI(Guid? id, string name, out bool cancel) {
-            cancel = false;
+        private IEnumerable<TokenModel> ReadTokens() {
+            string[] files = Directory.GetFiles(DiscordEnvironment.TokenCache);
+            foreach(string file in files) {
+                yield return tokenService.ReadToken(file);
+            }
+        }
+
+        private AesKey HandleAesKeyExtractorUI(Guid? id, string name) {
             KeyEntryModel keyEntry = new KeyEntryModel(name);
             KeyEntryView view = new KeyEntryView() { DataContext = new KeyEntryViewModel(keyEntry) };
             logger.LogInformation($"Requesting aes key for {name}.");
             UIHelper.Show(view);
             if (keyEntry.Key == null) {
                 logger.LogInformation("Request cancelled.");
-                cancel = true;
-                return;
+                return null;
             }
 
             if (!keyEntry.Key.Identify(id.GetValueOrDefault())) {
                 string error = $"Wrong key for {name} provided.";
                 UIHelper.ShowError(error, "Wrong key");
                 this.logger.LogError(error);
-                cancel = true;
+                return null;
             }
+
+            return keyEntry.Key.Reference;
         }
     }
 }

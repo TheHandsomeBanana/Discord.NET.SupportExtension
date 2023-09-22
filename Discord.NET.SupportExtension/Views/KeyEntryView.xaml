@@ -47,7 +47,7 @@
             <Label Style="{StaticResource SmallHeadLabel}" Content="{Binding Name}" Margin="5 0 5 10"/>
             <StackPanel Orientation="Horizontal">
                 <TextBox Style="{StaticResource TextBox}" Width="380" Margin="0 0 10 0" 
-                         Text="{Binding KeyPath}" ToolTip="{Binding KeyPath}">
+                         Text="{Binding KeyPath, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" ToolTip="{Binding KeyPath}">
 
                 </TextBox>
                 <Button Style="{StaticResource CommandButtonSmall}" Command="{Binding BrowseKeyCommand}" Content="Browse"></Button>

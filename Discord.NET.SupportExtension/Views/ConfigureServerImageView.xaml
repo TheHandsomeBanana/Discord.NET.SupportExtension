@@ -57,14 +57,7 @@
                         <TextBlock Text="Save Tokens"></TextBlock>
                     </CheckBox>
 
-                    <ComboBox Name="cbxTokenEncryptionMethod" ItemsSource="{Binding EncryptionModeValues}" SelectedItem="{Binding TkenEncryptionMode}" Visibility="{Binding IsChecked, ElementName=cbSaveTokens, Converter={StaticResource b2v}}" Margin="0 0 0 10">
-                        <!--<ComboBoxItem Name="cbiTokenDataProtectionAPI" Content="Windows Data Protection API">
-
-                        </ComboBoxItem>
-
-                        <ComboBoxItem Name="cbiTokenAESEncryption" Content="AES Encryption">
-
-                        </ComboBoxItem>-->
+                    <ComboBox ItemsSource="{Binding EncryptionModeValues}" SelectedItem="{Binding TokenEncryptionMode}" Visibility="{Binding IsChecked, ElementName=cbSaveTokens, Converter={StaticResource b2v}}" Margin="0 0 0 10">
                     </ComboBox>
 
                     <StackPanel Orientation="Horizontal" Visibility="{Binding Path=TokenAESEncryptionPanelVisibility}" Margin="0 0 0 10">
@@ -81,14 +74,7 @@
                         <TextBlock Text="Encrypt Data"></TextBlock>
                     </CheckBox>
 
-                    <ComboBox Name="cbxDataEncryptionMethod" ItemsSource="{Binding EncryptionModeValues}" SelectedItem="{Binding DataEncryptionMode}" Visibility="{Binding IsChecked, ElementName=cbEncryptData, Converter={StaticResource b2v}}" Margin="0 0 0 10">
-                        <!--<ComboBoxItem Name="cbiDataDataProtectionAPI" Content="Windows Data Protection API">
-
-                        </ComboBoxItem>
-
-                        <ComboBoxItem Name="cbiDataAESEncryption" Content="AES Encryption">
-
-                        </ComboBoxItem>-->
+                    <ComboBox ItemsSource="{Binding EncryptionModeValues}" SelectedItem="{Binding DataEncryptionMode}" Visibility="{Binding IsChecked, ElementName=cbEncryptData, Converter={StaticResource b2v}}" Margin="0 0 0 10">
                     </ComboBox>
 
                     <StackPanel Orientation="Horizontal" Visibility="{Binding Path=DataAESEncryptionPanelVisibility}" Margin="0 0 0 10">

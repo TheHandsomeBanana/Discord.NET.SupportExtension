@@ -8,5 +8,6 @@ using System.Threading.Tasks;
 namespace Discord.NET.SupportExtension.Models.VMModels {
     public class TokenEntryModel {
         public TokenModel[] Tokens { get; set; }
+        public bool IsCanceled { get; set; }    
     }
 }
