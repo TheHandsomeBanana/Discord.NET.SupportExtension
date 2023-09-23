@@ -38,6 +38,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using static Microsoft.VisualStudio.Shell.RegistrationAttribute;
 
 namespace Discord.NET.SupportExtension.ViewModels {
     public class ConfigureServerImageViewModel : ViewModelBase, ICloseableWindow {
@@ -49,6 +50,7 @@ namespace Discord.NET.SupportExtension.ViewModels {
         public RelayCommand CreateDataAESKeyFileCommand { get; }
         public RelayCommand CreateTokenAESKeyFileCommand { get; }
         public RelayCommand LoadTokensCommand { get; }
+        public RelayCommand SaveTokensCommand { get; }
         public RelayCommand AddTokenCommand { get; }
         public RelayCommand RemoveTokenCommand { get; }
         public RelayCommand EditTokenCommand { get; }
@@ -157,7 +159,7 @@ namespace Discord.NET.SupportExtension.ViewModels {
         private ObservableCollection<TokenModel> tokens = new ObservableCollection<TokenModel>();
         public IEnumerable<TokenModel> Tokens => tokens;
 
-        private int selectedTokenIndex;
+        private int selectedTokenIndex = -1;
         public int SelectedTokenIndex {
             get => selectedTokenIndex;
             set {
@@ -165,6 +167,27 @@ namespace Discord.NET.SupportExtension.ViewModels {
                 OnPropertyChanged(nameof(SelectedTokenIndex));
                 EditTokenCommand.OnCanExecuteChanged();
                 RemoveTokenCommand.OnCanExecuteChanged();
+            }
+        }
+
+        private string tokenText;
+        public string TokenText {
+            get { return tokenText; }
+            set {
+                tokenText = value;
+                OnPropertyChanged(nameof(TokenText));
+                AddTokenCommand.OnCanExecuteChanged();
+            }
+        }
+
+        private string botText;
+
+        public string BotText {
+            get { return botText; }
+            set {
+                botText = value;
+                OnPropertyChanged(nameof(BotText));
+                AddTokenCommand.OnCanExecuteChanged();
             }
         }
         #endregion
@@ -195,14 +218,14 @@ namespace Discord.NET.SupportExtension.ViewModels {
             CreateTokenAESKeyFileCommand = new RelayCommand(CreateTokenAESKeyFile, null);
             CreateDataAESKeyFileCommand = new RelayCommand(CreateDataAESKeyFile, null);
             LoadTokensCommand = new RelayCommand(LoadTokens, null);
-            AddTokenCommand = new RelayCommand(AddToken, null);
+            SaveTokensCommand = new RelayCommand(SaveTokensToModel, null);
+            AddTokenCommand = new RelayCommand(AddToken, o => !string.IsNullOrWhiteSpace(BotText) && !string.IsNullOrWhiteSpace(TokenText) && TokenText.Length == 70);
             RemoveTokenCommand = new RelayCommand(RemoveToken, (o) => SelectedTokenIndex > -1);
             EditTokenCommand = new RelayCommand(EditToken, (o) => SelectedTokenIndex > -1);
             this.model = model;
         }
 
         #region Command Callbacks
-
         private void GenerateServerImage(object o) {
             CommandHelper.RunVSCommand(PackageGuids.CommandSet, PackageIds.GenerateServerImageCommand);
         }
@@ -231,32 +254,50 @@ namespace Discord.NET.SupportExtension.ViewModels {
         }
 
         private void EditToken(object obj) {
-            throw new NotImplementedException();
+            BotText = tokens[selectedTokenIndex].Bot;
+            TokenText = tokens[selectedTokenIndex].Token;
+
+            RemoveToken(obj);
         }
 
         private void RemoveToken(object obj) {
-            throw new NotImplementedException();
+            tokens.RemoveAt(selectedTokenIndex);
         }
 
         private void AddToken(object obj) {
-            throw new NotImplementedException();
+            tokens.Add(new TokenModel(BotText, TokenText));
+            BotText = "";
+            TokenText = "";
         }
 
         private void LoadTokens(object obj) {
+            AesKey key = null;
             switch (model.TokenEncryptionMode) {
                 case EncryptionMode.AES:
-                    PrepareStreamWithAes(out bool cancel);
-                    if (cancel)
+                    key = GetAesKey();
+                    if (key == null)
                         return;
                     break;
-                case EncryptionMode.WindowsDataProtectionAPI:
-                    PrepareStreamWithWinAPI();
-                    break;
-
             }
 
+            TokenModel[] decryptedTokens = tokenService.DecryptTokens(model.Tokens, model.TokenEncryptionMode.Value, key);
+            foreach (TokenModel decrToken in decryptedTokens)
+                tokens.Add(decrToken);
+        }
 
-            this.tokens = ReadTokens();
+        private void SaveTokensToModel(object obj) {
+            switch (model.TokenEncryptionMode) {
+                case EncryptionMode.AES:
+                    AesKey key = GetAesKey();
+                    if (key == null)
+                        return;
+
+                    model.Tokens = tokenService.EncryptTokens(this.tokens.ToArray(), model.TokenEncryptionMode.Value, key);
+                    break;
+                case EncryptionMode.WindowsDataProtectionAPI:
+                    model.Tokens = tokenService.EncryptTokens(this.tokens.ToArray(), model.TokenEncryptionMode.Value);
+                    break;
+            }
         }
         #endregion
 
@@ -272,52 +313,29 @@ namespace Discord.NET.SupportExtension.ViewModels {
             }
         }
 
-        private void PrepareStreamWithAes(out bool cancel) {
-            cancel = false;
+        private AesKey GetAesKey() {
             KeyEntryModel keyEntry = new KeyEntryModel("Token");
             KeyEntryView keyEntryView = new KeyEntryView() { DataContext = new KeyEntryViewModel(keyEntry) };
             this.logger.LogInformation("Requesting key for tokens.");
             UIHelper.Show(keyEntryView);
             if (keyEntry.IsCanceled) {
                 this.logger.LogInformation($"Request for tokens cancelled.");
-                cancel = true;
-                return;
+                return null;
             }
 
             if (!keyEntry.ContainsKey()) {
-                cancel = true;
                 this.logger.LogInformation($"No key found.");
-                return;
+                return null;
             }
 
             if (!keyEntry.Key.Identify(model.TokenKeyIdentifier.GetValueOrDefault())) {
-                cancel = true;
                 string error = $"Wrong key for token provided.";
                 UIHelper.ShowError(error, "Wrong key");
                 this.logger.LogError(error);
-                return;
+                return null;
             }
 
-            tokenService.ManipulateStream((o) => o.UseBase64()
-            .UseCryptography(EncryptionMode.AES)
-            .ProvideKey(keyEntry.Key.Reference)
-            .Set());
-        }
-
-        private void PrepareStreamWithWinAPI() {
-            tokenService.ManipulateStream((o) => o.UseBase64()
-            .UseCryptography(EncryptionMode.WindowsDataProtectionAPI)
-            .Set());
-        }
-
-        private ObservableCollection<TokenModel> ReadTokens() {
-            List<TokenModel> tokens = new List<TokenModel>();
-            IEnumerable<string> files = Directory.GetFiles(DiscordEnvironment.TokenCache);
-            foreach (string file in files) {
-                tokens.Add(tokenService.ReadToken(file));
-            }
-
-            return new ObservableCollection<TokenModel>(tokens);
+            return keyEntry.Key.Reference;
         }
 
         private void SetTokenModeDependent() {

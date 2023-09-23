@@ -15,5 +15,6 @@ namespace Discord.NET.SupportExtension.Models.VMModels {
         public EncryptionMode? DataEncryptionMode { get; set; }
         public Guid? TokenKeyIdentifier { get; set; }
         public Guid? DataKeyIdentifier { get; set; }
+        public TokenModel[] Tokens { get; set; }
     }
 }

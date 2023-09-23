@@ -4,7 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:Discord.NET.SupportExtension.Views"
-             Background="#313338" ResizeMode="NoResize" ShowInTaskbar="False" WindowStyle="None" Width="1280" Height="720"
+             Background="#313338" ResizeMode="NoResize" ShowInTaskbar="False" WindowStyle="None" Width="1170" Height="720"
         Loaded="Window_Loaded">
 
     <Window.Resources>
@@ -23,7 +23,7 @@
             <RowDefinition Height="44*"/>
         </Grid.RowDefinitions>
 
-        <Rectangle Fill="{StaticResource DiscordDark}" MouseLeftButtonDown="Rectangle_MouseLeftButtonDown" HorizontalAlignment="Center" Width="1280"/>
+        <Rectangle Fill="{StaticResource DiscordDark}" MouseLeftButtonDown="Rectangle_MouseLeftButtonDown" HorizontalAlignment="Center" Width="1170"/>
         <Image Source="../Resources/DiscordLogoTextWhite.png" Margin="10,5,0,5" HorizontalAlignment="Left" Grid.Row="0" RenderOptions.BitmapScalingMode="HighQuality"/>
         <Label HorizontalAlignment="Center" VerticalAlignment="Center" Content="Data Generator" FontFamily="ABC Ginto Nord Medium" Foreground="White" FontSize="20"/>
         <Button Style="{StaticResource ExitButton}" Grid.Row="0" HorizontalAlignment="Right" 
@@ -97,43 +97,28 @@
                 <StackPanel Orientation="Horizontal">
                     <StackPanel Orientation="Vertical">
                         <Label Style="{StaticResource SmallHeadLabel}" Content="Bot"></Label>
-                        <TextBox Style="{StaticResource TextBox}" Margin="0 0 10 10" Width="100"/>
+                        <TextBox Style="{StaticResource TextBox}" Text="{Binding BotText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Margin="0 0 10 10" Width="200"/>
                     </StackPanel>
                     <StackPanel Orientation="Vertical">
                         <Label Style="{StaticResource SmallHeadLabel}" Content="Token"></Label>
-                        <TextBox Style="{StaticResource TextBox}" Margin="0 0 0 10" Width="300"/>
+                        <TextBox Style="{StaticResource TextBox}" Text="{Binding TokenText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Margin="0 0 0 10" Width="500"/>
                     </StackPanel>
                 </StackPanel>
 
                 <ListView Style="{StaticResource ListView}" ItemsSource="{Binding Tokens}" SelectedIndex="{Binding SelectedTokenIndex}"
-                          ItemContainerStyle="{StaticResource ListViewItem}">
+                          ItemContainerStyle="{StaticResource TokenListViewItem}">
                     <ListView.View>
                         <GridView>
-                            <GridViewColumn Width="100">
+                            <GridViewColumn Width="200" DisplayMemberBinding="{Binding Bot}">
                                 <GridViewColumnHeader Style="{StaticResource GridViewColumnHeader}" Content="Bot"/>
-                                <GridViewColumn.CellTemplate>
-                                    <DataTemplate>
-                                        <TextBlock Text="{Binding Bot}"/>
-                                    </DataTemplate>
-                                </GridViewColumn.CellTemplate>
                             </GridViewColumn>
 
-                            <GridViewColumn Width="200">
+                            <GridViewColumn Width="400" DisplayMemberBinding="{Binding Token}">
                                 <GridViewColumnHeader Style="{StaticResource GridViewColumnHeader}" Content="Token"/>
-                                <GridViewColumn.CellTemplate>
-                                    <DataTemplate>
-                                        <TextBlock Text="{Binding Token}"/>
-                                    </DataTemplate>
-                                </GridViewColumn.CellTemplate>
                             </GridViewColumn>
 
-                            <GridViewColumn Width="100">
+                            <GridViewColumn Width="100" DisplayMemberBinding="{Binding CreatedOn}">
                                 <GridViewColumnHeader Style="{StaticResource GridViewColumnHeader}" Content="Created On"/>
-                                <GridViewColumn.CellTemplate>
-                                    <DataTemplate>
-                                        <TextBlock Text="{Binding CreatedOn}"/>
-                                    </DataTemplate>
-                                </GridViewColumn.CellTemplate>
                             </GridViewColumn>
                         </GridView>
                     </ListView.View>
@@ -141,6 +126,14 @@
             </StackPanel>
 
             <StackPanel Orientation="Vertical" Margin="10 110 0 0">
+                <Button Style="{StaticResource CommandButtonSmall}" Command="{Binding LoadTokensCommand}" Content="Load" VerticalAlignment="Top"
+                        Margin="0 0 0 10">
+
+                </Button>
+                <Button Style="{StaticResource CommandButtonSmall}" Command="{Binding SaveTokensCommand}" Content="Save" VerticalAlignment="Top"
+                        Margin="0 0 0 10">
+
+                </Button>
                 <Button Style="{StaticResource CommandButtonSmall}" Command="{Binding AddTokenCommand}" Content="Add" VerticalAlignment="Top"
                         Margin="0 0 0 10">
 

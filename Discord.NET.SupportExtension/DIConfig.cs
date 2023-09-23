@@ -17,6 +17,7 @@ using HB.NETF.Discord.NET.Toolkit.EntityService.Cached.Handler;
 using HB.NETF.Services.Data.Handler.Async;
 using HB.NETF.Services.Data.Handler;
 using HB.NETF.Discord.NET.Toolkit.TokenService;
+using HB.NETF.Services.Serialization;
 
 namespace Discord.NET.SupportExtension {
     internal class DIConfig : IDependencyConfig {
@@ -30,7 +31,8 @@ namespace Discord.NET.SupportExtension {
                 .AddTransient<IAsyncStreamHandler, AsyncStreamHandler>()
                 .AddTransient<ICachedDiscordEntityServiceHandler, CachedDiscordEntityServiceHandler>()
                 .AddTransient<IDiscordTokenService, DiscordTokenService>()
-                .AddTransient<IAesCryptoService, AesCryptoService>();
+                .AddTransient<IAesCryptoService, AesCryptoService>()
+                .AddTransient<ISerializerService, SerializerService>();
         }
     }
 }

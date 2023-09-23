@@ -149,6 +149,10 @@
       <Project>{884d9597-bfbb-41c0-bdcf-37d1ef0ddf3a}</Project>
       <Name>HB.NETF.Services.Security</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\HB\HB.NETF.Services.Serialization\HB.NETF.Services.Serialization.csproj">
+      <Project>{802DE704-2F70-48AA-9734-CA9C0D1E2D38}</Project>
+      <Name>HB.NETF.Services.Serialization</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\HB\HB.NETF.VisualStudio\HB.NETF.VisualStudio.csproj">
       <Project>{f017e1b9-c8e3-4c09-bc41-4c6e6f8e7c98}</Project>
       <Name>HB.NETF.VisualStudio</Name>

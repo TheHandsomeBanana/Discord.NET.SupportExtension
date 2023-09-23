@@ -144,16 +144,36 @@
     </Style>
 
     <Style x:Key="ListView" TargetType="ListView">
-        <Setter Property="Background" Value="{StaticResource DiscordBlack}"/>
+        <Setter Property="Background" Value="{StaticResource DiscordBlurple}"/>
     </Style>
 
     <Style x:Key="GridViewColumnHeader" TargetType="GridViewColumnHeader">
-        <Setter Property="Background" Value="{StaticResource DiscordBlack}"/>
-        <Setter Property="Foreground" Value="{StaticResource DiscordText}"/>
+        <Setter Property="Background" Value="{StaticResource DiscordBlurple}"/>
+        <Setter Property="Foreground" Value="White"/>
     </Style>
 
-    <Style x:Key="ListViewItem" TargetType="ListViewItem">
+    <Style x:Key="TokenListViewItem" TargetType="ListViewItem">
         <Setter Property="Background" Value="{StaticResource DiscordTextBox}"/>
+        <Setter Property="Foreground" Value="{StaticResource DiscordText}"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="ListViewItem">
+                    <Border Background="{TemplateBinding Background}"
+                            BorderThickness="{TemplateBinding BorderThickness}"
+                            BorderBrush="{TemplateBinding BorderBrush}">
+                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+        <Style.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="Background" Value="{StaticResource DiscordBlurpleOverlay}"/>
+            </Trigger>
+            <Trigger Property="IsSelected" Value="True">
+                <Setter Property="Background" Value="{StaticResource DiscordBlurpleOverlay}"/>
+            </Trigger>
+        </Style.Triggers>
     </Style>
 
 </ResourceDictionary>

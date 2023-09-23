@@ -88,7 +88,6 @@ namespace Discord.NET.SupportExtension.Commands {
 
             OleMenuCommandService commandService = await package.GetServiceAsync(typeof(IMenuCommandService)) as OleMenuCommandService;
             Instance = new GenerateServerImageCommand(package, commandService);
-
         }
 
         /// <summary>
@@ -101,14 +100,14 @@ namespace Discord.NET.SupportExtension.Commands {
 
         private ICachedDiscordEntityServiceHandler entityServiceHandler;
         private IDiscordTokenService tokenService;
-        private ILogger<GenerateServerImageCommand> logger;
+        private readonly ILogger<GenerateServerImageCommand> logger;
         private void Execute(object sender, EventArgs e) {
             ThreadHelper.ThrowIfNotOnUIThread();
             tokenService = DIContainer.GetService<IDiscordTokenService>();
 
             package.JoinableTaskFactory.Run(async () => {
 
-                TokenModel[] tokens;
+                TokenModel[] tokens = new TokenModel[0];
 
                 try {
                     ConfigureServerImageModel model = new ConfigureServerImageModel();
@@ -121,19 +120,13 @@ namespace Discord.NET.SupportExtension.Commands {
                                 AesKey tokenKey = HandleAesKeyExtractorUI(model.TokenKeyIdentifier, "Token");
                                 if (tokenKey == null)
                                     return;
-                                tokenService.ManipulateStream(o => o.UseBase64()
-                                .UseCryptography(EncryptionMode.AES)
-                                .ProvideKey(tokenKey)
-                                .Set());
+
+                                tokens = tokenService.DecryptTokens(model.Tokens, model.TokenEncryptionMode.Value, tokenKey);
                                 break;
                             case EncryptionMode.WindowsDataProtectionAPI:
-                                tokenService.ManipulateStream(o => o.UseBase64()
-                                .UseCryptography(EncryptionMode.WindowsDataProtectionAPI)
-                                .Set());
+                                tokens = tokenService.DecryptTokens(model.Tokens, model.TokenEncryptionMode.Value);
                                 break;
                         }
-
-                        tokens = ReadTokens().ToArray();
                     }
                     else {
                         TokenEntryModel tokenEntry = new TokenEntryModel();
@@ -178,13 +171,6 @@ namespace Discord.NET.SupportExtension.Commands {
                     return;
                 }
             });
-        }
-
-        private IEnumerable<TokenModel> ReadTokens() {
-            string[] files = Directory.GetFiles(DiscordEnvironment.TokenCache);
-            foreach(string file in files) {
-                yield return tokenService.ReadToken(file);
-            }
         }
 
         private AesKey HandleAesKeyExtractorUI(Guid? id, string name) {
