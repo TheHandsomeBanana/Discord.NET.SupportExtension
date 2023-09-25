@@ -144,12 +144,22 @@
     </Style>
 
     <Style x:Key="ListView" TargetType="ListView">
-        <Setter Property="Background" Value="{StaticResource DiscordBlurple}"/>
+        <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="BorderBrush" Value="{StaticResource DiscordBlurple}"/>
+        <Setter Property="BorderThickness" Value="1"/>
     </Style>
-
+    
     <Style x:Key="GridViewColumnHeader" TargetType="GridViewColumnHeader">
-        <Setter Property="Background" Value="{StaticResource DiscordBlurple}"/>
         <Setter Property="Foreground" Value="White"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="GridViewColumnHeader">
+                        <TextBlock Text="{TemplateBinding Content}" Width="{TemplateBinding Width}"
+                               HorizontalAlignment="Left" VerticalAlignment="Center"
+                               FontSize="15" Padding="2"/>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
     </Style>
 
     <Style x:Key="TokenListViewItem" TargetType="ListViewItem">
@@ -159,9 +169,9 @@
             <Setter.Value>
                 <ControlTemplate TargetType="ListViewItem">
                     <Border Background="{TemplateBinding Background}"
-                            BorderThickness="{TemplateBinding BorderThickness}"
-                            BorderBrush="{TemplateBinding BorderBrush}">
-                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}">
+                        <GridViewRowPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
                     </Border>
                 </ControlTemplate>
             </Setter.Value>

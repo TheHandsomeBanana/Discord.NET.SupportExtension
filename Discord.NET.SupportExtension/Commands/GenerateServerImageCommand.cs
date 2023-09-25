@@ -98,14 +98,12 @@ namespace Discord.NET.SupportExtension.Commands {
         /// <param name="sender">Event sender.</param>
         /// <param name="e">Event args.</param>
 
-        private ICachedDiscordEntityServiceHandler entityServiceHandler;
-        private IDiscordTokenService tokenService;
         private readonly ILogger<GenerateServerImageCommand> logger;
         private void Execute(object sender, EventArgs e) {
             ThreadHelper.ThrowIfNotOnUIThread();
-            tokenService = DIContainer.GetService<IDiscordTokenService>();
 
             package.JoinableTaskFactory.Run(async () => {
+                IDiscordTokenService tokenService = DIContainer.GetService<IDiscordTokenService>();
 
                 TokenModel[] tokens = new TokenModel[0];
 
@@ -138,7 +136,7 @@ namespace Discord.NET.SupportExtension.Commands {
                         tokens = tokenEntry.Tokens;
                     }
 
-                    entityServiceHandler = DIContainer.GetService<ICachedDiscordEntityServiceHandler>();
+                    ICachedDiscordEntityServiceHandler entityServiceHandler = DIContainer.GetService<ICachedDiscordEntityServiceHandler>();
                     entityServiceHandler.Init(tokens);
 
                     if (model.EncryptData) {

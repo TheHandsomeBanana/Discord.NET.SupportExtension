@@ -108,18 +108,10 @@
                 <ListView Style="{StaticResource ListView}" ItemsSource="{Binding Tokens}" SelectedIndex="{Binding SelectedTokenIndex}"
                           ItemContainerStyle="{StaticResource TokenListViewItem}">
                     <ListView.View>
-                        <GridView>
-                            <GridViewColumn Width="200" DisplayMemberBinding="{Binding Bot}">
-                                <GridViewColumnHeader Style="{StaticResource GridViewColumnHeader}" Content="Bot"/>
-                            </GridViewColumn>
-
-                            <GridViewColumn Width="400" DisplayMemberBinding="{Binding Token}">
-                                <GridViewColumnHeader Style="{StaticResource GridViewColumnHeader}" Content="Token"/>
-                            </GridViewColumn>
-
-                            <GridViewColumn Width="100" DisplayMemberBinding="{Binding CreatedOn}">
-                                <GridViewColumnHeader Style="{StaticResource GridViewColumnHeader}" Content="Created On"/>
-                            </GridViewColumn>
+                        <GridView ColumnHeaderContainerStyle="{StaticResource GridViewColumnHeader}">
+                            <GridViewColumn Header="Bot" Width="200" DisplayMemberBinding="{Binding Bot}"/>
+                            <GridViewColumn Header="Token" Width="350" DisplayMemberBinding="{Binding Token}"/>
+                            <GridViewColumn Header="Created On" Width="150" DisplayMemberBinding="{Binding CreatedOn}"/>
                         </GridView>
                     </ListView.View>
                 </ListView>

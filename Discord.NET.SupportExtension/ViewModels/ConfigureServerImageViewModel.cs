@@ -26,6 +26,7 @@ using HB.NETF.WPF.Base.CommandBase;
 using HB.NETF.WPF.Base.ViewModelBase;
 using HB.NETF.WPF.Exceptions;
 using Microsoft.VisualStudio.Shell;
+using Microsoft.VisualStudio.Text.Editor;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -44,6 +45,7 @@ namespace Discord.NET.SupportExtension.ViewModels {
     public class ConfigureServerImageViewModel : ViewModelBase, ICloseableWindow {
 
         #region Bindings
+        #region Commands
         public RelayCommand GenerateCommand { get; }
         public RelayCommand SaveCommand { get; }
         public RelayCommand ExitCommand { get; }
@@ -54,6 +56,7 @@ namespace Discord.NET.SupportExtension.ViewModels {
         public RelayCommand AddTokenCommand { get; }
         public RelayCommand RemoveTokenCommand { get; }
         public RelayCommand EditTokenCommand { get; }
+        #endregion
 
         #region UI Only
         private string dataAESKey;
@@ -181,6 +184,7 @@ namespace Discord.NET.SupportExtension.ViewModels {
         }
 
         private string botText;
+        private bool loadCalled;
 
         public string BotText {
             get { return botText; }
@@ -201,6 +205,7 @@ namespace Discord.NET.SupportExtension.ViewModels {
         private readonly IIdentifierFactory identifierFactory;
         private readonly Project currentProject;
         private readonly ConfigureServerImageModel model;
+
         public Action Close { get; set; }
 
         public ConfigureServerImageViewModel(ConfigureServerImageModel model) {
@@ -217,8 +222,8 @@ namespace Discord.NET.SupportExtension.ViewModels {
             ExitCommand = new RelayCommand(Exit, null);
             CreateTokenAESKeyFileCommand = new RelayCommand(CreateTokenAESKeyFile, null);
             CreateDataAESKeyFileCommand = new RelayCommand(CreateDataAESKeyFile, null);
-            LoadTokensCommand = new RelayCommand(LoadTokens, null);
-            SaveTokensCommand = new RelayCommand(SaveTokensToModel, null);
+            LoadTokensCommand = new RelayCommand(LoadTokens, o => !loadCalled);
+            SaveTokensCommand = new RelayCommand(SaveTokensToModel, o => !IsTokensUpdated() && tokens.Count > 0);
             AddTokenCommand = new RelayCommand(AddToken, o => !string.IsNullOrWhiteSpace(BotText) && !string.IsNullOrWhiteSpace(TokenText) && TokenText.Length == 70);
             RemoveTokenCommand = new RelayCommand(RemoveToken, (o) => SelectedTokenIndex > -1);
             EditTokenCommand = new RelayCommand(EditToken, (o) => SelectedTokenIndex > -1);
@@ -232,12 +237,22 @@ namespace Discord.NET.SupportExtension.ViewModels {
 
         private void Save(object o) {
             ThreadHelper.ThrowIfNotOnUIThread();
+            if (!IsTokensUpdated()) {
+                logger.LogWarning("Token list is not saved. Save token list dialog invoked.");
+                int option = UIHelper.ShowWarningWithCancel("Save token list?", "Token list not saved.");
+                if (option == 1)
+                    SaveTokensToModel(o);
+                else {
+                    logger.LogInformation("Save cancelled.");
+                    return;
+                }
+            }
 
             string configLocation = ConfigHelper.GetConfigPath(this.currentProject);
             streamHandler.WriteToFile(configLocation, model);
 
             ProjectHelper.AddExistingFile(this.currentProject, configLocation);
-            logger.LogInformation($"New configuration saved to project {this.currentProject.Name}");
+            logger.LogInformation($"Configuration saved to project {this.currentProject.Name}");
             Exit(o);
         }
 
@@ -262,12 +277,15 @@ namespace Discord.NET.SupportExtension.ViewModels {
 
         private void RemoveToken(object obj) {
             tokens.RemoveAt(selectedTokenIndex);
+            SaveTokensCommand.OnCanExecuteChanged();
         }
 
         private void AddToken(object obj) {
             tokens.Add(new TokenModel(BotText, TokenText));
             BotText = "";
             TokenText = "";
+
+            SaveTokensCommand.OnCanExecuteChanged();
         }
 
         private void LoadTokens(object obj) {
@@ -281,8 +299,13 @@ namespace Discord.NET.SupportExtension.ViewModels {
             }
 
             TokenModel[] decryptedTokens = tokenService.DecryptTokens(model.Tokens, model.TokenEncryptionMode.Value, key);
-            foreach (TokenModel decrToken in decryptedTokens)
+            foreach (TokenModel decrToken in decryptedTokens) {
                 tokens.Add(decrToken);
+                logger.LogInformation($"{decrToken.Bot} decrypted and loaded.");
+            }
+
+            loadCalled = true;
+            LoadTokensCommand.OnCanExecuteChanged();
         }
 
         private void SaveTokensToModel(object obj) {
@@ -298,6 +321,9 @@ namespace Discord.NET.SupportExtension.ViewModels {
                     model.Tokens = tokenService.EncryptTokens(this.tokens.ToArray(), model.TokenEncryptionMode.Value);
                     break;
             }
+
+            logger.LogInformation($"{this.tokens.Count} tokens encrypted and saved.");
+            UIHelper.ShowInfo("Tokens saved successfully", "Info");
         }
         #endregion
 
@@ -365,6 +391,18 @@ namespace Discord.NET.SupportExtension.ViewModels {
                 dataKey = null;
                 model.DataKeyIdentifier = null;
             }
+        }
+
+        private bool IsTokensUpdated() {
+            if (model.Tokens.Length != tokens.Count)
+                return false;
+
+            for (int i = 0; i < model.Tokens.Length; i++) {
+                if (model.Tokens[i].Bot != tokens[i].Bot)
+                    return false;
+            }
+
+            return true;
         }
     }
 }
