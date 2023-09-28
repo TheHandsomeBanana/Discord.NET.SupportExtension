@@ -249,7 +249,7 @@ namespace Discord.NET.SupportExtension.Core.Analyser {
                 serverIds.AddRange(assemblyServerIdList.ServerIds);
 
             // Todo: Recursive search for a class with ServerIdListAttribute
-            await FindServerIdsFromClassAttribute(botAssembly, node);
+            //await FindServerIdsFromClassAttribute(botAssembly, node); // This is slow af => not recommended for language extension
         }
 
         private async Task FindServerIdsFromClassAttribute(Assembly botAssembly, SyntaxNode node) {

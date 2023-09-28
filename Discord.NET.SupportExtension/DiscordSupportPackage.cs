@@ -1,17 +1,25 @@
 ﻿using Discord.NET.SupportExtension.Commands;
 using Discord.NET.SupportExtension.Helper;
+using Discord.NET.SupportExtension.Models.VMModels;
 using HB.NETF.Common;
 using HB.NETF.Common.DependencyInjection;
 using HB.NETF.Discord.NET.Toolkit;
+using HB.NETF.Discord.NET.Toolkit.EntityService.Merged;
+using HB.NETF.Services.Data.Handler;
+using HB.NETF.Services.Data.Handler.Async;
 using HB.NETF.Services.Logging;
 using HB.NETF.Services.Logging.Factory;
 using HB.NETF.Services.Security.Cryptography;
 using HB.NETF.Services.Security.Cryptography.Interfaces;
+using HB.NETF.Services.Security.Cryptography.Keys;
+using HB.NETF.Services.Security.Cryptography.Settings;
 using HB.NETF.VisualStudio.UI;
+using HB.NETF.VisualStudio.Workspace;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 using System;
+using System.IO;
 using System.Runtime.InteropServices;
 using System.Threading;
 using Task = System.Threading.Tasks.Task;
@@ -39,9 +47,9 @@ namespace Discord.NET.SupportExtension {
     [ProvideMenuResource("Menus.ctmenu", 1)]
     [ProvideAutoLoad(UIContextGuids.SolutionExists, PackageAutoLoadFlags.BackgroundLoad)] // Auto load if solution exists
     public sealed class DiscordSupportPackage : AsyncPackage {
-        
-        public static string EventLogPath = DiscordEnvironment.LogPath + "\\" + DateTime.Now.ToString("yyyy.MM.dd_HHmmss") + ".log";
 
+        public static string EventLogPath = DiscordEnvironment.LogPath + "\\" + DateTime.Now.ToString("yyyy.MM.dd_HHmmss") + ".log";
+        public static string CachePath;
         public DiscordSupportPackage() {
             UIHelper.Package = this;
 
@@ -68,6 +76,29 @@ namespace Discord.NET.SupportExtension {
             UIHelper.InitOutputLog("Discord Support Extension");
             await GenerateServerImageConfigurationCommand.InitializeAsync(this);
             await GenerateServerImageCommand.InitializeAsync(this);
+
+            CachePath = DiscordEnvironment.CachePath + "\\" + SolutionHelper.GetCurrentProject().Name + DiscordEnvironment.CacheExtension;
+
+            if (File.Exists(ConfigHelper.GetConfigPath()))
+                await HandleCacheAsync();
+        }
+
+        private async Task HandleCacheAsync() {
+            ILogger<DiscordSupportPackage> logger = DIContainer.GetService<ILoggerFactory>().GetOrCreateLogger<DiscordSupportPackage>();
+            IAsyncStreamHandler streamHandler = DIContainer.GetService<IAsyncStreamHandler>();
+            IMergedDiscordEntityService mergedEntityService = DIContainer.GetService<IMergedDiscordEntityService>();
+            ConfigureServerImageModel model = await streamHandler.ReadFromFileAsync<ConfigureServerImageModel>(ConfigHelper.GetConfigPath());
+
+            GenerateHelper.ManipulateMergedEntityServiceDataEncrypt(mergedEntityService, model, logger, out bool cancel);
+            if (cancel) {
+                logger.LogWarning("Could not retrieve aes key for data decryption. ServerCollection not loaded.");
+                return;
+            }
+
+            if (await mergedEntityService.LoadMerged(CachePath))
+                logger.LogInformation("ServerCollection loaded.");
+            else
+                logger.LogWarning("ServerCollection not loaded. Generate new server image.");
         }
 
         #endregion

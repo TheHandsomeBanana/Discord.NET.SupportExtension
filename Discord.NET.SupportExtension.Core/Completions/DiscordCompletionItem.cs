@@ -7,10 +7,9 @@ using System.Threading.Tasks;
 
 namespace Discord.NET.SupportExtension.Core.Completions {
     internal class DiscordCompletionItem : IDiscordCompletionItem {
-        public string Id { get; set; }
+        public string DisplayText { get; set; }
+        public string InsertText { get; set; }
+        public string Suffix { get; set; }
 
-        public string Name { get; set; }
-
-        public DiscordCompletionContext CompletionContext { get; set; }
     }
 }

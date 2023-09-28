@@ -107,7 +107,6 @@
   <ItemGroup>
     <Compile Include="AnalyserTests\DiscordServerIdTestEngine.cs" />
     <Compile Include="AnalyserTests\DiscordAnalyserTests.cs" />
-    <Compile Include="ContextDetectorTests\DiscordChannelContextTestEngine.cs" />
     <Compile Include="ContextDetectorTests\DiscordCompletionContextTestEngine.cs" />
     <Compile Include="ContextDetectorTests\DiscordCompletionContextTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

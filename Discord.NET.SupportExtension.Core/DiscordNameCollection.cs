@@ -51,7 +51,9 @@ namespace Discord.NET.SupportExtension.Core {
             IDMCHANNEL,
             IFORUMCHANNEL,
             IGROUPCHANNEL,
-            IGUILDCHANNEL
+            IGUILDCHANNEL,
+            ISTAGECHANNEL,
+            ITHREADCHANNEL
         };
 
         public static bool Contains(string name) {

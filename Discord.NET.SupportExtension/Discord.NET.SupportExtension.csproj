@@ -54,6 +54,7 @@
       <DependentUpon>DiscordSupportPackage.vsct</DependentUpon>
     </Compile>
     <Compile Include="GlobalSuppressions.cs" />
+    <Compile Include="Helper\GenerateHelper.cs" />
     <Compile Include="Helper\ConfigHelper.cs" />
     <Compile Include="Models\VMModels\ConfigureServerImageModel.cs" />
     <Compile Include="Models\VMModels\KeyEntryModel.cs" />

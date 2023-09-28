@@ -52,14 +52,14 @@ namespace Discord.NET.SupportExtension.ViewModels {
 
         private readonly KeyEntryModel model;
         private readonly IStreamHandler streamHandler;
-        private readonly ILogger<KeyEntryViewModel> logger;
+        private readonly ILogger<DiscordSupportPackage> logger;
         public KeyEntryViewModel(KeyEntryModel model) {
             ExitCommand = new RelayCommand(Exit, null);
             BrowseKeyCommand = new RelayCommand(BrowseKey, null);
             ExtractCommand = new RelayCommand(Extract, (o) => !string.IsNullOrWhiteSpace(KeyPath) && File.Exists(KeyPath));
             this.model = model;
             this.streamHandler = DIContainer.GetService<IStreamHandler>();
-            this.logger = DIContainer.GetService<ILoggerFactory>().GetOrCreateLogger<KeyEntryViewModel>();
+            this.logger = DIContainer.GetService<ILoggerFactory>().GetOrCreateLogger<DiscordSupportPackage>();
         }
 
         public bool CanClose() => true;

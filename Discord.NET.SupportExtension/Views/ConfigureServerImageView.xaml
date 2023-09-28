@@ -96,17 +96,17 @@
 
                 <StackPanel Orientation="Horizontal">
                     <StackPanel Orientation="Vertical">
-                        <Label Style="{StaticResource SmallHeadLabel}" Content="Bot"></Label>
-                        <TextBox Style="{StaticResource TextBox}" Text="{Binding BotText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Margin="0 0 10 10" Width="200"/>
+                        <Label Style="{StaticResource SmallHeadLabel}" Content="Bot" ToolTip="Name of your Bot"></Label>
+                        <TextBox Style="{StaticResource TextBox}" Text="{Binding BotText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Margin="0 0 10 10" Width="195"/>
                     </StackPanel>
                     <StackPanel Orientation="Vertical">
-                        <Label Style="{StaticResource SmallHeadLabel}" Content="Token"></Label>
+                        <Label Style="{StaticResource SmallHeadLabel}" Content="Token" ToolTip="Token of your bot"></Label>
                         <TextBox Style="{StaticResource TextBox}" Text="{Binding TokenText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Margin="0 0 0 10" Width="500"/>
                     </StackPanel>
                 </StackPanel>
 
-                <ListView Style="{StaticResource ListView}" ItemsSource="{Binding Tokens}" SelectedIndex="{Binding SelectedTokenIndex}"
-                          ItemContainerStyle="{StaticResource TokenListViewItem}">
+                <ListView Style="{StaticResource TokenListView}" ItemsSource="{Binding Tokens}" SelectedIndex="{Binding SelectedTokenIndex}"
+                          ItemContainerStyle="{StaticResource TokenListViewItem}" MaxHeight="480" MaxWidth="710">
                     <ListView.View>
                         <GridView ColumnHeaderContainerStyle="{StaticResource GridViewColumnHeader}">
                             <GridViewColumn Header="Bot" Width="200" DisplayMemberBinding="{Binding Bot}"/>

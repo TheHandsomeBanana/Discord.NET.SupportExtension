@@ -14,23 +14,16 @@ using System.Threading.Tasks;
 
 namespace Discord.NET.SupportExtension.Core.ContextDetector {
     internal class AsyncDiscordContextDetector : IAsyncCodeAnalyser<DiscordCompletionContext>, IAsyncNodeResolver {
-        private SemanticModel SemanticModel;
-
-        private ILogger<AsyncDiscordContextDetector> logger;
-
         private const int MAXRECURSION = 2;
-        private DiscordCompletionContext context;
-        private bool hasContext;
+        private DiscordBaseCompletionContext context;
+        private DiscordChannelContext? channelContext;
+        private bool hasBaseContextContext;
         private SyntaxNode currentNode;
-        private SemanticModel semanticModel;
+        private readonly SemanticModel semanticModel;
 
-        public DiscordChannelContext? ChannelType { get; private set; }
 
         public AsyncDiscordContextDetector(SemanticModel sm) {
             semanticModel = sm;
-
-            ILoggerFactory loggerFactory = DIContainer.GetService<ILoggerFactory>();
-            logger = loggerFactory.GetOrCreateLogger<AsyncDiscordContextDetector>();
         }
 
         public async Task<DiscordCompletionContext> ExecuteAsync(SyntaxNode node) {
@@ -41,12 +34,12 @@ namespace Discord.NET.SupportExtension.Core.ContextDetector {
             for (int i = 0; i < MAXRECURSION && !(currentNode is BlockSyntax) && currentNode != null; i++) {
                 if (currentNode is ExpressionSyntax || currentNode is AttributeSyntax)
                     await ResolveNodeAsync(currentNode);
-                
-                if (hasContext)
-                    return context;
+
+                if (hasBaseContextContext)
+                    return new DiscordCompletionContext(context, channelContext);
             }
 
-            return DiscordCompletionContext.Undefined;
+            return new DiscordCompletionContext();
         }
 
         // Recursive node detection
@@ -91,18 +84,18 @@ namespace Discord.NET.SupportExtension.Core.ContextDetector {
             // Set context with found interface
             if (DiscordNameCollection.Contains(contextTypeSymbol.ToDisplayString())) {
                 SetContext(contextTypeSymbol);
-                hasContext = true;
+                hasBaseContextContext = true;
                 return;
             }
 
             // If interface not found check inheritance 
             foreach (INamedTypeSymbol interfaceSymbol in contextTypeSymbol.AllInterfaces) {
                 SetContext(interfaceSymbol);
-                if (context != DiscordCompletionContext.Undefined) {
-                    if (context == DiscordCompletionContext.Channel)
+                if (context != DiscordBaseCompletionContext.Undefined) {
+                    if (context == DiscordBaseCompletionContext.Channel)
                         HandleChannelType(contextTypeSymbol);
 
-                    hasContext = true;
+                    hasBaseContextContext = true;
                     return;
                 }
             }
@@ -115,35 +108,35 @@ namespace Discord.NET.SupportExtension.Core.ContextDetector {
                 case DiscordNameCollection.SERVERIDLIST:
                 case DiscordNameCollection.SERVERNAME:
                 case DiscordNameCollection.SERVERNAMELIST:
-                    context = DiscordCompletionContext.Server;
+                    context = DiscordBaseCompletionContext.Server;
                     break;
                 case DiscordNameCollection.IUSER:
-                    context = DiscordCompletionContext.User;
+                    context = DiscordBaseCompletionContext.User;
                     break;
                 case DiscordNameCollection.IROLE:
-                    context = DiscordCompletionContext.Role;
+                    context = DiscordBaseCompletionContext.Role;
                     break;
                 case DiscordNameCollection.ICHANNEL:
-                    context = DiscordCompletionContext.Channel;
+                    context = DiscordBaseCompletionContext.Channel;
                     break;
             }
         }
 
         private void HandleChannelType(INamedTypeSymbol contextTypeSymbol) {
             if (DiscordNameCollection.ChannelContains(contextTypeSymbol.ToDisplayString())) {
-                ChannelType = ResolveChannelType(contextTypeSymbol.ToDisplayString());
+                channelContext = ResolveChannelType(contextTypeSymbol.ToDisplayString());
                 return;
             }
 
-            DiscordChannelContext temp = ResolveChannelType(contextTypeSymbol.AllInterfaces.Select(e => e.ToDisplayString()));
+            DiscordChannelContext? temp = ResolveChannelType(contextTypeSymbol.AllInterfaces.Select(e => e.ToDisplayString()));
 
-            if (temp != DiscordChannelContext.Undefined) {
-                ChannelType = temp;
+            if (temp.HasValue) {
+                channelContext = temp;
                 return;
             }
         }
 
-        private DiscordChannelContext ResolveChannelType(string name) {
+        private DiscordChannelContext? ResolveChannelType(string name) {
             switch (name) {
                 case DiscordNameCollection.ITEXTCHANNEL:
                     return DiscordChannelContext.Text;
@@ -157,12 +150,16 @@ namespace Discord.NET.SupportExtension.Core.ContextDetector {
                     return DiscordChannelContext.Guild;
                 case DiscordNameCollection.IGROUPCHANNEL:
                     return DiscordChannelContext.Group;
+                case DiscordNameCollection.ISTAGECHANNEL:
+                    return DiscordChannelContext.Stage;
+                case DiscordNameCollection.ITHREADCHANNEL: 
+                    return DiscordChannelContext.Thread;
             }
 
-            return DiscordChannelContext.Undefined;
+            return null;
         }
 
-        private DiscordChannelContext ResolveChannelType(IEnumerable<string> allInterfaces) {
+        private DiscordChannelContext? ResolveChannelType(IEnumerable<string> allInterfaces) {
             // Order is important
             // Some Interfaces inherit from same --> Less specific Interfaces first
             if (allInterfaces.Any(e => e == DiscordNameCollection.IVOICECHANNEL))
@@ -184,7 +181,7 @@ namespace Discord.NET.SupportExtension.Core.ContextDetector {
                 return DiscordChannelContext.Guild;
 
 
-            return DiscordChannelContext.Undefined;
+            return null;
         }
     }
 }

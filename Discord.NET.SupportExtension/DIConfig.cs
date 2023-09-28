@@ -18,6 +18,7 @@ using HB.NETF.Services.Data.Handler.Async;
 using HB.NETF.Services.Data.Handler;
 using HB.NETF.Discord.NET.Toolkit.TokenService;
 using HB.NETF.Services.Serialization;
+using HB.NETF.Discord.NET.Toolkit.EntityService.Merged;
 
 namespace Discord.NET.SupportExtension {
     internal class DIConfig : IDependencyConfig {
@@ -26,10 +27,10 @@ namespace Discord.NET.SupportExtension {
                 .AddTarget(DiscordSupportPackage.EventLogPath)
                 .AddTarget(UIHelper.OutputWindowFunc)
             ))
-                .AddSingleton<IIdentifierFactory>(new IdentifierFactory())
+                .AddSingleton<IIdentifierFactory, IdentifierFactory>()
+                .AddSingleton<IMergedDiscordEntityService, MergedDiscordEntityService>()
                 .AddTransient<IStreamHandler, StreamHandler>()
                 .AddTransient<IAsyncStreamHandler, AsyncStreamHandler>()
-                .AddTransient<ICachedDiscordEntityServiceHandler, CachedDiscordEntityServiceHandler>()
                 .AddTransient<IDiscordTokenService, DiscordTokenService>()
                 .AddTransient<IAesCryptoService, AesCryptoService>()
                 .AddTransient<ISerializerService, SerializerService>();

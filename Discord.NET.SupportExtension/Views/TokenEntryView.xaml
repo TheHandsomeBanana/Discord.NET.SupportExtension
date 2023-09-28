@@ -5,7 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:Discord.NET.SupportExtension.Views"
              mc:Ignorable="d" 
-             Background="#313338" ResizeMode="NoResize" ShowInTaskbar="False" WindowStyle="None" Width="500" Height="300"
+             Background="#313338" ResizeMode="NoResize" ShowInTaskbar="False" WindowStyle="None" Width="640" Height="260"
         Loaded="Window_Loaded">
 
     <Window.Resources>
@@ -22,33 +22,60 @@
             <RowDefinition Height="20*"/>
             <RowDefinition Height="40"/>
         </Grid.RowDefinitions>
-        <Rectangle Fill="{StaticResource DiscordDark}" MouseLeftButtonDown="Rectangle_MouseLeftButtonDown" HorizontalAlignment="Center" Width="500"/>
+        <Rectangle Fill="{StaticResource DiscordDark}" MouseLeftButtonDown="Rectangle_MouseLeftButtonDown" HorizontalAlignment="Center" Width="850"/>
 
         <Image Source="../Resources/DiscordLogoTextWhite.png" Margin="10,5,0,5" HorizontalAlignment="Left" Grid.Row="0" RenderOptions.BitmapScalingMode="HighQuality" Width="89"/>
         <Label HorizontalAlignment="Center" VerticalAlignment="Center" Content="Token Provider" FontFamily="ABC Ginto Nord Medium" Foreground="White" FontSize="13" Height="28" Width="124"/>
-        <Button Style="{StaticResource SmallExitButton}" Grid.Row="0" HorizontalAlignment="Left" 
+        <Button Style="{StaticResource SmallExitButton}" Grid.Row="0" HorizontalAlignment="Right" 
                         x:Name="btnExitGenerator"       
-                        Command="{Binding ExitCommand}" Margin="460,0,0,0" Width="40">
+                        Command="{Binding ExitCommand}" Width="40">
             <Image Source="../Resources/ExitButton.png" Margin="5 5 5 5"/>
         </Button>
 
-        <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Center" Grid.Row="2" Margin="290,0,0,0" Height="24" Width="200">
-            <Button Style="{StaticResource CommandButtonSmall}" x:Name="btnUseKey" Margin="10 0 0 0" Content="Finish"
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center" Grid.Row="2" Height="24">
+            <Button Style="{StaticResource CommandButtonSmall}" x:Name="btnUseKey" Margin="0 0 0 0" Content="Finish"
                     Command="{Binding FinishCommand}">
 
             </Button>
-            <Button Style="{StaticResource CommandButtonSmall}" x:Name="btnCancel" Margin="10 0 0 0" Content="Cancel"
+            <Button Style="{StaticResource CommandButtonSmall}" x:Name="btnCancel" Margin="10 0 10 0" Content="Cancel"
                     Command="{Binding ExitCommand}">
 
             </Button>
         </StackPanel>
 
-        <StackPanel Orientation="Vertical" Grid.Row="1" Margin="10,0,10,10">
-            <Label Style="{StaticResource SmallHeadLabel}" Content="Tokens" Margin="5 0 5 10"/>
-            <StackPanel Orientation="Horizontal">
-                <ListView ItemsSource="{Binding Tokens}">
+        <StackPanel Orientation="Horizontal" Grid.Row="1" Margin="10,0,10,10">
+            <StackPanel Orientation="Vertical" HorizontalAlignment="Stretch" Margin="20 0 0 0">
+                <StackPanel Orientation="Horizontal">
+                    
+                    <StackPanel Orientation="Vertical">
+                        <Label Style="{StaticResource SmallHeadLabel}" Content="Token" ToolTip="Token of your bot"></Label>
+                        <TextBox Style="{StaticResource TextBox}" Text="{Binding TokenText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Margin="0 0 0 10" Width="500"/>
+                    </StackPanel>
+                </StackPanel>
 
+                <ListView Style="{StaticResource TokenListView}" ItemsSource="{Binding Tokens}" SelectedIndex="{Binding SelectedTokenIndex}"
+                          ItemContainerStyle="{StaticResource TokenListViewItem}" MaxWidth="710" MaxHeight="110">
+                    <ListView.View>
+                        <GridView ColumnHeaderContainerStyle="{StaticResource GridViewColumnHeader}">
+                            <GridViewColumn Header="Token" Width="350" DisplayMemberBinding="{Binding Token}"/>
+                        </GridView>
+                    </ListView.View>
                 </ListView>
+            </StackPanel>
+
+            <StackPanel Orientation="Vertical" Margin="10 65 0 0">
+                <Button Style="{StaticResource CommandButtonSmall}" Command="{Binding AddTokenCommand}" Content="Add" VerticalAlignment="Top"
+                        Margin="0 0 0 10">
+
+                </Button>
+                <Button Style="{StaticResource CommandButtonSmall}" Command="{Binding RemoveTokenCommand}" Content="Remove" VerticalAlignment="Top"
+                        Margin="0 0 0 10">
+
+                </Button>
+                <Button Style="{StaticResource CommandButtonSmall}" Command="{Binding EditTokenCommand}" Content="Edit" VerticalAlignment="Top"
+                        Margin="0 0 0 10">
+
+                </Button>
             </StackPanel>
         </StackPanel>
     </Grid>

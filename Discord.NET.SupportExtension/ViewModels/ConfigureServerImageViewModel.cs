@@ -197,10 +197,9 @@ namespace Discord.NET.SupportExtension.ViewModels {
         #endregion
         #endregion
 
-        private readonly ILogger<ConfigureServerImageViewModel> logger;
+        private readonly ILogger<DiscordSupportPackage> logger;
         private readonly IAesCryptoService aesCryptoService;
         private readonly IAsyncStreamHandler streamHandler;
-        private readonly IDiscordEntityServiceHandler entityService;
         private readonly IDiscordTokenService tokenService;
         private readonly IIdentifierFactory identifierFactory;
         private readonly Project currentProject;
@@ -209,10 +208,9 @@ namespace Discord.NET.SupportExtension.ViewModels {
         public Action Close { get; set; }
 
         public ConfigureServerImageViewModel(ConfigureServerImageModel model) {
-            this.logger = DIContainer.GetService<ILoggerFactory>().GetOrCreateLogger<ConfigureServerImageViewModel>();
+            this.logger = DIContainer.GetService<ILoggerFactory>().GetOrCreateLogger<DiscordSupportPackage>();
             this.streamHandler = DIContainer.GetService<IAsyncStreamHandler>();
             this.currentProject = SolutionHelper.GetCurrentProject();
-            this.entityService = DIContainer.GetService<IDiscordEntityServiceHandler>();
             this.identifierFactory = DIContainer.GetService<IIdentifierFactory>();
             this.tokenService = DIContainer.GetService<IDiscordTokenService>();
             this.aesCryptoService = DIContainer.GetService<IAesCryptoService>();
@@ -237,12 +235,23 @@ namespace Discord.NET.SupportExtension.ViewModels {
 
         private void Save(object o) {
             ThreadHelper.ThrowIfNotOnUIThread();
-            if (!IsTokensUpdated()) {
+            if(!SaveTokens && (model.Tokens.Length > 0 || tokens.Count > 0)) {
+                logger.LogWarning($"{nameof(SaveTokens)} is disabled, there are still {model.Tokens.Length} saved. Saving will remove all current tokens and you will need a new aes key if aes encryption is used.");
+                int option = UIHelper.ShowWarningWithCancel("If you save now, your current tokens will be removed.", "Save Tokens is disabled");
+                if (option == 1) {
+                    tokens.Clear();
+                    model.Tokens = new TokenModel[0];
+                    logger.LogInformation("All tokens have been removed.");
+                }
+                else
+                    return;
+            }
+            else if (!IsTokensUpdated()) {
                 logger.LogWarning("Token list is not saved. Save token list dialog invoked.");
                 int option = UIHelper.ShowWarningWithCancel("Save token list?", "Token list not saved.");
-                if (option == 1)
+                if (option == 1) // Ok
                     SaveTokensToModel(o);
-                else {
+                else { // Cancel
                     logger.LogInformation("Save cancelled.");
                     return;
                 }
@@ -289,6 +298,11 @@ namespace Discord.NET.SupportExtension.ViewModels {
         }
 
         private void LoadTokens(object obj) {
+            if(model.Tokens.Length == 0) {
+                logger.LogInformation("Configuration does not contain any tokens.");
+                return;
+            }
+
             AesKey key = null;
             switch (model.TokenEncryptionMode) {
                 case EncryptionMode.AES:

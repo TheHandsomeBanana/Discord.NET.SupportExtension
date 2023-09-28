@@ -6,9 +6,10 @@ using System.Threading.Tasks;
 
 namespace Discord.NET.SupportExtension.Core.Interface {
     public interface IDiscordCompletionItem {
-        string Id { get; }
-        string Name { get; }
-        DiscordCompletionContext CompletionContext { get; }
+        string DisplayText { get; }
+        string InsertText { get; }
+        string Suffix { get; }
         
+
     }
 }

@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 namespace Discord.NET.SupportExtension.MEF.CompletionSource {
     [Export(typeof(IAsyncCompletionSourceProvider))]
     [ContentType("CSharp")]
-    [Name("Discord Provider")]
+    [Name("Discord Source Provider")]
     internal class AsyncDiscordCompletionSourceProvider : IAsyncCompletionSourceProvider {
         [Import]
         internal ITextStructureNavigatorSelectorService NavigatorService { get; set; }

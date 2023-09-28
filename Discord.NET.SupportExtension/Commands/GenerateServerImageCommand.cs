@@ -9,6 +9,7 @@ using HB.NETF.Discord.NET.Toolkit;
 using HB.NETF.Discord.NET.Toolkit.EntityService;
 using HB.NETF.Discord.NET.Toolkit.EntityService.Cached.Handler;
 using HB.NETF.Discord.NET.Toolkit.EntityService.Handler;
+using HB.NETF.Discord.NET.Toolkit.EntityService.Merged;
 using HB.NETF.Discord.NET.Toolkit.EntityService.Models;
 using HB.NETF.Discord.NET.Toolkit.TokenService;
 using HB.NETF.Services.Data.Handler;
@@ -112,83 +113,35 @@ namespace Discord.NET.SupportExtension.Commands {
                     if (File.Exists(ConfigHelper.GetConfigPath()))
                         model = await streamHandler.ReadFromFileAsync<ConfigureServerImageModel>(ConfigHelper.GetConfigPath());
 
-                    if (model.SaveTokens) {
-                        switch (model.TokenEncryptionMode) {
-                            case EncryptionMode.AES:
-                                AesKey tokenKey = HandleAesKeyExtractorUI(model.TokenKeyIdentifier, "Token");
-                                if (tokenKey == null)
-                                    return;
+                    logger.LogInformation("Extracting key for token decryption.");
+                    tokens = GenerateHelper.GetTokens(tokenService, model, logger);
 
-                                tokens = tokenService.DecryptTokens(model.Tokens, model.TokenEncryptionMode.Value, tokenKey);
-                                break;
-                            case EncryptionMode.WindowsDataProtectionAPI:
-                                tokens = tokenService.DecryptTokens(model.Tokens, model.TokenEncryptionMode.Value);
-                                break;
-                        }
-                    }
-                    else {
-                        TokenEntryModel tokenEntry = new TokenEntryModel();
-                        TokenEntryView view = new TokenEntryView { DataContext = new TokenEntryViewModel(tokenEntry) };
-                        UIHelper.Show(view);
-                        if (tokenEntry.IsCanceled)
-                            return;
-
-                        tokens = tokenEntry.Tokens;
+                    if (tokens == null || tokens.Length == 0) {
+                        logger.LogInformation("Get tokens failed, server image generation aborted.");
+                        return;
                     }
 
-                    ICachedDiscordEntityServiceHandler entityServiceHandler = DIContainer.GetService<ICachedDiscordEntityServiceHandler>();
-                    entityServiceHandler.Init(tokens);
+                    IMergedDiscordEntityService mergedEntityService = DIContainer.GetService<IMergedDiscordEntityService>();
 
-                    if (model.EncryptData) {
-                        switch (model.DataEncryptionMode) {
-                            case EncryptionMode.AES:
-                                AesKey dataKey = HandleAesKeyExtractorUI(model.DataKeyIdentifier, "Data");
-                                if (dataKey == null)
-                                    return;
+                    mergedEntityService.Init(tokens);
 
-                                entityServiceHandler.ManipulateStream(o => o.UseBase64()
-                                .UseCryptography(EncryptionMode.AES)
-                                .ProvideKey(dataKey)
-                                .Set());
-                                break;
-                            case EncryptionMode.WindowsDataProtectionAPI:
-                                entityServiceHandler.ManipulateStream(o => o.UseBase64()
-                                .UseCryptography(EncryptionMode.WindowsDataProtectionAPI)
-                                .Set());
-                                break;
-                        }
+                    GenerateHelper.ManipulateMergedEntityServiceDataEncrypt(mergedEntityService, model, logger, out bool cancel);
+                    if (cancel) {
+                        logger.LogInformation("Server image generation cancelled.");
+                        return;
                     }
 
-                    await entityServiceHandler.Refresh();
-                    entityServiceHandler.Dispose();
+                    await mergedEntityService.SaveMerged(DiscordSupportPackage.CachePath);
+                    mergedEntityService.Dispose();
+                    logger.LogInformation("Server image successfully generated.");
                     UIHelper.ShowInfo("Server Image generated.", "Success");
                 }
                 catch (InternalException ex) {
                     this.logger.LogError(ex.ToString());
-                    UIHelper.ShowError("Image generation failed.", "Error");
+                    UIHelper.ShowError("Server image generation failed.", "Error");
                     return;
                 }
             });
-        }
-
-        private AesKey HandleAesKeyExtractorUI(Guid? id, string name) {
-            KeyEntryModel keyEntry = new KeyEntryModel(name);
-            KeyEntryView view = new KeyEntryView() { DataContext = new KeyEntryViewModel(keyEntry) };
-            logger.LogInformation($"Requesting aes key for {name}.");
-            UIHelper.Show(view);
-            if (keyEntry.Key == null) {
-                logger.LogInformation("Request cancelled.");
-                return null;
-            }
-
-            if (!keyEntry.Key.Identify(id.GetValueOrDefault())) {
-                string error = $"Wrong key for {name} provided.";
-                UIHelper.ShowError(error, "Wrong key");
-                this.logger.LogError(error);
-                return null;
-            }
-
-            return keyEntry.Key.Reference;
         }
     }
 }

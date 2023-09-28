@@ -143,10 +143,12 @@
         <Setter Property="FontSize" Value="12"/>
     </Style>
 
-    <Style x:Key="ListView" TargetType="ListView">
+    <Style x:Key="TokenListView" TargetType="ListView">
         <Setter Property="Background" Value="Transparent"/>
         <Setter Property="BorderBrush" Value="{StaticResource DiscordBlurple}"/>
         <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="SelectionMode" Value="Single"/>
+        <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Disabled"/>
     </Style>
     
     <Style x:Key="GridViewColumnHeader" TargetType="GridViewColumnHeader">

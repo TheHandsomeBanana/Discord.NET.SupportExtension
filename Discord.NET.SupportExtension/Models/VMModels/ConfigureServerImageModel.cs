@@ -9,12 +9,12 @@ using System.Threading.Tasks;
 
 namespace Discord.NET.SupportExtension.Models.VMModels {
     public class ConfigureServerImageModel {
-        public bool SaveTokens { get; set; }
-        public bool EncryptData { get; set; }
-        public EncryptionMode? TokenEncryptionMode { get; set; }
-        public EncryptionMode? DataEncryptionMode { get; set; }
-        public Guid? TokenKeyIdentifier { get; set; }
-        public Guid? DataKeyIdentifier { get; set; }
-        public TokenModel[] Tokens { get; set; }
+        public bool SaveTokens { get; set; } = false;
+        public bool EncryptData { get; set; } = false;
+        public EncryptionMode? TokenEncryptionMode { get; set; } = null;
+        public EncryptionMode? DataEncryptionMode { get; set; } = null;
+        public Guid? TokenKeyIdentifier { get; set; } = null;
+        public Guid? DataKeyIdentifier { get; set; } = null;
+        public TokenModel[] Tokens { get; set; } = new TokenModel[0];
     }
 }

@@ -42,15 +42,15 @@ namespace Discord.NET.SupportExtension.MEF.CompletionSource {
                 return default;
 
             ILoggerFactory loggerFactory = DIContainer.GetService<ILoggerFactory>();
-            if (loggerFactory == null) // LoggerFactory not present => Extension crash
+            if (loggerFactory == null) // Package not loaded => Nullref
                 return default;
 
             ILogger<AsyncDiscordCompletionSource> logger = loggerFactory.GetOrCreateLogger<AsyncDiscordCompletionSource>();
-
             IAsyncDiscordCompletionEngine engine = DIContainer.GetService<IAsyncDiscordCompletionEngine>();
 
             try {
                 Assumes.Present(engine);
+                Stopwatch stopwatch = Stopwatch.StartNew();
                 SemanticModel semanticModel = await document.GetSemanticModelAsync(token);
                 SyntaxToken triggerToken = (await document.GetSyntaxRootAsync(token)).FindToken(triggerLocation);
 
@@ -59,23 +59,28 @@ namespace Discord.NET.SupportExtension.MEF.CompletionSource {
                 if (completions.Length > 0)
                     logger.LogInformation($"{completions.Length} completions added.");
 
+                logger.LogInformation($"Completion finished in {stopwatch.ElapsedMilliseconds} ms.");
+
+                stopwatch.Stop();
                 return new CompletionContext(completions.Select(e =>
-                    new CompletionItem(e.Id, this, DiscordImage, DiscordFilters, GetCompletionSuffix(e))).ToImmutableArray()
+                    new CompletionItem(e.DisplayText, this, DiscordImage, DiscordFilters, e.Suffix, e.InsertText, e.InsertText, e.InsertText, DiscordImageArray)).ToImmutableArray()
                 );
             }
             catch (Exception ex) {
-                logger.LogCritical("IntelliSense adaption failed. " + ex.ToString());
+                logger.LogCritical("Completion context engine failed. " + ex.ToString());
             }
 
             return default;
         }
 
         public async Task<object> GetDescriptionAsync(IAsyncCompletionSession session, CompletionItem item, CancellationToken token) {
-            return await Task.FromResult(item.Properties["description"] as ContainerElement);
+            if (item.Properties.ContainsProperty("description"))
+                return await Task.FromResult(item.Properties["description"] as ContainerElement);
+            return null;
         }
 
         public CompletionStartData InitializeCompletion(CompletionTrigger trigger, SnapshotPoint triggerLocation, CancellationToken token) {
-            ThreadHelper.ThrowIfNotOnUIThread(); // DTE access should only be done in main thread
+            ThreadHelper.ThrowIfNotOnUIThread();
             if (DocumentIdentifier == null) {
                 DTE dte = WorkspaceHelper.GetDTE();
                 if (dte?.ActiveDocument != null)
@@ -93,7 +98,7 @@ namespace Discord.NET.SupportExtension.MEF.CompletionSource {
         }
 
         private static readonly ImageElement DiscordImage = new ImageElement(new ImageId(PackageImageIds.discordImages, PackageImageIds.bmpPic1), "Discord");
+        private static readonly ImmutableArray<ImageElement> DiscordImageArray = new ImageElement[] { new ImageElement(new ImageId(PackageImageIds.discordImages, PackageImageIds.bmpPic1), "Discord") }.ToImmutableArray();
         private static readonly ImmutableArray<CompletionFilter> DiscordFilters = new CompletionFilter[] { new CompletionFilter("Discord", "D", DiscordImage) }.ToImmutableArray();
-        private string GetCompletionSuffix(IDiscordCompletionItem item) => $"[{item.Name}] ({item.CompletionContext})";
     }
 }
