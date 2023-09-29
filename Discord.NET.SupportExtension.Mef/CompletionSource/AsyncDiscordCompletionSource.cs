@@ -27,7 +27,7 @@ using Discord.NET.SupportExtension.Mef;
 using HB.NETF.VisualStudio.Workspace;
 
 namespace Discord.NET.SupportExtension.MEF.CompletionSource {
-    internal class AsyncDiscordCompletionSource : IAsyncCompletionSource {
+    public class AsyncDiscordCompletionSource : IAsyncCompletionSource {
         private bool _isDisposed;
         public VisualStudioWorkspace VSWorkspace { get; set; }
         public DocumentId DocumentIdentifier { get; set; }
@@ -37,10 +37,6 @@ namespace Discord.NET.SupportExtension.MEF.CompletionSource {
         }
 
         public async Task<CompletionContext> GetCompletionContextAsync(IAsyncCompletionSession session, CompletionTrigger trigger, SnapshotPoint triggerLocation, SnapshotSpan applicableToSpan, CancellationToken token) {
-            Microsoft.CodeAnalysis.Document document = VSWorkspace.CurrentSolution.GetDocument(DocumentIdentifier);
-            if (document == null)
-                return default;
-
             ILoggerFactory loggerFactory = DIContainer.GetService<ILoggerFactory>();
             if (loggerFactory == null) // Package not loaded => Nullref
                 return default;
@@ -49,8 +45,17 @@ namespace Discord.NET.SupportExtension.MEF.CompletionSource {
             IAsyncDiscordCompletionEngine engine = DIContainer.GetService<IAsyncDiscordCompletionEngine>();
 
             try {
+                if(token.IsCancellationRequested) {
+                    logger.LogInformation("Completion context request cancelled");
+                    return default;
+                }
+
                 Assumes.Present(engine);
                 Stopwatch stopwatch = Stopwatch.StartNew();
+                Microsoft.CodeAnalysis.Document document = VSWorkspace.CurrentSolution.GetDocument(DocumentIdentifier);
+                if (document == null)
+                    return default;
+
                 SemanticModel semanticModel = await document.GetSemanticModelAsync(token);
                 SyntaxToken triggerToken = (await document.GetSyntaxRootAsync(token)).FindToken(triggerLocation);
 
@@ -76,7 +81,7 @@ namespace Discord.NET.SupportExtension.MEF.CompletionSource {
         public async Task<object> GetDescriptionAsync(IAsyncCompletionSession session, CompletionItem item, CancellationToken token) {
             if (item.Properties.ContainsProperty("description"))
                 return await Task.FromResult(item.Properties["description"] as ContainerElement);
-            return null;
+            return await Task.FromResult("");
         }
 
         public CompletionStartData InitializeCompletion(CompletionTrigger trigger, SnapshotPoint triggerLocation, CancellationToken token) {

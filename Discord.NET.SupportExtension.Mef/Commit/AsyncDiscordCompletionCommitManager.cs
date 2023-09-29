@@ -11,10 +11,10 @@ using System.Threading.Tasks;
 
 namespace Discord.NET.SupportExtension.Mef.Commit {
     public class AsyncDiscordCompletionCommitManager : IAsyncCompletionCommitManager {
-        public IEnumerable<char> PotentialCommitCharacters => " (1234567890".ToCharArray();
+        public IEnumerable<char> PotentialCommitCharacters => ".".ToCharArray();
 
         public bool ShouldCommitCompletion(IAsyncCompletionSession session, SnapshotPoint location, char typedChar, CancellationToken token) {
-            return true;
+            return false;
         }
 
         public CommitResult TryCommit(IAsyncCompletionSession session, ITextBuffer buffer, CompletionItem item, char typedChar, CancellationToken token) {

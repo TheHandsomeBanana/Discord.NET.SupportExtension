@@ -13,9 +13,9 @@ namespace Discord.NET.SupportExtension.MEF.CompletionSource {
     [Export(typeof(IAsyncCompletionSourceProvider))]
     [ContentType("CSharp")]
     [Name("Discord Source Provider")]
-    internal class AsyncDiscordCompletionSourceProvider : IAsyncCompletionSourceProvider {
+    public class AsyncDiscordCompletionSourceProvider : IAsyncCompletionSourceProvider {
         [Import]
-        internal ITextStructureNavigatorSelectorService NavigatorService { get; set; }
+        public ITextStructureNavigatorSelectorService NavigatorService { get; set; }
 
         public IAsyncCompletionSource GetOrCreate(ITextView textView) {
             return new AsyncDiscordCompletionSource();

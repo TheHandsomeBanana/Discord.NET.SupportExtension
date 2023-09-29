@@ -9,9 +9,11 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace Discord.NET.SupportExtension.Mef.Commit {
-    //[Export(typeof(IAsyncCompletionCommitManagerProvider))]
-    //[ContentType("CSharp")]
-    //[Name("Discord Commit Provider")]
+    [Export(typeof(IAsyncCompletionCommitManagerProvider))]
+    [ContentType("code")]
+    [TextViewRole(PredefinedTextViewRoles.Editable)]
+    [Order(Before = "default")]
+    [Name("Discord Commit Provider")]
     public class AsyncDiscordCompletionCommitManagerProvider : IAsyncCompletionCommitManagerProvider {
         public IAsyncCompletionCommitManager GetOrCreate(ITextView textView) {
             return new AsyncDiscordCompletionCommitManager();
