@@ -2,8 +2,9 @@
 <PackageManifest Version="2.0.0" xmlns="http://schemas.microsoft.com/developer/vsx-schema/2011" xmlns:d="http://schemas.microsoft.com/developer/vsx-schema-design/2011">
     <Metadata>
         <Identity Id="Discord.NET.SupportExtension.bb28da74-4e8c-4969-885f-9d63f7764dbd" Version="1.0" Language="en-US" Publisher="Merwa Stefan" />
-        <DisplayName>Discord.NET.SupportExtension</DisplayName>
-        <Description>Empty VSIX Project.</Description>
+        <DisplayName>Discord.NET Support Extension</DisplayName>
+        <Description xml:space="preserve">Provides support functionality for coding discord bots.</Description>
+        <Icon>Resources\Icons\discordicon_512.png</Icon>
     </Metadata>
     <Installation>
         <InstallationTarget Id="Microsoft.VisualStudio.Community" Version="[17.0, 18.0)">

@@ -55,8 +55,8 @@ namespace Discord.NET.SupportExtension.Core.Analyser {
                 currentNode = currentNode.Parent;
             }
 
-            // No specific server id found --> Check attributes
-            await FindServerIdsFromAttribute(node);
+            // No specific server id found --> Check AssemblyInfo for attribute
+            await FindServerIdsFromAttribute();
             return serverIds;
         }
 
@@ -235,14 +235,15 @@ namespace Discord.NET.SupportExtension.Core.Analyser {
             }
         }
 
-        private async Task FindServerIdsFromAttribute(SyntaxNode node) {
+        private async Task FindServerIdsFromAttribute() {
             Assembly botAssembly;
-            try {
+            if (File.Exists(project.OutputFilePath))
                 botAssembly = Assembly.LoadFrom(project.OutputFilePath);
+            else {
+                logger.LogError($"Could not resolve server id from attribute --> project output not found. Build your project {project.Name} first.");
+                return;
             }
-            catch (FileNotFoundException ex) {
-                throw new InternalException("Project output not found. Build your project first.", ex);
-            }
+
 
             ServerIdListAttribute assemblyServerIdList = botAssembly.GetCustomAttribute<ServerIdListAttribute>();
             if (assemblyServerIdList != null)
@@ -279,7 +280,7 @@ namespace Discord.NET.SupportExtension.Core.Analyser {
                 if (tempNode.SyntaxTree.FilePath != location.SourceTree.FilePath) {
                     SyntaxTree syntaxTree = locationNode.SyntaxTree;
                     SemanticModel semanticModel = this.semanticModel.Compilation.GetSemanticModel(syntaxTree);
-                    
+
                     serverIdAnalyser = new AsyncDiscordServerIdAnalyser(semanticModel, syntaxTree, solution, project) { serverIds = this.serverIds };
                 }
                 else

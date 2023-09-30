@@ -23,6 +23,9 @@ namespace Discord.NET.SupportExtension
 
         public const string discordImagesString = "b4157286-21f9-4e49-9731-6016213b4f08";
         public static Guid discordImages = new Guid(discordImagesString);
+
+        public const string DiscordMonikerString = "d53d7256-d44d-4245-bdd2-bfd22943659c";
+        public static Guid DiscordMoniker = new Guid(DiscordMonikerString);
     }
     /// <summary>
     /// Helper class that encapsulates all CommandIDs uses across VS Package.
@@ -33,5 +36,6 @@ namespace Discord.NET.SupportExtension
         public const int GenerateServerImageConfigurationCommand = 0x0010;
         public const int GenerateServerImageCommand = 0x0020;
         public const int bmpPic1 = 0x0001;
+        public const int Discord = 0x0001;
     }
 }

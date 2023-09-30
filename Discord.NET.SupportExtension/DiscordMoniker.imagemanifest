@@ -1,0 +1,20 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+
+<ImageManifest xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://schemas.microsoft.com/VisualStudio/ImageManifestSchema/2014">
+	<Symbols>
+		<String Name="Resources" Value="/Discord.NET.SupportExtension;Component/Resources/Icons" />
+		<Guid Name="DiscordMoniker" Value="{d53d7256-d44d-4245-bdd2-bfd22943659c}" />
+		<ID Name="Discord" Value="1" />
+	</Symbols>
+	<Images>
+		<Image Guid="$(DiscordMoniker)" ID="$(Discord)">
+			<Source Uri="$(Resources)/discordicon_16.png">
+				<Size Value="16" />
+			</Source>
+			<Source Uri="$(Resources)/discordicon_32.png">
+				<Size Value="32" />
+			</Source>
+		</Image>
+	</Images>
+	<ImageLists />
+</ImageManifest>
