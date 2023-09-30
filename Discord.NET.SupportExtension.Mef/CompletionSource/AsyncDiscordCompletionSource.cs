@@ -25,17 +25,15 @@ using HB.NETF.Services.Logging.Factory;
 using Microsoft.VisualStudio.Core.Imaging;
 using Discord.NET.SupportExtension.Mef;
 using HB.NETF.VisualStudio.Workspace;
-using Microsoft.VisualStudio.Imaging.Interop;
-using Microsoft.VisualStudio.Imaging;
 
 namespace Discord.NET.SupportExtension.MEF.CompletionSource {
     public class AsyncDiscordCompletionSource : IAsyncCompletionSource {
         private bool _isDisposed;
-        public VisualStudioWorkspace VSWorkspace { get; set; }
-        public DocumentId DocumentIdentifier { get; set; }
+        private DocumentId documentIdentifier;
+        private VisualStudioWorkspace vsWorkspace;
 
         public AsyncDiscordCompletionSource() {
-            VSWorkspace = WorkspaceHelper.GetVisualStudioWorkspace();
+            vsWorkspace = WorkspaceHelper.GetVisualStudioWorkspace();
         }
 
         public async Task<CompletionContext> GetCompletionContextAsync(IAsyncCompletionSession session, CompletionTrigger trigger, SnapshotPoint triggerLocation, SnapshotSpan applicableToSpan, CancellationToken token) {
@@ -54,19 +52,17 @@ namespace Discord.NET.SupportExtension.MEF.CompletionSource {
 
                 Assumes.Present(engine);
                 Stopwatch stopwatch = Stopwatch.StartNew();
-                Microsoft.CodeAnalysis.Document document = VSWorkspace.CurrentSolution.GetDocument(DocumentIdentifier);
+                Microsoft.CodeAnalysis.Document document = vsWorkspace.CurrentSolution.GetDocument(documentIdentifier);
                 if (document == null)
                     return default;
 
                 SemanticModel semanticModel = await document.GetSemanticModelAsync(token);
                 SyntaxToken triggerToken = (await document.GetSyntaxRootAsync(token)).FindToken(triggerLocation);
 
-                IDiscordCompletionItem[] completions = await engine.ProcessCompletionAsync(VSWorkspace.CurrentSolution, semanticModel, triggerToken);
+                IDiscordCompletionItem[] completions = await engine.ProcessCompletionAsync(vsWorkspace.CurrentSolution, semanticModel, triggerToken);
 
                 if (completions.Length > 0)
-                    logger.LogInformation($"{completions.Length} completions added.");
-
-                logger.LogInformation($"Completion finished in {stopwatch.ElapsedMilliseconds} ms.");
+                    logger.LogInformation($"{completions.Length} completions added in {stopwatch.ElapsedMilliseconds} ms.");
 
                 stopwatch.Stop();
                 return new CompletionContext(completions.Select(e =>
@@ -88,10 +84,10 @@ namespace Discord.NET.SupportExtension.MEF.CompletionSource {
 
         public CompletionStartData InitializeCompletion(CompletionTrigger trigger, SnapshotPoint triggerLocation, CancellationToken token) {
             ThreadHelper.ThrowIfNotOnUIThread();
-            if (DocumentIdentifier == null) {
+            if (documentIdentifier == null) {
                 DTE dte = WorkspaceHelper.GetDTE();
                 if (dte?.ActiveDocument != null)
-                    DocumentIdentifier = VSWorkspace.CurrentSolution.GetDocumentIdsWithFilePath(dte.ActiveDocument.FullName).FirstOrDefault();
+                    documentIdentifier = vsWorkspace.CurrentSolution.GetDocumentIdsWithFilePath(dte.ActiveDocument.FullName).FirstOrDefault();
             }
 
             

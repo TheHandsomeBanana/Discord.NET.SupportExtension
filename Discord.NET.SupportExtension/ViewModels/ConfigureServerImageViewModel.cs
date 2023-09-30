@@ -221,8 +221,8 @@ namespace Discord.NET.SupportExtension.ViewModels {
             CreateTokenAESKeyFileCommand = new RelayCommand(CreateTokenAESKeyFile, null);
             CreateDataAESKeyFileCommand = new RelayCommand(CreateDataAESKeyFile, null);
             LoadTokensCommand = new RelayCommand(LoadTokens, o => !loadCalled);
-            SaveTokensCommand = new RelayCommand(SaveTokensToModel, o => !IsTokensUpdated() && tokens.Count > 0);
-            AddTokenCommand = new RelayCommand(AddToken, o => !string.IsNullOrWhiteSpace(BotText) && !string.IsNullOrWhiteSpace(TokenText) && TokenText.Length == 70);
+            SaveTokensCommand = new RelayCommand(SaveTokensToModel, o => loadCalled && !IsTokensUpdated() && tokens.Count > 0);
+            AddTokenCommand = new RelayCommand(AddToken, o => loadCalled && !string.IsNullOrWhiteSpace(BotText) && !string.IsNullOrWhiteSpace(TokenText) && TokenText.Length == 70);
             RemoveTokenCommand = new RelayCommand(RemoveToken, (o) => SelectedTokenIndex > -1);
             EditTokenCommand = new RelayCommand(EditToken, (o) => SelectedTokenIndex > -1);
             this.model = model;
@@ -235,7 +235,7 @@ namespace Discord.NET.SupportExtension.ViewModels {
 
         private void Save(object o) {
             ThreadHelper.ThrowIfNotOnUIThread();
-            if(!SaveTokens && (model.Tokens.Length > 0 || tokens.Count > 0)) {
+            if(!SaveTokens && (model.Tokens.Length > 0)) {
                 logger.LogWarning($"{nameof(SaveTokens)} is disabled, there are still {model.Tokens.Length} saved. Saving will remove all current tokens and you will need a new aes key if aes encryption is used.");
                 int option = UIHelper.ShowWarningWithCancel("If you save now, your current tokens will be removed.", "Save Tokens is disabled");
                 if (option == 1) {
@@ -246,7 +246,7 @@ namespace Discord.NET.SupportExtension.ViewModels {
                 else
                     return;
             }
-            else if (!IsTokensUpdated()) {
+            if (loadCalled && !IsTokensUpdated()) {
                 logger.LogWarning("Token list is not saved. Save token list dialog invoked.");
                 int option = UIHelper.ShowWarningWithCancel("Save token list?", "Token list not saved.");
                 if (option == 1) // Ok
@@ -320,6 +320,8 @@ namespace Discord.NET.SupportExtension.ViewModels {
 
             loadCalled = true;
             LoadTokensCommand.OnCanExecuteChanged();
+            SaveTokensCommand.OnCanExecuteChanged();
+            AddTokenCommand.OnCanExecuteChanged();
         }
 
         private void SaveTokensToModel(object obj) {

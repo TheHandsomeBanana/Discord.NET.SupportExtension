@@ -113,7 +113,6 @@ namespace Discord.NET.SupportExtension.Commands {
                     if (File.Exists(ConfigHelper.GetConfigPath()))
                         model = await streamHandler.ReadFromFileAsync<ConfigureServerImageModel>(ConfigHelper.GetConfigPath());
 
-                    logger.LogInformation("Extracting key for token decryption.");
                     tokens = GenerateHelper.GetTokens(tokenService, model, logger);
 
                     if (tokens == null || tokens.Length == 0) {
