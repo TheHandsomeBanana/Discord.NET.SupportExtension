@@ -1,5 +1,5 @@
 ﻿using Discord.NET.SupportExtension.Core.Interface;
-using HB.NETF.Code.Analysis;
+using HB.NETF.Code.Analysis.Interface;
 using HB.NETF.Common.DependencyInjection;
 using HB.NETF.Services.Logging;
 using HB.NETF.Services.Logging.Factory;
@@ -13,7 +13,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace Discord.NET.SupportExtension.Core.ContextDetector {
-    internal class AsyncDiscordContextDetector : IAsyncCodeAnalyser<DiscordCompletionContext>, IAsyncNodeResolver {
+    internal class AsyncDiscordContextDetector : ICodeAnalyser<DiscordCompletionContext> {
         private const int MAXRECURSION = 2;
         private DiscordBaseCompletionContext context;
         private DiscordChannelContext? channelContext;

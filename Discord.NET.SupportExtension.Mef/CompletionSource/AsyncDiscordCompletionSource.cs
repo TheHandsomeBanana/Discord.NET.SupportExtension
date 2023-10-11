@@ -46,7 +46,7 @@ namespace Discord.NET.SupportExtension.MEF.CompletionSource {
 
             try {
                 if(token.IsCancellationRequested) {
-                    logger.LogInformation("Completion context request cancelled");
+                    logger.LogInformation("Completion cancelled");
                     return default;
                 }
 
