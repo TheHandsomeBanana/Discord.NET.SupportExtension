@@ -1,5 +1,6 @@
 ﻿using Discord.NET.SupportExtension.Core.Interface;
 using HB.NETF.Code.Analysis;
+using HB.NETF.Code.Analysis.Interface;
 using HB.NETF.Common.DependencyInjection;
 using HB.NETF.Discord.NET.Toolkit.EntityService.Handler;
 using HB.NETF.Discord.NET.Toolkit.EntityService.Merged;
@@ -16,7 +17,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace Discord.NET.SupportExtension.Core.Analyser {
-    internal class AsyncDiscordContextAnalyser : IAsyncCodeAnalyser<DiscordEntity[]> {
+    internal class AsyncDiscordContextAnalyser : ISnapshotAnalyser<DiscordEntity[]> {
         private readonly ILogger<AsyncDiscordContextAnalyser> logger;
         private readonly IMergedDiscordEntityService entityService;
 
@@ -42,7 +43,7 @@ namespace Discord.NET.SupportExtension.Core.Analyser {
             if (completionContext.BaseContext == DiscordBaseCompletionContext.Server)
                 return entityService.ServerCollection.GetServers();
 
-            IAsyncCodeAnalyser<IEnumerable<ulong>> serverIdAnalyser = new AsyncDiscordServerIdAnalyser(semanticModel, syntaxTree, solution, project);
+            ISnapshotAnalyser<IEnumerable<ulong>> serverIdAnalyser = new AsyncDiscordServerIdAnalyser(semanticModel, syntaxTree, solution, project);
             IEnumerable<ulong> serverIdList = await serverIdAnalyser.ExecuteAsync(syntaxNode);
             List<DiscordEntity> foundItems = new List<DiscordEntity>();
             switch (completionContext.BaseContext) {

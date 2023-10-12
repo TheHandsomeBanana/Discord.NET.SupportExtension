@@ -13,7 +13,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace Discord.NET.SupportExtension.Core.ContextDetector {
-    internal class AsyncDiscordContextDetector : ICodeAnalyser<DiscordCompletionContext> {
+    internal class AsyncDiscordContextDetector : ISnapshotAnalyser<DiscordCompletionContext> {
         private const int MAXRECURSION = 2;
         private DiscordBaseCompletionContext context;
         private DiscordChannelContext? channelContext;

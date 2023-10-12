@@ -1,4 +1,5 @@
 ﻿using HB.NETF.Code.Analysis;
+using HB.NETF.Code.Analysis.Interface;
 using HB.NETF.Common.DependencyInjection;
 using HB.NETF.Common.Exceptions;
 using HB.NETF.Discord.NET.Toolkit.SupportExtension;
@@ -20,7 +21,7 @@ using System.Threading.Tasks;
 using System.Xml.Linq;
 
 namespace Discord.NET.SupportExtension.Core.Analyser {
-    internal class AsyncDiscordServerIdAnalyser : IAsyncCodeAnalyser<IEnumerable<ulong>>, IAsyncNodeResolver {
+    internal class AsyncDiscordServerIdAnalyser : ISnapshotAnalyser<IEnumerable<ulong>> {
         private ILogger<AsyncDiscordServerIdAnalyser> logger;
         private const int RECURSIONLEVEL = 4;
         private Solution solution;
