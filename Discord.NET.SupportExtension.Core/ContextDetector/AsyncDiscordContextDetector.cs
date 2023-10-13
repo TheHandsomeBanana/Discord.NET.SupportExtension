@@ -13,20 +13,20 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace Discord.NET.SupportExtension.Core.ContextDetector {
-    internal class AsyncDiscordContextDetector : ISnapshotAnalyser<DiscordCompletionContext> {
+    internal class AsyncDiscordContextDetector : ICodeAnalyser<DiscordCompletionContext> {
         private const int MAXRECURSION = 2;
         private DiscordBaseCompletionContext context;
         private DiscordChannelContext? channelContext;
         private bool hasBaseContextContext;
         private SyntaxNode currentNode;
-        private readonly SemanticModel semanticModel;
+        public SemanticModel SemanticModel { get; }
 
 
         public AsyncDiscordContextDetector(SemanticModel sm) {
-            semanticModel = sm;
+            SemanticModel = sm;
         }
 
-        public async Task<DiscordCompletionContext> ExecuteAsync(SyntaxNode node) {
+        public async Task<DiscordCompletionContext> Run(SyntaxNode node) {
             currentNode = node.Parent;
             if (currentNode.IsKind(SyntaxKind.NumericLiteralExpression))
                 currentNode = currentNode.Parent;
@@ -73,7 +73,7 @@ namespace Discord.NET.SupportExtension.Core.ContextDetector {
         }
 
         private void CheckForContext(ExpressionSyntax expression) {
-            INamedTypeSymbol contextTypeSymbol = semanticModel.GetTypeInfo(expression).Type as INamedTypeSymbol;
+            INamedTypeSymbol contextTypeSymbol = SemanticModel.GetTypeInfo(expression).Type as INamedTypeSymbol;
 
             if (contextTypeSymbol?.Name == "Task") // Overwrite symbol with generic type
                 contextTypeSymbol = contextTypeSymbol.TypeArguments[0] as INamedTypeSymbol;
@@ -152,7 +152,7 @@ namespace Discord.NET.SupportExtension.Core.ContextDetector {
                     return DiscordChannelContext.Group;
                 case DiscordNameCollection.ISTAGECHANNEL:
                     return DiscordChannelContext.Stage;
-                case DiscordNameCollection.ITHREADCHANNEL: 
+                case DiscordNameCollection.ITHREADCHANNEL:
                     return DiscordChannelContext.Thread;
             }
 

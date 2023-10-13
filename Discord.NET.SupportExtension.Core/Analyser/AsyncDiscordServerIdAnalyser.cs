@@ -21,29 +21,29 @@ using System.Threading.Tasks;
 using System.Xml.Linq;
 
 namespace Discord.NET.SupportExtension.Core.Analyser {
-    internal class AsyncDiscordServerIdAnalyser : ISnapshotAnalyser<IEnumerable<ulong>> {
+    internal class AsyncDiscordServerIdAnalyser : ICodeAnalyser<IEnumerable<ulong>> {
         private ILogger<AsyncDiscordServerIdAnalyser> logger;
         private const int RECURSIONLEVEL = 4;
         private Solution solution;
         private Project project;
         private IImmutableSet<Microsoft.CodeAnalysis.Document> documents;
-        private SemanticModel semanticModel;
         private SyntaxTree syntaxTree;
         private SyntaxNode currentNode;
         private List<ulong> serverIds = new List<ulong>();
 
 
+        public SemanticModel SemanticModel { get; }
         public AsyncDiscordServerIdAnalyser(SemanticModel semanticModel, SyntaxTree syntaxTree, Solution solution, Project project) {
             ILoggerFactory loggerFactory = DIContainer.GetService<ILoggerFactory>();
             logger = loggerFactory.GetOrCreateLogger<AsyncDiscordServerIdAnalyser>();
 
-            this.semanticModel = semanticModel;
+            this.SemanticModel = semanticModel;
             this.syntaxTree = syntaxTree;
             this.solution = solution;
             this.project = project;
         }
 
-        public async Task<IEnumerable<ulong>> ExecuteAsync(SyntaxNode node) {
+        public async Task<IEnumerable<ulong>> Run(SyntaxNode node) {
             currentNode = node;
 
             for (int i = 0; i < RECURSIONLEVEL && !(currentNode is BlockSyntax) && currentNode != null; i++) {
@@ -93,7 +93,7 @@ namespace Discord.NET.SupportExtension.Core.Analyser {
         }
 
         private async Task<bool> CheckInvocationType(InvocationExpressionSyntax invocation) {
-            INamedTypeSymbol typeSymbol = semanticModel.GetTypeInfo(invocation).Type as INamedTypeSymbol;
+            INamedTypeSymbol typeSymbol = SemanticModel.GetTypeInfo(invocation).Type as INamedTypeSymbol;
 
             if (typeSymbol?.Name == "Task") // Overwrite symbol with generic type
                 typeSymbol = typeSymbol.TypeArguments[0] as INamedTypeSymbol;
@@ -122,7 +122,7 @@ namespace Discord.NET.SupportExtension.Core.Analyser {
         }
 
         private async Task HandleIdentifierAsync(IdentifierNameSyntax identifier) {
-            ISymbol identifierSymbol = semanticModel.GetSymbolInfo(identifier).Symbol;
+            ISymbol identifierSymbol = SemanticModel.GetSymbolInfo(identifier).Symbol;
 
             if (identifierSymbol == null)
                 return;
@@ -144,7 +144,7 @@ namespace Discord.NET.SupportExtension.Core.Analyser {
 
                 AsyncDiscordServerIdAnalyser serverIdAnalyser;
                 if (referencedNode.SyntaxTree.FilePath != syntaxTree.FilePath) {
-                    SemanticModel sm = semanticModel.Compilation.GetSemanticModel(referencedNode.SyntaxTree);
+                    SemanticModel sm = SemanticModel.Compilation.GetSemanticModel(referencedNode.SyntaxTree);
                     serverIdAnalyser = new AsyncDiscordServerIdAnalyser(sm, referencedNode.SyntaxTree, solution, project) { serverIds = this.serverIds }; // Pass current server-id-list to new analyser;
                 }
                 else
@@ -179,7 +179,7 @@ namespace Discord.NET.SupportExtension.Core.Analyser {
         }
 
         private async Task HandleIncomingParameterAsync(ParameterSyntax parameter) {
-            ISymbol declarationSymbol = semanticModel.GetDeclaredSymbol(parameter.Parent.Parent);
+            ISymbol declarationSymbol = SemanticModel.GetDeclaredSymbol(parameter.Parent.Parent);
 
             if (declarationSymbol == null && parameter.Parent is LambdaExpressionSyntax lambda)
                 await HandleLambdaParameter(lambda);
@@ -208,14 +208,14 @@ namespace Discord.NET.SupportExtension.Core.Analyser {
                 if (parameter.SyntaxTree.FilePath != location.SourceTree.FilePath) {
 
                     SyntaxTree syntaxTree = locationNode.SyntaxTree;
-                    SemanticModel semanticModel = this.semanticModel.Compilation.GetSemanticModel(syntaxTree);
+                    SemanticModel semanticModel = this.SemanticModel.Compilation.GetSemanticModel(syntaxTree);
 
                     serverIdAnalyser = new AsyncDiscordServerIdAnalyser(semanticModel, syntaxTree, solution, project);
                 }
                 else
                     serverIdAnalyser = this;
 
-                IEnumerable<ulong> temp = await serverIdAnalyser.ExecuteAsync(locationNode);
+                IEnumerable<ulong> temp = await serverIdAnalyser.Run(locationNode);
                 foreach (ulong value in temp) {
                     if (!serverIds.Contains(value))
                         serverIds.Add(value);
@@ -270,7 +270,7 @@ namespace Discord.NET.SupportExtension.Core.Analyser {
                 return;
 
             MemberDeclarationSyntax declaration = tempNode as MemberDeclarationSyntax;
-            ISymbol declarationSymbol = semanticModel.GetDeclaredSymbol(declaration);
+            ISymbol declarationSymbol = SemanticModel.GetDeclaredSymbol(declaration);
 
             IEnumerable<ReferencedSymbol> memberReferences = await SymbolFinder.FindReferencesAsync(declarationSymbol, solution, documents);
             IEnumerable<Location> locations = memberReferences.SelectMany(l => l.Locations.Select(s => s.Location));
@@ -280,7 +280,7 @@ namespace Discord.NET.SupportExtension.Core.Analyser {
                 AsyncDiscordServerIdAnalyser serverIdAnalyser;
                 if (tempNode.SyntaxTree.FilePath != location.SourceTree.FilePath) {
                     SyntaxTree syntaxTree = locationNode.SyntaxTree;
-                    SemanticModel semanticModel = this.semanticModel.Compilation.GetSemanticModel(syntaxTree);
+                    SemanticModel semanticModel = this.SemanticModel.Compilation.GetSemanticModel(syntaxTree);
 
                     serverIdAnalyser = new AsyncDiscordServerIdAnalyser(semanticModel, syntaxTree, solution, project) { serverIds = this.serverIds };
                 }

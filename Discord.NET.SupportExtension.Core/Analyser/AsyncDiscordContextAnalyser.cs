@@ -17,15 +17,15 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace Discord.NET.SupportExtension.Core.Analyser {
-    internal class AsyncDiscordContextAnalyser : ISnapshotAnalyser<DiscordEntity[]> {
+    internal class AsyncDiscordContextAnalyser : ICodeAnalyser<DiscordEntity[]> {
         private readonly ILogger<AsyncDiscordContextAnalyser> logger;
         private readonly IMergedDiscordEntityService entityService;
 
         private readonly DiscordCompletionContext completionContext;
         private readonly Solution solution;
         private readonly Project project;
-        private readonly SemanticModel semanticModel;
         private readonly SyntaxTree syntaxTree;
+        public SemanticModel SemanticModel { get; }
 
         public AsyncDiscordContextAnalyser(SemanticModel semanticModel, SyntaxTree syntaxTree, Solution solution, Project project, DiscordCompletionContext completionContext) {
             ILoggerFactory loggerFactory = DIContainer.GetService<ILoggerFactory>();
@@ -35,16 +35,16 @@ namespace Discord.NET.SupportExtension.Core.Analyser {
             this.completionContext = completionContext;
             this.solution = solution;
             this.project = project;
-            this.semanticModel = semanticModel;
+            this.SemanticModel = semanticModel;
             this.syntaxTree = syntaxTree;
         }
 
-        public async Task<DiscordEntity[]> ExecuteAsync(SyntaxNode syntaxNode) {
+        public async Task<DiscordEntity[]> Run(SyntaxNode syntaxNode) {
             if (completionContext.BaseContext == DiscordBaseCompletionContext.Server)
                 return entityService.ServerCollection.GetServers();
 
-            ISnapshotAnalyser<IEnumerable<ulong>> serverIdAnalyser = new AsyncDiscordServerIdAnalyser(semanticModel, syntaxTree, solution, project);
-            IEnumerable<ulong> serverIdList = await serverIdAnalyser.ExecuteAsync(syntaxNode);
+            ICodeAnalyser<IEnumerable<ulong>> serverIdAnalyser = new AsyncDiscordServerIdAnalyser(SemanticModel, syntaxTree, solution, project);
+            IEnumerable<ulong> serverIdList = await serverIdAnalyser.Run(syntaxNode);
             List<DiscordEntity> foundItems = new List<DiscordEntity>();
             switch (completionContext.BaseContext) {
                 case DiscordBaseCompletionContext.User:
