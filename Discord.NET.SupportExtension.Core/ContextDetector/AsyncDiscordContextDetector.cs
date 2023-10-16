@@ -42,6 +42,8 @@ namespace Discord.NET.SupportExtension.Core.ContextDetector {
             return new DiscordCompletionContext();
         }
 
+        async Task<object> ICodeAnalyser.Run(SyntaxNode syntaxNode) => await Run(syntaxNode);
+
         // Recursive node detection
         public async Task ResolveNodeAsync(SyntaxNode node) {
             switch (node) {

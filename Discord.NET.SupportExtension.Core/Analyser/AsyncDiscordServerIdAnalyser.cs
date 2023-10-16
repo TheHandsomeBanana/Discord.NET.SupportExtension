@@ -61,6 +61,9 @@ namespace Discord.NET.SupportExtension.Core.Analyser {
             return serverIds;
         }
 
+
+        async Task<object> ICodeAnalyser.Run(SyntaxNode syntaxNode) => await Run(syntaxNode);
+
         public async Task ResolveNodeAsync(SyntaxNode node) {
             switch (node) {
                 case IdentifierNameSyntax identifier:

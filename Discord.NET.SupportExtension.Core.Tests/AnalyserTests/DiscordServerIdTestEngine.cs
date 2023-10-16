@@ -1,5 +1,6 @@
 ﻿using Discord.NET.SupportExtension.Core.Analyser;
 using HB.NETF.Code.Analysis;
+using HB.NETF.Code.Analysis.Interface;
 using HB.NETF.Code.Analysis.TestEngine;
 using System;
 using System.Collections.Generic;
@@ -14,8 +15,8 @@ namespace Discord.NET.SupportExtension.Core.Tests.AnalyserTests {
         }
 
         protected override async Task RunTestAsync(string testString, ulong[] ids) {
-            IAsyncCodeAnalyser<IEnumerable<ulong>> serverIdAnalyser = new AsyncDiscordServerIdAnalyser(SemanticModel, SyntaxTree, Solution, Project);
-            IEnumerable<ulong> result = await serverIdAnalyser.ExecuteAsync(SyntaxNode);
+            ICodeAnalyser<IEnumerable<ulong>> serverIdAnalyser = new AsyncDiscordServerIdAnalyser(SemanticModel, SyntaxTree, Solution, Project);
+            IEnumerable<ulong> result = await serverIdAnalyser.Run(SyntaxNode);
         }
     }
 }

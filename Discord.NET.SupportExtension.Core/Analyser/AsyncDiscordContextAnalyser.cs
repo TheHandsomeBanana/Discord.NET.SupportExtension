@@ -68,6 +68,9 @@ namespace Discord.NET.SupportExtension.Core.Analyser {
             return null;
         }
 
+
+        async Task<object> ICodeAnalyser.Run(SyntaxNode syntaxNode) => await Run(syntaxNode);
+
         private DiscordChannelType? MapChannelType(DiscordChannelContext? context) {
             switch (context) {
                 case DiscordChannelContext.Text: return DiscordChannelType.Text;

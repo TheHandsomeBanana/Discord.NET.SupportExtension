@@ -14,7 +14,7 @@ namespace Discord.NET.SupportExtension.Core.Tests.ContextDetectorTests {
 
         protected override async Task RunTestAsync(string key, DiscordCompletionContext value) {
             AsyncDiscordContextDetector detector = new AsyncDiscordContextDetector(base.SemanticModel);
-            DiscordCompletionContext context = await detector.ExecuteAsync(SyntaxNode);
+            DiscordCompletionContext context = await detector.Run(SyntaxNode);
 
             if (value != context)
                 Errors.Add($"Teststring: {key} | Expected Context: {value} | Found Context: {context}.");
