@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Discord.NET.SupportExtension.Core.Tests.ContextDetectorTests {
     [TestClass]
-    public class DiscordCompletionContextTests : TestBase {
+    public class DiscordCompletionContextTests {
         private DiscordCompletionContextTestEngine completionContextTests;
 
         [TestInitialize]

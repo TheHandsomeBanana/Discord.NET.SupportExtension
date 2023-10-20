@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Discord.NET.SupportExtension.Core.Tests.AnalyserTests {
     [TestClass]
-    public class DiscordAnalyserTests : TestBase {
+    public class DiscordAnalyserTests {
         private DiscordServerIdTestEngine serverDetailTests;
 
         [TestInitialize]

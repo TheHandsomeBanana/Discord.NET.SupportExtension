@@ -50,6 +50,7 @@ namespace Discord.NET.SupportExtension {
 
         public static string EventLogPath = DiscordEnvironment.LogPath + "\\" + DateTime.Now.ToString("yyyy.MM.dd_HHmmss") + ".log";
         public static string CachePath;
+        private ILogger<DiscordSupportPackage> logger;
         public DiscordSupportPackage() {
             UIHelper.Package = this;
 
@@ -58,6 +59,9 @@ namespace Discord.NET.SupportExtension {
             new DIConfig().Configure(builder);
             new Core.DIConfig().Configure(builder);
             DIContainer.BuildServiceProvider(builder);
+
+            ILoggerFactory loggerFactory = DIContainer.GetService<ILoggerFactory>();
+            this.logger = loggerFactory.GetOrCreateLogger<DiscordSupportPackage>();
         }
 
         #region Package Members
@@ -79,8 +83,14 @@ namespace Discord.NET.SupportExtension {
 
             CachePath = DiscordEnvironment.CachePath + "\\" + SolutionHelper.GetCurrentProject().Name + DiscordEnvironment.CacheExtension;
 
-            if (File.Exists(ConfigHelper.GetConfigPath()))
-                await HandleCacheAsync();
+            // Safe Package Load
+            try {
+                if (File.Exists(ConfigHelper.GetConfigPath()))
+                    await HandleCacheAsync();
+            }
+            catch(Exception ex) {
+                logger.LogError(ex.Message);
+            }
         }
 
         private async Task HandleCacheAsync() {
