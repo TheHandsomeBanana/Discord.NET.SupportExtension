@@ -1,8 +1,8 @@
 ﻿using Discord.NET.SupportExtension.Core.Completions;
 using Discord.NET.SupportExtension.Core.Interface;
 using HB.NETF.Common.DependencyInjection;
-using HB.NETF.Discord.NET.Toolkit.EntityService.Merged;
-using HB.NETF.Discord.NET.Toolkit.EntityService.Models;
+using HB.NETF.Discord.NET.Toolkit.Obsolete.EntityService.Merged;
+using HB.NETF.Discord.NET.Toolkit.Obsolete.EntityService.Models;
 using HB.NETF.Discord.NET.Toolkit.Models.Entities;
 using System;
 using System.Collections.Generic;

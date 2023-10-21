@@ -1,5 +1,5 @@
 ﻿using Discord.NET.SupportExtension.Models.VMModels;
-using HB.NETF.Discord.NET.Toolkit.EntityService.Models;
+using HB.NETF.Discord.NET.Toolkit.Obsolete.EntityService.Models;
 using HB.NETF.WPF.Base.CommandBase;
 using HB.NETF.WPF.Base.ViewModelBase;
 using Microsoft.VisualStudio.Shell;

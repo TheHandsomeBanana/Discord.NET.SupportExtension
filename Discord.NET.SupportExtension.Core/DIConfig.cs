@@ -1,9 +1,9 @@
 ﻿using Discord.NET.SupportExtension.Core.Completions;
 using Discord.NET.SupportExtension.Core.Interface;
 using HB.NETF.Common.DependencyInjection;
-using HB.NETF.Discord.NET.Toolkit.EntityService;
-using HB.NETF.Discord.NET.Toolkit.EntityService.Cached.Handler;
-using HB.NETF.Discord.NET.Toolkit.EntityService.Handler;
+using HB.NETF.Discord.NET.Toolkit.Obsolete.EntityService;
+using HB.NETF.Discord.NET.Toolkit.Obsolete.EntityService.Cached.Handler;
+using HB.NETF.Discord.NET.Toolkit.Obsolete.EntityService.Handler;
 using HB.NETF.Services.Data.Handler;
 using HB.NETF.Services.Data.Handler.Async;
 using HB.NETF.Services.Security.Cryptography;

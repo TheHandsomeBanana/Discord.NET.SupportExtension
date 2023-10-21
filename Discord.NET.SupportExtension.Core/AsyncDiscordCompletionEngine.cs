@@ -5,7 +5,7 @@ using Discord.NET.SupportExtension.Core.Helper;
 using Discord.NET.SupportExtension.Core.Interface;
 using HB.NETF.Common.DependencyInjection;
 using HB.NETF.Common.Exceptions;
-using HB.NETF.Discord.NET.Toolkit.EntityService.Merged;
+using HB.NETF.Discord.NET.Toolkit.Obsolete.EntityService.Merged;
 using HB.NETF.Discord.NET.Toolkit.Models.Entities;
 using Microsoft.CodeAnalysis;
 using System;
