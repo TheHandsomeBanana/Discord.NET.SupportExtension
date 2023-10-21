@@ -1,4 +1,4 @@
-﻿using HB.NETF.Discord.NET.Toolkit.EntityService.Models;
+﻿using HB.NETF.Discord.NET.Toolkit.Obsolete.EntityService.Models;
 using HB.NETF.Services.Security.Cryptography.Settings;
 using System;
 using System.Collections.Generic;

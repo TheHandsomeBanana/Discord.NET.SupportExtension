@@ -2,10 +2,8 @@
 using HB.NETF.Code.Analysis;
 using HB.NETF.Code.Analysis.Interface;
 using HB.NETF.Common.DependencyInjection;
-using HB.NETF.Discord.NET.Toolkit.EntityService.Handler;
-using HB.NETF.Discord.NET.Toolkit.EntityService.Merged;
-using HB.NETF.Discord.NET.Toolkit.EntityService.Models;
 using HB.NETF.Discord.NET.Toolkit.Models.Entities;
+using HB.NETF.Discord.NET.Toolkit.Obsolete.EntityService.Merged;
 using HB.NETF.Services.Logging;
 using HB.NETF.Services.Logging.Factory;
 using Microsoft.CodeAnalysis;

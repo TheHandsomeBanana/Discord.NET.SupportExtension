@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Discord.NET.SupportExtension.Core.Tests.ContextDetectorTests {
     [TestClass]
-    public class DiscordCompletionContextTests {
+    public class DiscordCompletionContextTests : TestBase {
         private DiscordCompletionContextTestEngine completionContextTests;
 
         [TestInitialize]
@@ -20,19 +20,19 @@ namespace Discord.NET.SupportExtension.Core.Tests.ContextDetectorTests {
         [TestMethod] // Special Test for Channel Type Detection
         public async Task ChannelContextTests() {
             completionContextTests.Add("ChannelFindings.cs")
-                        .Add("0", new DiscordCompletionContext(DiscordBaseCompletionContext.Channel, DiscordChannelContext.Guild))
-                        .Add("1", new DiscordCompletionContext(DiscordBaseCompletionContext.Channel, DiscordChannelContext.Guild))
-                        .Add("2", new DiscordCompletionContext(DiscordBaseCompletionContext.Channel, DiscordChannelContext.Text))
-                        .Add("3", new DiscordCompletionContext(DiscordBaseCompletionContext.Channel, DiscordChannelContext.Guild))
-                        .Add("4", new DiscordCompletionContext(DiscordBaseCompletionContext.Channel, DiscordChannelContext.Guild))
+                        .Add("0", new DiscordCompletionContext(DiscordCompletionContext.Channel, DiscordChannelContext.Guild))
+                        .Add("1", new DiscordCompletionContext(DiscordCompletionContext.Channel, DiscordChannelContext.Guild))
+                        .Add("2", new DiscordCompletionContext(DiscordCompletionContext.Channel, DiscordChannelContext.Text))
+                        .Add("3", new DiscordCompletionContext(DiscordCompletionContext.Channel, DiscordChannelContext.Guild))
+                        .Add("4", new DiscordCompletionContext(DiscordCompletionContext.Channel, DiscordChannelContext.Guild))
                         .Add("5", DiscordCompletionContext.Channel)
                         .Add("6", DiscordCompletionContext.Channel)
-                        .Add("7", new DiscordCompletionContext(DiscordBaseCompletionContext.Channel, DiscordChannelContext.Voice))
-                        .Add("8", new DiscordCompletionContext(DiscordBaseCompletionContext.Channel, DiscordChannelContext.Category))
-                        .Add("9", new DiscordCompletionContext(DiscordBaseCompletionContext.Channel, DiscordChannelContext.Text))
-                        .Add("10", new DiscordCompletionContext(DiscordBaseCompletionContext.Channel, DiscordChannelContext.Voice))
-                        .Add("11", new DiscordCompletionContext(DiscordBaseCompletionContext.Channel, DiscordChannelContext.Forum))
-                        .Add("12", new DiscordCompletionContext(DiscordBaseCompletionContext.Channel, DiscordChannelContext.Text));
+                        .Add("7", new DiscordCompletionContext(DiscordCompletionContext.Channel, DiscordChannelContext.Voice))
+                        .Add("8", new DiscordCompletionContext(DiscordCompletionContext.Channel, DiscordChannelContext.Category))
+                        .Add("9", new DiscordCompletionContext(DiscordCompletionContext.Channel, DiscordChannelContext.Text))
+                        .Add("10", new DiscordCompletionContext(DiscordCompletionContext.Channel, DiscordChannelContext.Voice))
+                        .Add("11", new DiscordCompletionContext(DiscordCompletionContext.Channel, DiscordChannelContext.Forum))
+                        .Add("12", new DiscordCompletionContext(DiscordCompletionContext.Channel, DiscordChannelContext.Text));
 
             await completionContextTests.RunEngineAsync();
         }

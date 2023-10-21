@@ -1,9 +1,9 @@
 ﻿using Discord.NET.SupportExtension.Models.VMModels;
 using Discord.NET.SupportExtension.ViewModels;
 using Discord.NET.SupportExtension.Views;
-using HB.NETF.Discord.NET.Toolkit.EntityService.Merged;
-using HB.NETF.Discord.NET.Toolkit.EntityService.Models;
-using HB.NETF.Discord.NET.Toolkit.TokenService;
+using HB.NETF.Discord.NET.Toolkit.Obsolete.EntityService.Merged;
+using HB.NETF.Discord.NET.Toolkit.Obsolete.EntityService.Models;
+using HB.NETF.Discord.NET.Toolkit.Obsolete.TokenService;
 using HB.NETF.Services.Logging;
 using HB.NETF.Services.Security.Cryptography.Keys;
 using HB.NETF.Services.Security.Cryptography.Settings;

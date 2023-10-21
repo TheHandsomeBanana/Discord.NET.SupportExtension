@@ -30,7 +30,7 @@ namespace Discord.NET.SupportExtension.MEF.CompletionSource {
     public class AsyncDiscordCompletionSource : IAsyncCompletionSource {
         private bool _isDisposed;
         private DocumentId documentIdentifier;
-        private VisualStudioWorkspace vsWorkspace;
+        private readonly VisualStudioWorkspace vsWorkspace;
 
         public AsyncDiscordCompletionSource() {
             vsWorkspace = WorkspaceHelper.GetVisualStudioWorkspace();
@@ -66,7 +66,7 @@ namespace Discord.NET.SupportExtension.MEF.CompletionSource {
 
                 stopwatch.Stop();
                 return new CompletionContext(completions.Select(e =>
-                    new CompletionItem(e.DisplayText, this, DiscordImage, DiscordFilters, e.Suffix, e.InsertText, e.InsertText, e.InsertText, ImmutableArray<ImageElement>.Empty)).ToImmutableArray()
+                    new CompletionItem(e.DisplayText, this, discordImage, discordFilters, e.Suffix, e.InsertText, e.InsertText, e.InsertText, ImmutableArray<ImageElement>.Empty)).ToImmutableArray()
                 );
             }
             catch (Exception ex) {
@@ -102,7 +102,7 @@ namespace Discord.NET.SupportExtension.MEF.CompletionSource {
             }
         }
 
-        private static readonly ImageElement DiscordImage = new ImageElement(new ImageId(PackageImageIds.DiscordMoniker, PackageImageIds.Discord), "Discord");
-        private static readonly ImmutableArray<CompletionFilter> DiscordFilters = new CompletionFilter[] { new CompletionFilter("Discord", "D", DiscordImage) }.ToImmutableArray();
+        private static readonly ImageElement discordImage = new ImageElement(new ImageId(PackageImageIds.DiscordMoniker, PackageImageIds.Discord), "Discord");
+        private static readonly ImmutableArray<CompletionFilter> discordFilters = new CompletionFilter[] { new CompletionFilter("Discord", "D", discordImage) }.ToImmutableArray();
     }
 }

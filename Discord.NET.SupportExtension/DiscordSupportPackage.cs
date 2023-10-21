@@ -4,7 +4,7 @@ using Discord.NET.SupportExtension.Models.VMModels;
 using HB.NETF.Common;
 using HB.NETF.Common.DependencyInjection;
 using HB.NETF.Discord.NET.Toolkit;
-using HB.NETF.Discord.NET.Toolkit.EntityService.Merged;
+using HB.NETF.Discord.NET.Toolkit.Obsolete.EntityService.Merged;
 using HB.NETF.Services.Data.Handler;
 using HB.NETF.Services.Data.Handler.Async;
 using HB.NETF.Services.Logging;
