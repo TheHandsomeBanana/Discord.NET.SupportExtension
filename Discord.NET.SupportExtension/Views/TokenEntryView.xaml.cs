@@ -1,4 +1,4 @@
-﻿using HB.NETF.WPF.Base.ViewModelBase;
+﻿using HB.NETF.WPF.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;

@@ -23,7 +23,7 @@ using HB.NETF.VisualStudio.Commands;
 using HB.NETF.VisualStudio.UI;
 using HB.NETF.VisualStudio.Workspace;
 using HB.NETF.WPF.Base.CommandBase;
-using HB.NETF.WPF.Base.ViewModelBase;
+using HB.NETF.WPF.ViewModels;
 using HB.NETF.WPF.Exceptions;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Text.Editor;
@@ -40,6 +40,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using static Microsoft.VisualStudio.Shell.RegistrationAttribute;
+using HB.NETF.WPF.Commands;
 
 namespace Discord.NET.SupportExtension.ViewModels {
     public class ConfigureServerImageViewModel : ViewModelBase, ICloseableWindow {
