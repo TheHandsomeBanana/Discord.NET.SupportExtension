@@ -301,6 +301,7 @@ namespace Discord.NET.SupportExtension.ViewModels {
         private void LoadTokens(object obj) {
             if(model.Tokens.Length == 0) {
                 logger.LogInformation("Configuration does not contain any tokens.");
+                loadCalled = true;
                 return;
             }
 
