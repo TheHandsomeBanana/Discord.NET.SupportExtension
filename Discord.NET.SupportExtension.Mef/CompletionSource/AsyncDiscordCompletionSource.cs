@@ -33,7 +33,7 @@ namespace Discord.NET.SupportExtension.MEF.CompletionSource {
         private readonly VisualStudioWorkspace vsWorkspace;
 
         public AsyncDiscordCompletionSource() {
-            vsWorkspace = WorkspaceHelper.GetVisualStudioWorkspace();
+            vsWorkspace = WorkspaceHelper.VisualStudioWorkspace;
         }
 
         public async Task<CompletionContext> GetCompletionContextAsync(IAsyncCompletionSession session, CompletionTrigger trigger, SnapshotPoint triggerLocation, SnapshotSpan applicableToSpan, CancellationToken token) {
