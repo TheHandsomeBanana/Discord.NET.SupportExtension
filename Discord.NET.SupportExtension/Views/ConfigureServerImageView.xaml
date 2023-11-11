@@ -53,11 +53,11 @@
             <Border BorderThickness="0 0 2 0" BorderBrush="{StaticResource DiscordDark}" Padding="10 5 10 10" Width="325">
                 <StackPanel Orientation="Vertical">
                     <Label Style="{StaticResource HeadLabel}" Content="Settings" Margin="0 0 0 10"/>
-                    
+
                     <CheckBox Name="cbSaveTokens" Style="{StaticResource CheckBoxLarge}" IsChecked="{Binding SaveToken}" Margin="0,0,0,10">
                         <TextBlock Text="Save Token"></TextBlock>
                     </CheckBox>
-                    
+
                     <ComboBox ItemsSource="{Binding EncryptionModeValues}" SelectedItem="{Binding TokenEncryptionMode}" Visibility="{Binding IsChecked, ElementName=cbSaveTokens, Converter={StaticResource b2v}}" Margin="0 0 0 10">
                     </ComboBox>
 
@@ -69,19 +69,6 @@
                         <Button Style="{StaticResource CommandButtonSmall}" Command="{Binding CreateTokenAESKeyFileCommand}" Content="Create">
 
                         </Button>
-                    </StackPanel>
-
-                    <StackPanel Orientation="Vertical" Visibility="{Binding Path=TokenAESEncryptionPanelVisibility}" Margin="0 0 0 10">
-                        <Label Style="{StaticResource SmallHeadLabel}" Content="Token"/>
-                        <StackPanel Orientation="Horizontal">
-                            <TextBox x:Name="tbToken" Style="{StaticResource TextBox}" Width="200" Margin="0 0 10 0" 
-                                        Text="{Binding Token}" ToolTip="{Binding Token}" TextWrapping="Wrap" AcceptsReturn="True">
-
-                            </TextBox>
-                            <Button Style="{StaticResource CommandButtonSmall}" Command="{Binding SaveTokenCommand}" Content="Save">
-
-                            </Button>
-                        </StackPanel>
                     </StackPanel>
 
                     <CheckBox Name="cbEncryptData" Style="{StaticResource CheckBoxLarge}" IsChecked="{Binding EncryptData}" Margin="0,0,0,10">
@@ -105,7 +92,27 @@
 
             <StackPanel Orientation="Vertical" Margin="10 0 0 0">
                 <Label Style="{StaticResource HeadLabel}" Content="Data" Margin="0 0 0 10"/>
-                <Label Style="{StaticResource BaseLabel}" Content="Latest generation"/>
+
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="35"/>
+                        <RowDefinition Height="35"/>
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="100"/>
+                        <ColumnDefinition Width="720"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBox Style="{StaticResource TextBox}" Width="720" Grid.Column="1" Grid.Row="0"
+                                Text="{Binding Token}" ToolTip="{Binding Token}" Height="30">
+                    </TextBox>
+
+                    <Label Style="{StaticResource BaseLabel}" Content="Token:" Grid.Column="0" Grid.Row="0"/>
+
+
+                    <Label Style="{StaticResource BaseLabel}" Content="Latest run:" Grid.Column="0" Grid.Row="1"/>
+                    <TextBlock Text="{Binding LatestRun}" Grid.Column="1" Grid.Row="1"/>
+                </Grid>
+
             </StackPanel>
         </StackPanel>
     </Grid>

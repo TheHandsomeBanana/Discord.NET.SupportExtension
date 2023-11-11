@@ -4,7 +4,7 @@ using Discord.NET.SupportExtension.Models.VMModels;
 using HB.NETF.Common;
 using HB.NETF.Common.DependencyInjection;
 using HB.NETF.Discord.NET.Toolkit;
-using HB.NETF.Discord.NET.Toolkit.Obsolete.EntityService.Merged;
+using HB.NETF.Discord.NET.Toolkit.Services.EntityService;
 using HB.NETF.Services.Data.Handler;
 using HB.NETF.Services.Data.Handler.Async;
 using HB.NETF.Services.Logging;
@@ -96,16 +96,16 @@ namespace Discord.NET.SupportExtension {
         private async Task HandleCacheAsync() {
             ILogger<DiscordSupportPackage> logger = DIContainer.GetService<ILoggerFactory>().GetOrCreateLogger<DiscordSupportPackage>();
             IAsyncStreamHandler streamHandler = DIContainer.GetService<IAsyncStreamHandler>();
-            IMergedDiscordEntityService mergedEntityService = DIContainer.GetService<IMergedDiscordEntityService>();
+            IDiscordEntityService mergedEntityService = DIContainer.GetService<IDiscordEntityService>();
             ConfigureServerImageModel model = await streamHandler.ReadFromFileAsync<ConfigureServerImageModel>(ConfigHelper.GetConfigPath());
 
-            GenerateHelper.ManipulateMergedEntityServiceDataEncrypt(mergedEntityService, model, logger, out bool cancel);
+            GenerateHelper.ManipulateEntityServiceDataEncrypt(mergedEntityService, model, logger, out bool cancel);
             if (cancel) {
                 logger.LogWarning("Could not retrieve aes key for data decryption. ServerCollection not loaded.");
                 return;
             }
 
-            if (await mergedEntityService.LoadMerged(CachePath))
+            if (await mergedEntityService.ReadFromFile(CachePath))
                 logger.LogInformation("ServerCollection loaded.");
             else
                 logger.LogWarning("ServerCollection not loaded. Generate new server image.");

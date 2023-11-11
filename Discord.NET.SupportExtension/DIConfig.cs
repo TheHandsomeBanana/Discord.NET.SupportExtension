@@ -8,19 +8,17 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using HB.NETF.Discord.NET.Toolkit.Obsolete.EntityService;
 using HB.NETF.Services.Logging;
 using Discord.NET.SupportExtension.Helper;
 using HB.NETF.Services.Data.Identifier;
 using HB.NETF.VisualStudio.UI;
-using HB.NETF.Discord.NET.Toolkit.Obsolete.EntityService.Cached.Handler;
 using HB.NETF.Services.Data.Handler.Async;
 using HB.NETF.Services.Data.Handler;
-using HB.NETF.Discord.NET.Toolkit.Obsolete.TokenService;
+using HB.NETF.Discord.NET.Toolkit.Services.TokenService;
 using HB.NETF.Services.Serialization;
-using HB.NETF.Discord.NET.Toolkit.Obsolete.EntityService.Merged;
 using System.Data;
 using HB.NETF.Services.Security.DataProtection;
+using HB.NETF.Discord.NET.Toolkit.Services.EntityService;
 
 namespace Discord.NET.SupportExtension {
     internal class DIConfig : IDependencyConfig {
@@ -30,7 +28,7 @@ namespace Discord.NET.SupportExtension {
                 .AddTarget(UIHelper.OutputWindowFunc)
             ))
                 .AddSingleton<IIdentifierFactory, IdentifierFactory>()
-                .AddSingleton<IMergedDiscordEntityService, MergedDiscordEntityService>()
+                .AddSingleton<IDiscordEntityService, DiscordEntityService>()
                 .AddTransient<IStreamHandler, StreamHandler>()
                 .AddTransient<IAsyncStreamHandler, AsyncStreamHandler>()
                 .AddTransient<IDiscordTokenService, DiscordTokenService>()

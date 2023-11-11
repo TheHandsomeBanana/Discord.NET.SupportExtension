@@ -5,7 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:Discord.NET.SupportExtension.Views"
              mc:Ignorable="d" 
-             Background="#313338" ResizeMode="NoResize" ShowInTaskbar="False" WindowStyle="None" Width="640" Height="260"
+             Background="#313338" ResizeMode="NoResize" ShowInTaskbar="False" WindowStyle="None" Width="640" Height="150"
         Loaded="Window_Loaded">
 
     <Window.Resources>
@@ -44,38 +44,14 @@
         </StackPanel>
 
         <StackPanel Orientation="Horizontal" Grid.Row="1" Margin="10,0,10,10">
-            <StackPanel Orientation="Vertical" HorizontalAlignment="Stretch" Margin="20 0 0 0">
+            <StackPanel Orientation="Vertical" HorizontalAlignment="Stretch">
                 <StackPanel Orientation="Horizontal">
-                    
+
                     <StackPanel Orientation="Vertical">
                         <Label Style="{StaticResource SmallHeadLabel}" Content="Token" ToolTip="Token of your bot"></Label>
-                        <TextBox Style="{StaticResource TextBox}" Text="{Binding TokenText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Margin="0 0 0 10" Width="500"/>
+                        <TextBox Style="{StaticResource TextBox}" Text="{Binding TokenText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Margin="0 0 0 10" Width="620"/>
                     </StackPanel>
                 </StackPanel>
-
-                <ListView Style="{StaticResource TokenListView}" ItemsSource="{Binding Tokens}" SelectedIndex="{Binding SelectedTokenIndex}"
-                          ItemContainerStyle="{StaticResource TokenListViewItem}" MaxWidth="710" MaxHeight="110">
-                    <ListView.View>
-                        <GridView ColumnHeaderContainerStyle="{StaticResource GridViewColumnHeader}">
-                            <GridViewColumn Header="Token" Width="350" DisplayMemberBinding="{Binding Token}"/>
-                        </GridView>
-                    </ListView.View>
-                </ListView>
-            </StackPanel>
-
-            <StackPanel Orientation="Vertical" Margin="10 65 0 0">
-                <Button Style="{StaticResource CommandButtonSmall}" Command="{Binding AddTokenCommand}" Content="Add" VerticalAlignment="Top"
-                        Margin="0 0 0 10">
-
-                </Button>
-                <Button Style="{StaticResource CommandButtonSmall}" Command="{Binding RemoveTokenCommand}" Content="Remove" VerticalAlignment="Top"
-                        Margin="0 0 0 10">
-
-                </Button>
-                <Button Style="{StaticResource CommandButtonSmall}" Command="{Binding EditTokenCommand}" Content="Edit" VerticalAlignment="Top"
-                        Margin="0 0 0 10">
-
-                </Button>
             </StackPanel>
         </StackPanel>
     </Grid>

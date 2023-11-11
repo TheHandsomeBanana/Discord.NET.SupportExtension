@@ -2,7 +2,6 @@
 using HB.NETF.Code.Analysis.Interface;
 using HB.NETF.Common.DependencyInjection;
 using HB.NETF.Common.Exceptions;
-using HB.NETF.Discord.NET.Toolkit.SupportExtension;
 using HB.NETF.Services.Logging;
 using HB.NETF.Services.Logging.Factory;
 using Microsoft.CodeAnalysis;
@@ -56,8 +55,6 @@ namespace Discord.NET.SupportExtension.Core.Analyser {
                 currentNode = currentNode.Parent;
             }
 
-            // No specific server id found --> Check AssemblyInfo for attribute
-            await FindServerIdsFromAttribute();
             return serverIds;
         }
 
@@ -238,81 +235,5 @@ namespace Discord.NET.SupportExtension.Core.Analyser {
                 temp = temp.Parent;
             }
         }
-
-        private async Task FindServerIdsFromAttribute() {
-            Assembly botAssembly;
-            if (File.Exists(project.OutputFilePath))
-                botAssembly = Assembly.LoadFrom(project.OutputFilePath);
-            else {
-                logger.LogError($"Could not resolve server id from attribute --> project output not found. Build your project {project.Name} first.");
-                return;
-            }
-
-
-            ServerIdListAttribute assemblyServerIdList = botAssembly.GetCustomAttribute<ServerIdListAttribute>();
-            if (assemblyServerIdList != null)
-                serverIds.AddRange(assemblyServerIdList.ServerIds);
-
-            // Todo: Recursive search for a class with ServerIdListAttribute
-            //await FindServerIdsFromClassAttribute(botAssembly, node); // This is slow af => not recommended for language extension
-        }
-
-        private async Task FindServerIdsFromClassAttribute(Assembly botAssembly, SyntaxNode node) {
-            SyntaxNode tempNode = node;
-            if (ClassHasServerIdAttribute(botAssembly, tempNode, out ServerIdListAttribute serverIdList)) {
-                serverIds.AddRange(serverIdList.ServerIds);
-                return;
-            }
-
-            tempNode = node;
-
-            while (!IsMemberDeclaration(tempNode) && tempNode != null)
-                tempNode = tempNode.Parent;
-
-            if (tempNode == null)
-                return;
-
-            MemberDeclarationSyntax declaration = tempNode as MemberDeclarationSyntax;
-            ISymbol declarationSymbol = SemanticModel.GetDeclaredSymbol(declaration);
-
-            IEnumerable<ReferencedSymbol> memberReferences = await SymbolFinder.FindReferencesAsync(declarationSymbol, solution, documents);
-            IEnumerable<Location> locations = memberReferences.SelectMany(l => l.Locations.Select(s => s.Location));
-
-            foreach (Location location in locations) {
-                SyntaxNode locationNode = (await location.SourceTree.GetRootAsync()).FindNode(location.SourceSpan);
-                AsyncDiscordServerIdAnalyser serverIdAnalyser;
-                if (tempNode.SyntaxTree.FilePath != location.SourceTree.FilePath) {
-                    SyntaxTree syntaxTree = locationNode.SyntaxTree;
-                    SemanticModel semanticModel = this.SemanticModel.Compilation.GetSemanticModel(syntaxTree);
-
-                    serverIdAnalyser = new AsyncDiscordServerIdAnalyser(semanticModel, syntaxTree, solution, project) { serverIds = this.serverIds };
-                }
-                else
-                    serverIdAnalyser = this;
-
-                await serverIdAnalyser.FindServerIdsFromClassAttribute(botAssembly, locationNode);
-            }
-        }
-
-        private bool ClassHasServerIdAttribute(Assembly botAssembly, SyntaxNode node, out ServerIdListAttribute serverIdList) {
-            serverIdList = null;
-
-            while (!node.IsKind(SyntaxKind.ClassDeclaration) && node != null)
-                node = node.Parent;
-
-            if (node == null)
-                return false;
-
-            ClassDeclarationSyntax classDeclaration = node as ClassDeclarationSyntax;
-            NamespaceDeclarationSyntax nameSpaceDeclaration = classDeclaration.Parent as NamespaceDeclarationSyntax;
-            string classTypeName = nameSpaceDeclaration.Name + "." + classDeclaration.Identifier.ValueText;
-
-            Type foundType = botAssembly.GetTypes().FirstOrDefault(e => e.FullName == classTypeName);
-
-            serverIdList = foundType.GetCustomAttribute<ServerIdListAttribute>();
-            return serverIdList != null;
-        }
-
-        private bool IsMemberDeclaration(SyntaxNode node) => node is MemberDeclarationSyntax;
     }
 }

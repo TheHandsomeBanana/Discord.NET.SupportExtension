@@ -6,9 +6,6 @@ using EnvDTE;
 using HB.NETF.Common;
 using HB.NETF.Common.DependencyInjection;
 using HB.NETF.Discord.NET.Toolkit;
-using HB.NETF.Discord.NET.Toolkit.Obsolete.EntityService.Handler;
-using HB.NETF.Discord.NET.Toolkit.Obsolete.EntityService.Models;
-using HB.NETF.Discord.NET.Toolkit.Obsolete.TokenService;
 using HB.NETF.Services.Data.Exceptions;
 using HB.NETF.Services.Data.Handler;
 using HB.NETF.Services.Data.Handler.Async;
@@ -41,6 +38,7 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using static Microsoft.VisualStudio.Shell.RegistrationAttribute;
 using HB.NETF.WPF.Commands;
+using HB.NETF.Discord.NET.Toolkit.Services.TokenService;
 
 namespace Discord.NET.SupportExtension.ViewModels {
     public class ConfigureServerImageViewModel : ViewModelBase, ICloseableWindow {
@@ -52,7 +50,6 @@ namespace Discord.NET.SupportExtension.ViewModels {
         public RelayCommand ExitCommand { get; }
         public RelayCommand CreateDataAESKeyFileCommand { get; }
         public RelayCommand CreateTokenAESKeyFileCommand { get; }
-        public RelayCommand SaveTokenCommand { get; }
         #endregion
 
         #region UI Only
@@ -95,6 +92,12 @@ namespace Discord.NET.SupportExtension.ViewModels {
         public bool SaveToken {
             get { return model.SaveToken; }
             set {
+                if (!value && CheckExistingToken()) {
+                    model.Token = null;
+                    this.token = null;
+                    return;
+                }
+
                 model.SaveToken = value;
                 OnPropertyChanged(nameof(SaveToken));
 
@@ -105,6 +108,13 @@ namespace Discord.NET.SupportExtension.ViewModels {
             }
         }
 
+        private bool CheckExistingToken() {
+            if (model.Token == null && token == null)
+                return false;
+
+            int res = UIHelper.ShowWarningWithCancel("There is an existing token. Disabling this option will remove the token.", "Existing token warning");
+            return res == 1;
+        }
 
         private Visibility dataAESEncryptionPanelVisibility = Visibility.Collapsed;
 
@@ -155,14 +165,21 @@ namespace Discord.NET.SupportExtension.ViewModels {
         }
         #endregion
 
-        #region Token
-        private TokenModel token;
-        public TokenModel Token {
+        #region Data
+        private string token;
+        public string Token {
             get {
                 return token;
             }
             set {
                 token = value;
+                OnPropertyChanged(nameof(Token));
+            }
+        }
+
+        public string LatestRun {
+            get {
+                return model.LatestRun.ToString("yyyy/MM/dd hh:mm:ss");
             }
         }
         #endregion
@@ -191,8 +208,10 @@ namespace Discord.NET.SupportExtension.ViewModels {
             ExitCommand = new RelayCommand(Exit, null);
             CreateTokenAESKeyFileCommand = new RelayCommand(CreateTokenAESKeyFile, null);
             CreateDataAESKeyFileCommand = new RelayCommand(CreateDataAESKeyFile, null);
-            SaveTokenCommand = new RelayCommand(SaveTokensToModel, null);
             this.model = model;
+
+            if (model.Token != null)
+                LoadTokenFromModel();
         }
 
         #region Command Callbacks
@@ -202,16 +221,10 @@ namespace Discord.NET.SupportExtension.ViewModels {
 
         private void Save(object o) {
             ThreadHelper.ThrowIfNotOnUIThread();
-            if(!SaveToken && model.Token != null) {
-                logger.LogWarning($"{nameof(SaveToken)} is disabled, there is still a token saved. Saving will remove it and you will need a new key if aes encryption is used.");
-                int option = UIHelper.ShowWarningWithCancel("If you save now, your current token will be removed.", "Save Tokens is disabled");
-                if (option == 1) {
-                    model.Token = null;
-                    logger.LogInformation("Token removed.");
-                }
-                else
-                    return;
-            }
+            if (!ValidateToken())
+                return;
+
+            SaveTokenToModel();
 
             string configLocation = ConfigHelper.GetConfigPath(this.currentProject);
             streamHandler.WriteToFile(configLocation, model);
@@ -233,23 +246,6 @@ namespace Discord.NET.SupportExtension.ViewModels {
             CreateAESKeyFile(tokenKey);
         }
 
-        private void SaveTokensToModel(object obj) {
-            switch (model.TokenEncryptionMode) {
-                case EncryptionMode.AES:
-                    AesKey key = GetAesKey();
-                    if (key == null)
-                        return;
-
-                    model.Token = tokenService.EncryptToken(this.token, model.TokenEncryptionMode.Value, key);
-                    break;
-                case EncryptionMode.WindowsDataProtectionAPI:
-                    model.Token = tokenService.EncryptToken(this.token, model.TokenEncryptionMode.Value);
-                    break;
-            }
-
-            logger.LogInformation($"Token encrypted and saved.");
-            UIHelper.ShowInfo("Token saved successfully", "Info");
-        }
         #endregion
 
         public bool CanClose() => true;
@@ -263,7 +259,6 @@ namespace Discord.NET.SupportExtension.ViewModels {
                 UIHelper.ShowError(error, "Error");
             }
         }
-
         private AesKey GetAesKey() {
             KeyEntryModel keyEntry = new KeyEntryModel("Token");
             KeyEntryView keyEntryView = new KeyEntryView() { DataContext = new KeyEntryViewModel(keyEntry) };
@@ -288,7 +283,53 @@ namespace Discord.NET.SupportExtension.ViewModels {
 
             return keyEntry.Key.Reference;
         }
+        private void SaveTokenToModel() {
+            switch (model.TokenEncryptionMode) {
+                case EncryptionMode.AES:
+                    AesKey key = GetAesKey();
+                    if (key == null)
+                        return;
 
+                    model.Token = tokenService.EncryptToken(this.Token, model.TokenEncryptionMode.Value, key);
+                    break;
+                case EncryptionMode.WindowsDataProtectionAPI:
+                    model.Token = tokenService.EncryptToken(this.Token, model.TokenEncryptionMode.Value);
+                    break;
+            }
+
+            logger.LogInformation($"Token encrypted and saved.");
+            UIHelper.ShowInfo("Token saved successfully", "Info");
+        }
+        private void LoadTokenFromModel() {
+            switch (model.TokenEncryptionMode) {
+                case EncryptionMode.AES:
+                    AesKey key = GetAesKey();
+                    if (key == null)
+                        return;
+
+                    this.Token = tokenService.DecryptToken(model.Token, model.TokenEncryptionMode.Value, key);
+                    break;
+                case EncryptionMode.WindowsDataProtectionAPI:
+                    this.Token = tokenService.EncryptToken(model.Token, model.TokenEncryptionMode.Value);
+                    break;
+            }
+        }
+        private bool ValidateToken() {
+            if (!SaveToken)
+                return true;
+
+            if (token == null) {
+                UIHelper.ShowError("There is no token to save. Provide a token before saving.", "Token missing");
+                return false;
+            }
+
+            if (string.IsNullOrWhiteSpace(token) || token.Length != 70) {
+                UIHelper.ShowError("The provided token is invalid.", "Token invalid");
+                return false;
+            }
+
+            return true;
+        }
         private void SetTokenModeDependent() {
             if (model.TokenEncryptionMode == EncryptionMode.AES && SaveToken) {
                 TokenAESEncryptionPanelVisibility = Visibility.Visible;

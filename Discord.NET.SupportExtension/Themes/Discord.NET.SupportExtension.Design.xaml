@@ -139,7 +139,7 @@
         <Setter Property="BorderThickness" Value="0"/>
         <Setter Property="HorizontalContentAlignment" Value="Left"/>
         <Setter Property="VerticalContentAlignment" Value="Center"/>
-        <Setter Property="FontSize" Value="15"/>
+        <Setter Property="FontSize" Value="14"/>
     </Style>
 
     <Style x:Key="SmallTextBox" BasedOn="{StaticResource TextBox}" TargetType="TextBox">

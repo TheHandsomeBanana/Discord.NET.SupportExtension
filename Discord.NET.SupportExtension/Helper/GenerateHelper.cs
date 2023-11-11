@@ -1,9 +1,8 @@
 ﻿using Discord.NET.SupportExtension.Models.VMModels;
 using Discord.NET.SupportExtension.ViewModels;
 using Discord.NET.SupportExtension.Views;
-using HB.NETF.Discord.NET.Toolkit.Obsolete.EntityService.Merged;
-using HB.NETF.Discord.NET.Toolkit.Obsolete.EntityService.Models;
-using HB.NETF.Discord.NET.Toolkit.Obsolete.TokenService;
+using HB.NETF.Discord.NET.Toolkit.Services.EntityService;
+using HB.NETF.Discord.NET.Toolkit.Services.TokenService;
 using HB.NETF.Services.Logging;
 using HB.NETF.Services.Security.Cryptography.Keys;
 using HB.NETF.Services.Security.Cryptography.Settings;
@@ -18,7 +17,7 @@ using System.Threading.Tasks;
 
 namespace Discord.NET.SupportExtension.Helper {
     public static class GenerateHelper {
-        public static TokenModel[] GetTokens(IDiscordTokenService tokenService, ConfigureServerImageModel model, ILogger logger) {
+        public static string GetToken(IDiscordTokenService tokenService, ConfigureServerImageModel model, ILogger logger) {
             if (model.SaveToken) {
                 switch (model.TokenEncryptionMode) {
                     case EncryptionMode.AES:
@@ -26,9 +25,9 @@ namespace Discord.NET.SupportExtension.Helper {
                         if (tokenKey == null)
                             return null;
 
-                        return tokenService.DecryptTokens(model.Token, model.TokenEncryptionMode.Value, tokenKey);
+                        return tokenService.DecryptToken(model.Token, model.TokenEncryptionMode.Value, tokenKey);
                     case EncryptionMode.WindowsDataProtectionAPI:
-                        return tokenService.DecryptTokens(model.Token, model.TokenEncryptionMode.Value);
+                        return tokenService.DecryptToken(model.Token, model.TokenEncryptionMode.Value);
                 }
             }
             else {
@@ -38,13 +37,13 @@ namespace Discord.NET.SupportExtension.Helper {
                 if (tokenEntry.IsCanceled)
                     return null;
 
-                return tokenEntry.Tokens.Select(f => new TokenModel("Directly provided token", f)).ToArray();
+                return tokenEntry.Token;
             }
 
             return null;
         }
 
-        public static void ManipulateMergedEntityServiceDataEncrypt(IMergedDiscordEntityService entityService, ConfigureServerImageModel model, ILogger logger, out bool cancel) {
+        public static void ManipulateEntityServiceDataEncrypt(IDiscordEntityService entityService, ConfigureServerImageModel model, ILogger logger, out bool cancel) {
             cancel = false;
             if (model.EncryptData) {
                 switch (model.DataEncryptionMode) {

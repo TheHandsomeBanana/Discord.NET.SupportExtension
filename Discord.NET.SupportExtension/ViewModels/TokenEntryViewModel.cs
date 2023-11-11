@@ -1,5 +1,4 @@
 ﻿using Discord.NET.SupportExtension.Models.VMModels;
-using HB.NETF.Discord.NET.Toolkit.Obsolete.EntityService.Models;
 using HB.NETF.WPF.Commands;
 using HB.NETF.WPF.ViewModels;
 using Microsoft.VisualStudio.Shell;
@@ -15,24 +14,10 @@ using System.Windows.Input;
 namespace Discord.NET.SupportExtension.ViewModels {
     public class TokenEntryViewModel : ViewModelBase, ICloseableWindow {
         #region Binding
-        public RelayCommand AddTokenCommand { get; }
-        public RelayCommand RemoveTokenCommand { get; }
-        public RelayCommand EditTokenCommand { get; }
         public RelayCommand ExitCommand { get; }
         public RelayCommand FinishCommand { get; }
 
-        public IEnumerable<string> Tokens => model.Tokens;
-
-        private int selectedTokenIndex = -1;
-        public int SelectedTokenIndex {
-            get => selectedTokenIndex;
-            set {
-                selectedTokenIndex = value;
-                OnPropertyChanged(nameof(SelectedTokenIndex));
-                EditTokenCommand.OnCanExecuteChanged();
-                RemoveTokenCommand.OnCanExecuteChanged();
-            }
-        }
+        public string Token => model.Token;
 
         private string tokenText;
         public string TokenText {
@@ -40,7 +25,6 @@ namespace Discord.NET.SupportExtension.ViewModels {
             set {
                 tokenText = value;
                 OnPropertyChanged(nameof(TokenText));
-                AddTokenCommand.OnCanExecuteChanged();
             }
         }
         #endregion
@@ -50,11 +34,8 @@ namespace Discord.NET.SupportExtension.ViewModels {
         private readonly TokenEntryModel model;
         public TokenEntryViewModel(TokenEntryModel model) {
             this.model = model;
-            AddTokenCommand = new RelayCommand(AddToken, o => !string.IsNullOrWhiteSpace(TokenText) && TokenText.Length == 70);
-            RemoveTokenCommand = new RelayCommand(RemoveToken, (o) => SelectedTokenIndex > -1);
-            EditTokenCommand = new RelayCommand(EditToken, (o) => SelectedTokenIndex > -1);
             this.ExitCommand = new RelayCommand(Exit, null);
-            this.FinishCommand = new RelayCommand(Finish, o => model.Tokens.Count > 0);
+            this.FinishCommand = new RelayCommand(Finish, o => model.Token != null);
         }
 
         private void Finish(object obj) {
@@ -63,23 +44,7 @@ namespace Discord.NET.SupportExtension.ViewModels {
 
         private void Exit(object obj) {
             model.IsCanceled = true;
-            Close?.Invoke();
-        }
-
-        private void EditToken(object obj) {
-            TokenText = model.Tokens[selectedTokenIndex];
-            RemoveToken(obj);
-        }
-
-        private void RemoveToken(object obj) {
-            model.Tokens.RemoveAt(selectedTokenIndex);
-            FinishCommand.OnCanExecuteChanged();
-        }
-
-        private void AddToken(object obj) {
-            model.Tokens.Add(TokenText);
-            TokenText = "";
-            FinishCommand.OnCanExecuteChanged();
+            Finish(obj);
         }
 
         public bool CanClose() => true;

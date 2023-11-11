@@ -5,13 +5,8 @@ using Discord.NET.SupportExtension.Views;
 using EnvDTE;
 using HB.NETF.Common.DependencyInjection;
 using HB.NETF.Common.Exceptions;
-using HB.NETF.Discord.NET.Toolkit;
-using HB.NETF.Discord.NET.Toolkit.Obsolete.EntityService;
-using HB.NETF.Discord.NET.Toolkit.Obsolete.EntityService.Cached.Handler;
-using HB.NETF.Discord.NET.Toolkit.Obsolete.EntityService.Handler;
-using HB.NETF.Discord.NET.Toolkit.Obsolete.EntityService.Merged;
-using HB.NETF.Discord.NET.Toolkit.Obsolete.EntityService.Models;
-using HB.NETF.Discord.NET.Toolkit.Obsolete.TokenService;
+using HB.NETF.Discord.NET.Toolkit.Services.EntityService;
+using HB.NETF.Discord.NET.Toolkit.Services.TokenService;
 using HB.NETF.Services.Data.Handler;
 using HB.NETF.Services.Data.Handler.Async;
 using HB.NETF.Services.Logging;
@@ -106,34 +101,41 @@ namespace Discord.NET.SupportExtension.Commands {
             package.JoinableTaskFactory.Run(async () => {
                 IDiscordTokenService tokenService = DIContainer.GetService<IDiscordTokenService>();
 
-                TokenModel[] tokens = new TokenModel[0];
+                string token;
 
                 try {
                     ConfigureServerImageModel model = new ConfigureServerImageModel();
                     if (File.Exists(ConfigHelper.GetConfigPath()))
                         model = await streamHandler.ReadFromFileAsync<ConfigureServerImageModel>(ConfigHelper.GetConfigPath());
 
-                    tokens = GenerateHelper.GetTokens(tokenService, model, logger);
+                    token = GenerateHelper.GetToken(tokenService, model, logger);
 
-                    if (tokens == null || tokens.Length == 0) {
-                        logger.LogInformation("Get tokens failed, server image generation aborted.");
+                    if (string.IsNullOrWhiteSpace(token)) {
+                        logger.LogInformation("Get token failed, server image generation aborted.");
                         return;
                     }
 
-                    IMergedDiscordEntityService mergedEntityService = DIContainer.GetService<IMergedDiscordEntityService>();
+                    IDiscordEntityService entityService = DIContainer.GetService<IDiscordEntityService>();
 
-                    mergedEntityService.Init(tokens);
+                    entityService.Init(token);
 
-                    GenerateHelper.ManipulateMergedEntityServiceDataEncrypt(mergedEntityService, model, logger, out bool cancel);
+                    GenerateHelper.ManipulateEntityServiceDataEncrypt(entityService, model, logger, out bool cancel);
                     if (cancel) {
                         logger.LogInformation("Server image generation cancelled.");
                         return;
                     }
 
-                    await mergedEntityService.SaveMerged(DiscordSupportPackage.CachePath);
-                    mergedEntityService.Dispose();
+                    if (!await entityService.ReadFromFile(DiscordSupportPackage.CachePath))
+                        await entityService.LoadEntities();
+
+                    await entityService.SaveToFile(DiscordSupportPackage.CachePath);
+                    entityService.Dispose();
                     logger.LogInformation("Server image successfully generated.");
                     UIHelper.ShowInfo("Server Image generated.", "Success");
+
+                    model.LatestRun = DateTime.Now;
+                    logger.LogInformation("Base config file generated.");
+                    await streamHandler.WriteToFileAsync(ConfigHelper.GetConfigPath(), model);
                 }
                 catch (InternalException ex) {
                     this.logger.LogError(ex.ToString());

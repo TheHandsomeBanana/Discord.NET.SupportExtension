@@ -1,5 +1,4 @@
-﻿using HB.NETF.Discord.NET.Toolkit.Obsolete.EntityService.Models;
-using HB.NETF.Services.Security.Cryptography.Settings;
+﻿using HB.NETF.Services.Security.Cryptography.Settings;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -15,6 +14,7 @@ namespace Discord.NET.SupportExtension.Models.VMModels {
         public EncryptionMode? DataEncryptionMode { get; set; } = null;
         public Guid? TokenKeyIdentifier { get; set; } = null;
         public Guid? DataKeyIdentifier { get; set; } = null;
-        public TokenModel Token { get; set; }
+        public string Token { get; set; } = null;
+        public DateTime LatestRun { get; set; }
     }
 }
