@@ -49,7 +49,6 @@ namespace Discord.NET.SupportExtension {
     public sealed class DiscordSupportPackage : AsyncPackage {
 
         public static string EventLogPath = DiscordEnvironment.LogPath + "\\" + DateTime.Now.ToString("yyyy.MM.dd_HHmmss") + ".log";
-        public static string CachePath;
         private ILogger<DiscordSupportPackage> logger;
         public DiscordSupportPackage() {
             UIHelper.Package = this;
@@ -63,6 +62,8 @@ namespace Discord.NET.SupportExtension {
             ILoggerFactory loggerFactory = DIContainer.GetService<ILoggerFactory>();
             this.logger = loggerFactory.GetOrCreateLogger<DiscordSupportPackage>();
         }
+
+        public static string GetCachePath() => DiscordEnvironment.CachePath + "\\" + SolutionHelper.GetCurrentProject().Name + DiscordEnvironment.CacheExtension;
 
         #region Package Members
 
@@ -81,12 +82,13 @@ namespace Discord.NET.SupportExtension {
             await GenerateServerImageConfigurationCommand.InitializeAsync(this);
             await GenerateServerImageCommand.InitializeAsync(this);
 
-            CachePath = DiscordEnvironment.CachePath + "\\" + SolutionHelper.GetCurrentProject().Name + DiscordEnvironment.CacheExtension;
 
             // Safe Package Load
             try {
                 if (File.Exists(ConfigHelper.GetConfigPath()))
                     await HandleCacheAsync();
+                else
+                    logger.LogInformation($"No config file found in active project {SolutionHelper.GetCurrentProject().Name}. ServerCollection not loaded.");
             }
             catch(Exception ex) {
                 logger.LogError(ex.Message);
@@ -105,7 +107,7 @@ namespace Discord.NET.SupportExtension {
                 return;
             }
 
-            if (await mergedEntityService.ReadFromFile(CachePath))
+            if (await mergedEntityService.ReadFromFile(GetCachePath()))
                 logger.LogInformation("ServerCollection loaded.");
             else
                 logger.LogWarning("ServerCollection not loaded. Generate new server image.");

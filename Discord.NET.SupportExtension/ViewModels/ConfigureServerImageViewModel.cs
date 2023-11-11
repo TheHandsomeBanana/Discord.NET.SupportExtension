@@ -310,7 +310,7 @@ namespace Discord.NET.SupportExtension.ViewModels {
                     this.Token = tokenService.DecryptToken(model.Token, model.TokenEncryptionMode.Value, key);
                     break;
                 case EncryptionMode.WindowsDataProtectionAPI:
-                    this.Token = tokenService.EncryptToken(model.Token, model.TokenEncryptionMode.Value);
+                    this.Token = tokenService.DecryptToken(model.Token, model.TokenEncryptionMode.Value);
                     break;
             }
         }

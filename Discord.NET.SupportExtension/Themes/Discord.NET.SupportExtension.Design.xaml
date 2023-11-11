@@ -124,6 +124,11 @@
         <Setter Property="Padding" Value="4"/>
     </Style>
 
+    <Style x:Key="TextBlockFixed" TargetType="TextBlock" BasedOn="{StaticResource TextBlock}">
+        <Setter Property="Height" Value="25"/>
+        <Setter Property="FontSize" Value="14"/>
+    </Style>
+
     <Style x:Key="TextBlockBorder" TargetType="Border">
         <Setter Property="Padding" Value="3"/>
         <Setter Property="HorizontalAlignment" Value="Center"/>

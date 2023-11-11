@@ -125,10 +125,8 @@ namespace Discord.NET.SupportExtension.Commands {
                         return;
                     }
 
-                    if (!await entityService.ReadFromFile(DiscordSupportPackage.CachePath))
-                        await entityService.LoadEntities();
-
-                    await entityService.SaveToFile(DiscordSupportPackage.CachePath);
+                    await entityService.LoadEntities();
+                    await entityService.SaveToFile(DiscordSupportPackage.GetCachePath());
                     entityService.Dispose();
                     logger.LogInformation("Server image successfully generated.");
                     UIHelper.ShowInfo("Server Image generated.", "Success");
