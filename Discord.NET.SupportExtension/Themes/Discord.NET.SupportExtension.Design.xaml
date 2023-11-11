@@ -113,6 +113,9 @@
     <Style x:Key="SmallHeadLabel" TargetType="Label" BasedOn="{StaticResource HeadLabel}">
         <Setter Property="FontSize" Value="16"/>
     </Style>
+    <Style x:Key="BaseLabel" TargetType="Label" BasedOn="{StaticResource SmallHeadLabel}">
+        <Setter Property="FontSize" Value="14"/>
+    </Style>
 
     <Style x:Key="TextBlock" TargetType="TextBlock">
         <Setter Property="FontSize" Value="12"/>

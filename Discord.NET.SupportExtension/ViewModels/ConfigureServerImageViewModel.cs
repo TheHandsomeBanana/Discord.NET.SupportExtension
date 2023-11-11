@@ -52,11 +52,7 @@ namespace Discord.NET.SupportExtension.ViewModels {
         public RelayCommand ExitCommand { get; }
         public RelayCommand CreateDataAESKeyFileCommand { get; }
         public RelayCommand CreateTokenAESKeyFileCommand { get; }
-        public RelayCommand LoadTokensCommand { get; }
-        public RelayCommand SaveTokensCommand { get; }
-        public RelayCommand AddTokenCommand { get; }
-        public RelayCommand RemoveTokenCommand { get; }
-        public RelayCommand EditTokenCommand { get; }
+        public RelayCommand SaveTokenCommand { get; }
         #endregion
 
         #region UI Only
@@ -96,11 +92,11 @@ namespace Discord.NET.SupportExtension.ViewModels {
             }
         }
 
-        public bool SaveTokens {
-            get { return model.SaveTokens; }
+        public bool SaveToken {
+            get { return model.SaveToken; }
             set {
-                model.SaveTokens = value;
-                OnPropertyChanged(nameof(SaveTokens));
+                model.SaveToken = value;
+                OnPropertyChanged(nameof(SaveToken));
 
                 if (value)
                     TokenEncryptionMode = 0;
@@ -160,39 +156,13 @@ namespace Discord.NET.SupportExtension.ViewModels {
         #endregion
 
         #region Token
-        private ObservableCollection<TokenModel> tokens = new ObservableCollection<TokenModel>();
-        public IEnumerable<TokenModel> Tokens => tokens;
-
-        private int selectedTokenIndex = -1;
-        public int SelectedTokenIndex {
-            get => selectedTokenIndex;
-            set {
-                selectedTokenIndex = value;
-                OnPropertyChanged(nameof(SelectedTokenIndex));
-                EditTokenCommand.OnCanExecuteChanged();
-                RemoveTokenCommand.OnCanExecuteChanged();
+        private TokenModel token;
+        public TokenModel Token {
+            get {
+                return token;
             }
-        }
-
-        private string tokenText;
-        public string TokenText {
-            get { return tokenText; }
             set {
-                tokenText = value;
-                OnPropertyChanged(nameof(TokenText));
-                AddTokenCommand.OnCanExecuteChanged();
-            }
-        }
-
-        private string botText;
-        private bool loadCalled;
-
-        public string BotText {
-            get { return botText; }
-            set {
-                botText = value;
-                OnPropertyChanged(nameof(BotText));
-                AddTokenCommand.OnCanExecuteChanged();
+                token = value;
             }
         }
         #endregion
@@ -221,11 +191,7 @@ namespace Discord.NET.SupportExtension.ViewModels {
             ExitCommand = new RelayCommand(Exit, null);
             CreateTokenAESKeyFileCommand = new RelayCommand(CreateTokenAESKeyFile, null);
             CreateDataAESKeyFileCommand = new RelayCommand(CreateDataAESKeyFile, null);
-            LoadTokensCommand = new RelayCommand(LoadTokens, o => !loadCalled);
-            SaveTokensCommand = new RelayCommand(SaveTokensToModel, o => loadCalled && !IsTokensUpdated() && tokens.Count > 0);
-            AddTokenCommand = new RelayCommand(AddToken, o => loadCalled && !string.IsNullOrWhiteSpace(BotText) && !string.IsNullOrWhiteSpace(TokenText) && TokenText.Length == 70);
-            RemoveTokenCommand = new RelayCommand(RemoveToken, (o) => SelectedTokenIndex > -1);
-            EditTokenCommand = new RelayCommand(EditToken, (o) => SelectedTokenIndex > -1);
+            SaveTokenCommand = new RelayCommand(SaveTokensToModel, null);
             this.model = model;
         }
 
@@ -236,26 +202,15 @@ namespace Discord.NET.SupportExtension.ViewModels {
 
         private void Save(object o) {
             ThreadHelper.ThrowIfNotOnUIThread();
-            if(!SaveTokens && (model.Tokens.Length > 0)) {
-                logger.LogWarning($"{nameof(SaveTokens)} is disabled, there are still {model.Tokens.Length} saved. Saving will remove all current tokens and you will need a new aes key if aes encryption is used.");
-                int option = UIHelper.ShowWarningWithCancel("If you save now, your current tokens will be removed.", "Save Tokens is disabled");
+            if(!SaveToken && model.Token != null) {
+                logger.LogWarning($"{nameof(SaveToken)} is disabled, there is still a token saved. Saving will remove it and you will need a new key if aes encryption is used.");
+                int option = UIHelper.ShowWarningWithCancel("If you save now, your current token will be removed.", "Save Tokens is disabled");
                 if (option == 1) {
-                    tokens.Clear();
-                    model.Tokens = new TokenModel[0];
-                    logger.LogInformation("All tokens have been removed.");
+                    model.Token = null;
+                    logger.LogInformation("Token removed.");
                 }
                 else
                     return;
-            }
-            if (loadCalled && !IsTokensUpdated()) {
-                logger.LogWarning("Token list is not saved. Save token list dialog invoked.");
-                int option = UIHelper.ShowWarningWithCancel("Save token list?", "Token list not saved.");
-                if (option == 1) // Ok
-                    SaveTokensToModel(o);
-                else { // Cancel
-                    logger.LogInformation("Save cancelled.");
-                    return;
-                }
             }
 
             string configLocation = ConfigHelper.GetConfigPath(this.currentProject);
@@ -278,54 +233,6 @@ namespace Discord.NET.SupportExtension.ViewModels {
             CreateAESKeyFile(tokenKey);
         }
 
-        private void EditToken(object obj) {
-            BotText = tokens[selectedTokenIndex].Bot;
-            TokenText = tokens[selectedTokenIndex].Token;
-
-            RemoveToken(obj);
-        }
-
-        private void RemoveToken(object obj) {
-            tokens.RemoveAt(selectedTokenIndex);
-            SaveTokensCommand.OnCanExecuteChanged();
-        }
-
-        private void AddToken(object obj) {
-            tokens.Add(new TokenModel(BotText, TokenText));
-            BotText = "";
-            TokenText = "";
-
-            SaveTokensCommand.OnCanExecuteChanged();
-        }
-
-        private void LoadTokens(object obj) {
-            if(model.Tokens.Length == 0) {
-                logger.LogInformation("Configuration does not contain any tokens.");
-                loadCalled = true;
-                return;
-            }
-
-            AesKey key = null;
-            switch (model.TokenEncryptionMode) {
-                case EncryptionMode.AES:
-                    key = GetAesKey();
-                    if (key == null)
-                        return;
-                    break;
-            }
-
-            TokenModel[] decryptedTokens = tokenService.DecryptTokens(model.Tokens, model.TokenEncryptionMode.Value, key);
-            foreach (TokenModel decrToken in decryptedTokens) {
-                tokens.Add(decrToken);
-                logger.LogInformation($"{decrToken.Bot} decrypted and loaded.");
-            }
-
-            loadCalled = true;
-            LoadTokensCommand.OnCanExecuteChanged();
-            SaveTokensCommand.OnCanExecuteChanged();
-            AddTokenCommand.OnCanExecuteChanged();
-        }
-
         private void SaveTokensToModel(object obj) {
             switch (model.TokenEncryptionMode) {
                 case EncryptionMode.AES:
@@ -333,15 +240,15 @@ namespace Discord.NET.SupportExtension.ViewModels {
                     if (key == null)
                         return;
 
-                    model.Tokens = tokenService.EncryptTokens(this.tokens.ToArray(), model.TokenEncryptionMode.Value, key);
+                    model.Token = tokenService.EncryptToken(this.token, model.TokenEncryptionMode.Value, key);
                     break;
                 case EncryptionMode.WindowsDataProtectionAPI:
-                    model.Tokens = tokenService.EncryptTokens(this.tokens.ToArray(), model.TokenEncryptionMode.Value);
+                    model.Token = tokenService.EncryptToken(this.token, model.TokenEncryptionMode.Value);
                     break;
             }
 
-            logger.LogInformation($"{this.tokens.Count} tokens encrypted and saved.");
-            UIHelper.ShowInfo("Tokens saved successfully", "Info");
+            logger.LogInformation($"Token encrypted and saved.");
+            UIHelper.ShowInfo("Token saved successfully", "Info");
         }
         #endregion
 
@@ -383,7 +290,7 @@ namespace Discord.NET.SupportExtension.ViewModels {
         }
 
         private void SetTokenModeDependent() {
-            if (model.TokenEncryptionMode == EncryptionMode.AES && SaveTokens) {
+            if (model.TokenEncryptionMode == EncryptionMode.AES && SaveToken) {
                 TokenAESEncryptionPanelVisibility = Visibility.Visible;
                 tokenKey = identifierFactory.CreateIdentifier(aesCryptoService.GenerateKey(256));
                 TokenAESKey = Convert.ToBase64String(tokenKey.Reference.Key);
@@ -409,18 +316,6 @@ namespace Discord.NET.SupportExtension.ViewModels {
                 dataKey = null;
                 model.DataKeyIdentifier = null;
             }
-        }
-
-        private bool IsTokensUpdated() {
-            if (model.Tokens.Length != tokens.Count)
-                return false;
-
-            for (int i = 0; i < model.Tokens.Length; i++) {
-                if (model.Tokens[i].Bot != tokens[i].Bot)
-                    return false;
-            }
-
-            return true;
         }
     }
 }

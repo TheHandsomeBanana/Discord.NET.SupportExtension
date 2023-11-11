@@ -53,10 +53,11 @@
             <Border BorderThickness="0 0 2 0" BorderBrush="{StaticResource DiscordDark}" Padding="10 5 10 10" Width="325">
                 <StackPanel Orientation="Vertical">
                     <Label Style="{StaticResource HeadLabel}" Content="Settings" Margin="0 0 0 10"/>
-                    <CheckBox Name="cbSaveTokens" Style="{StaticResource CheckBoxLarge}" IsChecked="{Binding SaveTokens}" Margin="0,0,0,10">
-                        <TextBlock Text="Save Tokens"></TextBlock>
+                    
+                    <CheckBox Name="cbSaveTokens" Style="{StaticResource CheckBoxLarge}" IsChecked="{Binding SaveToken}" Margin="0,0,0,10">
+                        <TextBlock Text="Save Token"></TextBlock>
                     </CheckBox>
-
+                    
                     <ComboBox ItemsSource="{Binding EncryptionModeValues}" SelectedItem="{Binding TokenEncryptionMode}" Visibility="{Binding IsChecked, ElementName=cbSaveTokens, Converter={StaticResource b2v}}" Margin="0 0 0 10">
                     </ComboBox>
 
@@ -68,6 +69,19 @@
                         <Button Style="{StaticResource CommandButtonSmall}" Command="{Binding CreateTokenAESKeyFileCommand}" Content="Create">
 
                         </Button>
+                    </StackPanel>
+
+                    <StackPanel Orientation="Vertical" Visibility="{Binding Path=TokenAESEncryptionPanelVisibility}" Margin="0 0 0 10">
+                        <Label Style="{StaticResource SmallHeadLabel}" Content="Token"/>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBox x:Name="tbToken" Style="{StaticResource TextBox}" Width="200" Margin="0 0 10 0" 
+                                        Text="{Binding Token}" ToolTip="{Binding Token}" TextWrapping="Wrap" AcceptsReturn="True">
+
+                            </TextBox>
+                            <Button Style="{StaticResource CommandButtonSmall}" Command="{Binding SaveTokenCommand}" Content="Save">
+
+                            </Button>
+                        </StackPanel>
                     </StackPanel>
 
                     <CheckBox Name="cbEncryptData" Style="{StaticResource CheckBoxLarge}" IsChecked="{Binding EncryptData}" Margin="0,0,0,10">
@@ -89,57 +103,10 @@
                 </StackPanel>
             </Border>
 
-
-            <StackPanel Orientation="Vertical" HorizontalAlignment="Stretch" Margin="20 0 0 0">
-                <!--Visibility="{Binding IsChecked, ElementName=cbSaveTokens, Converter={StaticResource b2v}}"-->
-                <Label Style="{StaticResource HeadLabel}" Content="Tokens" Margin="0 0 0 10"/>
-
-                <StackPanel Orientation="Horizontal">
-                    <StackPanel Orientation="Vertical">
-                        <Label Style="{StaticResource SmallHeadLabel}" Content="Bot" ToolTip="Name of your Bot"></Label>
-                        <TextBox Style="{StaticResource TextBox}" Text="{Binding BotText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Margin="0 0 10 10" Width="195"/>
-                    </StackPanel>
-                    <StackPanel Orientation="Vertical">
-                        <Label Style="{StaticResource SmallHeadLabel}" Content="Token" ToolTip="Token of your bot"></Label>
-                        <TextBox Style="{StaticResource TextBox}" Text="{Binding TokenText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Margin="0 0 0 10" Width="500"/>
-                    </StackPanel>
-                </StackPanel>
-
-                <ListView Style="{StaticResource TokenListView}" ItemsSource="{Binding Tokens}" SelectedIndex="{Binding SelectedTokenIndex}"
-                          ItemContainerStyle="{StaticResource TokenListViewItem}" MaxHeight="480" MaxWidth="710">
-                    <ListView.View>
-                        <GridView ColumnHeaderContainerStyle="{StaticResource GridViewColumnHeader}">
-                            <GridViewColumn Header="Bot" Width="200" DisplayMemberBinding="{Binding Bot}"/>
-                            <GridViewColumn Header="Token" Width="350" DisplayMemberBinding="{Binding Token}"/>
-                            <GridViewColumn Header="Created On" Width="150" DisplayMemberBinding="{Binding CreatedOn}"/>
-                        </GridView>
-                    </ListView.View>
-                </ListView>
+            <StackPanel Orientation="Vertical" Margin="10 0 0 0">
+                <Label Style="{StaticResource HeadLabel}" Content="Data" Margin="0 0 0 10"/>
+                <Label Style="{StaticResource BaseLabel}" Content="Latest generation"/>
             </StackPanel>
-
-            <StackPanel Orientation="Vertical" Margin="10 110 0 0">
-                <Button Style="{StaticResource CommandButtonSmall}" Command="{Binding LoadTokensCommand}" Content="Load" VerticalAlignment="Top"
-                        Margin="0 0 0 10">
-
-                </Button>
-                <Button Style="{StaticResource CommandButtonSmall}" Command="{Binding SaveTokensCommand}" Content="Save" VerticalAlignment="Top"
-                        Margin="0 0 0 10">
-
-                </Button>
-                <Button Style="{StaticResource CommandButtonSmall}" Command="{Binding AddTokenCommand}" Content="Add" VerticalAlignment="Top"
-                        Margin="0 0 0 10">
-
-                </Button>
-                <Button Style="{StaticResource CommandButtonSmall}" Command="{Binding RemoveTokenCommand}" Content="Remove" VerticalAlignment="Top"
-                        Margin="0 0 0 10">
-
-                </Button>
-                <Button Style="{StaticResource CommandButtonSmall}" Command="{Binding EditTokenCommand}" Content="Edit" VerticalAlignment="Top"
-                        Margin="0 0 0 10">
-
-                </Button>
-            </StackPanel>
-
         </StackPanel>
     </Grid>
 </Window>

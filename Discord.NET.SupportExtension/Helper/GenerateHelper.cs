@@ -19,16 +19,16 @@ using System.Threading.Tasks;
 namespace Discord.NET.SupportExtension.Helper {
     public static class GenerateHelper {
         public static TokenModel[] GetTokens(IDiscordTokenService tokenService, ConfigureServerImageModel model, ILogger logger) {
-            if (model.SaveTokens) {
+            if (model.SaveToken) {
                 switch (model.TokenEncryptionMode) {
                     case EncryptionMode.AES:
                         AesKey tokenKey = GenerateHelper.HandleAesKeyExtractorUI(model.TokenKeyIdentifier, "Token", logger);
                         if (tokenKey == null)
                             return null;
 
-                        return tokenService.DecryptTokens(model.Tokens, model.TokenEncryptionMode.Value, tokenKey);
+                        return tokenService.DecryptTokens(model.Token, model.TokenEncryptionMode.Value, tokenKey);
                     case EncryptionMode.WindowsDataProtectionAPI:
-                        return tokenService.DecryptTokens(model.Tokens, model.TokenEncryptionMode.Value);
+                        return tokenService.DecryptTokens(model.Token, model.TokenEncryptionMode.Value);
                 }
             }
             else {
