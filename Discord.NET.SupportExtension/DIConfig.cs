@@ -28,7 +28,7 @@ namespace Discord.NET.SupportExtension {
                 .AddTarget(UIHelper.OutputWindowFunc)
             ))
                 .AddSingleton<IIdentifierFactory, IdentifierFactory>()
-                .AddSingleton<IDiscordEntityService, DiscordEntityService>()
+                .AddTransient<IDiscordEntityService, DiscordEntityService>()
                 .AddTransient<IStreamHandler, StreamHandler>()
                 .AddTransient<IAsyncStreamHandler, AsyncStreamHandler>()
                 .AddTransient<IDiscordTokenService, DiscordTokenService>()

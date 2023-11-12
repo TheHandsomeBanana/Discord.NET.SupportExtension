@@ -116,8 +116,7 @@ namespace Discord.NET.SupportExtension.Commands {
                     }
 
                     IDiscordEntityService entityService = DIContainer.GetService<IDiscordEntityService>();
-
-                    entityService.Init(token);
+                    entityService.OnTimeout += OnTimeout;
 
                     GenerateHelper.ManipulateEntityServiceDataEncrypt(entityService, model, logger, out bool cancel);
                     if (cancel) {
@@ -125,15 +124,18 @@ namespace Discord.NET.SupportExtension.Commands {
                         return;
                     }
 
-                    await entityService.LoadEntities();
-                    await entityService.SaveToFile(DiscordSupportPackage.GetCachePath());
-                    entityService.Dispose();
-                    logger.LogInformation("Server image successfully generated.");
-                    UIHelper.ShowInfo("Server Image generated.", "Success");
+                    await entityService.Connect(token);
+                    if(entityService.Ready) {
+                        await entityService.LoadEntities();
+                        await entityService.SaveToFile(DiscordSupportPackage.GetCachePath());
+                        logger.LogInformation("Server image successfully generated.");
+                        UIHelper.ShowInfo("Server Image generated.", "Success");
 
-                    model.LatestRun = DateTime.Now;
-                    logger.LogInformation("Base config file generated.");
-                    await streamHandler.WriteToFileAsync(ConfigHelper.GetConfigPath(), model);
+                        model.LatestRun = DateTime.Now;
+                        await streamHandler.WriteToFileAsync(ConfigHelper.GetConfigPath(), model);
+                    }
+
+                    entityService.Dispose();
                 }
                 catch (InternalException ex) {
                     this.logger.LogError(ex.ToString());
@@ -141,6 +143,11 @@ namespace Discord.NET.SupportExtension.Commands {
                     return;
                 }
             });
+        }
+
+        private void OnTimeout() {
+            logger.LogError("Could not generate image, connection timed out");
+            UIHelper.ShowError("Could not generate image.", "Failure");
         }
     }
 }
