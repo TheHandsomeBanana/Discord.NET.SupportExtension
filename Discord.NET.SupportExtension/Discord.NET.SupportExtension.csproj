@@ -63,6 +63,7 @@
     <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="Helper\GenerateHelper.cs" />
     <Compile Include="Helper\ConfigHelper.cs" />
+    <Compile Include="Models\RunLogEntry.cs" />
     <Compile Include="Models\VMModels\ConfigureServerImageModel.cs" />
     <Compile Include="Models\VMModels\KeyEntryModel.cs" />
     <Compile Include="Models\VMModels\TokenEntryModel.cs" />

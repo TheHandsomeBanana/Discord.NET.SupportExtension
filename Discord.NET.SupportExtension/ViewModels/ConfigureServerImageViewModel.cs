@@ -39,6 +39,7 @@ using System.Windows.Input;
 using static Microsoft.VisualStudio.Shell.RegistrationAttribute;
 using HB.NETF.WPF.Commands;
 using HB.NETF.Discord.NET.Toolkit.Services.TokenService;
+using Discord.NET.SupportExtension.Models;
 
 namespace Discord.NET.SupportExtension.ViewModels {
     public class ConfigureServerImageViewModel : ViewModelBase, ICloseableWindow {
@@ -93,10 +94,15 @@ namespace Discord.NET.SupportExtension.ViewModels {
             get { return model.SaveToken; }
             set {
                 if (!value && CheckExistingToken()) {
+                    if (!DeleteTokenDialog())
+                        return;
+
                     model.Token = null;
-                    this.token = null;
-                    return;
+                    this.Token = null;
+                    model.RunLog.Clear();
                 }
+
+
 
                 model.SaveToken = value;
                 OnPropertyChanged(nameof(SaveToken));
@@ -109,10 +115,11 @@ namespace Discord.NET.SupportExtension.ViewModels {
         }
 
         private bool CheckExistingToken() {
-            if (model.Token == null && token == null)
-                return false;
+            return model.Token != null || token != null;
+        }
 
-            int res = UIHelper.ShowWarningWithCancel("There is an existing token. Disabling this option will remove the token.", "Existing token warning");
+        private bool DeleteTokenDialog() {
+            int res = UIHelper.ShowWarningWithCancel("Disabling this option will remove the existing token and clear the run log.", "Existing token warning");
             return res == 1;
         }
 
@@ -177,11 +184,7 @@ namespace Discord.NET.SupportExtension.ViewModels {
             }
         }
 
-        public string LatestRun {
-            get {
-                return model.LatestRun.ToString("yyyy/MM/dd hh:mm:ss");
-            }
-        }
+        public IEnumerable<RunLogEntry> RunLog => model.RunLog;
         #endregion
         #endregion
 
@@ -216,6 +219,7 @@ namespace Discord.NET.SupportExtension.ViewModels {
 
         #region Command Callbacks
         private void GenerateServerImage(object o) {
+            Save(o);
             CommandHelper.RunVSCommand(PackageGuids.CommandSet, PackageIds.GenerateServerImageCommand);
         }
 
@@ -224,7 +228,8 @@ namespace Discord.NET.SupportExtension.ViewModels {
             if (!ValidateToken())
                 return;
 
-            SaveTokenToModel();
+            if (SaveToken)
+                SaveTokenToModel();
 
             string configLocation = ConfigHelper.GetConfigPath(this.currentProject);
             streamHandler.WriteToFile(configLocation, model);
@@ -298,7 +303,6 @@ namespace Discord.NET.SupportExtension.ViewModels {
             }
 
             logger.LogInformation($"Token encrypted and saved.");
-            UIHelper.ShowInfo("Token saved successfully", "Info");
         }
         private void LoadTokenFromModel() {
             switch (model.TokenEncryptionMode) {

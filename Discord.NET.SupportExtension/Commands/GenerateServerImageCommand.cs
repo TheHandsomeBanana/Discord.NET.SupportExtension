@@ -1,4 +1,5 @@
 ﻿using Discord.NET.SupportExtension.Helper;
+using Discord.NET.SupportExtension.Models;
 using Discord.NET.SupportExtension.Models.VMModels;
 using Discord.NET.SupportExtension.ViewModels;
 using Discord.NET.SupportExtension.Views;
@@ -99,12 +100,16 @@ namespace Discord.NET.SupportExtension.Commands {
             ThreadHelper.ThrowIfNotOnUIThread();
 
             package.JoinableTaskFactory.Run(async () => {
+                ConfigureServerImageModel model = new ConfigureServerImageModel();
+
+                DateTime startedAt = DateTime.Now;
+                JobStatus status = JobStatus.Failed;
+
                 IDiscordTokenService tokenService = DIContainer.GetService<IDiscordTokenService>();
 
                 string token;
 
                 try {
-                    ConfigureServerImageModel model = new ConfigureServerImageModel();
                     if (File.Exists(ConfigHelper.GetConfigPath()))
                         model = await streamHandler.ReadFromFileAsync<ConfigureServerImageModel>(ConfigHelper.GetConfigPath());
 
@@ -131,8 +136,7 @@ namespace Discord.NET.SupportExtension.Commands {
                         logger.LogInformation("Server image successfully generated.");
                         UIHelper.ShowInfo("Server Image generated.", "Success");
 
-                        model.LatestRun = DateTime.Now;
-                        await streamHandler.WriteToFileAsync(ConfigHelper.GetConfigPath(), model);
+                        status = JobStatus.Succeeded;
                     }
 
                     entityService.Dispose();
@@ -140,7 +144,11 @@ namespace Discord.NET.SupportExtension.Commands {
                 catch (InternalException ex) {
                     this.logger.LogError(ex.ToString());
                     UIHelper.ShowError("Server image generation failed.", "Error");
-                    return;
+                }
+                finally {
+                    DateTime finishedAt = DateTime.Now;
+                    model.RunLog.Add(new RunLogEntry() { StartedAt = startedAt, FinishedAt = finishedAt, Status = status });
+                    await streamHandler.WriteToFileAsync(ConfigHelper.GetConfigPath(), model);
                 }
             });
         }

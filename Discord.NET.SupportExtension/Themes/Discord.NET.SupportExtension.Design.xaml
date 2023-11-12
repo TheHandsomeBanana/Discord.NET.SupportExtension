@@ -151,11 +151,11 @@
         <Setter Property="FontSize" Value="12"/>
     </Style>
 
-    <Style x:Key="TokenListView" TargetType="ListView">
+    <Style x:Key="LatestRunsView" TargetType="ListView">
+        <Setter Property="HorizontalAlignment" Value="Left"/>
         <Setter Property="Background" Value="Transparent"/>
         <Setter Property="BorderBrush" Value="{StaticResource DiscordBlurple}"/>
         <Setter Property="BorderThickness" Value="1"/>
-        <Setter Property="SelectionMode" Value="Single"/>
         <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Disabled"/>
     </Style>
     
@@ -172,9 +172,10 @@
         </Setter>
     </Style>
 
-    <Style x:Key="TokenListViewItem" TargetType="ListViewItem">
+    <Style x:Key="LatestRunListViewItem" TargetType="ListViewItem">
         <Setter Property="Background" Value="{StaticResource DiscordTextBox}"/>
         <Setter Property="Foreground" Value="{StaticResource DiscordText}"/>
+        <Setter Property="Focusable" Value="False"/>
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="ListViewItem">
@@ -186,14 +187,6 @@
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
-        <Style.Triggers>
-            <Trigger Property="IsMouseOver" Value="True">
-                <Setter Property="Background" Value="{StaticResource DiscordBlurpleOverlay}"/>
-            </Trigger>
-            <Trigger Property="IsSelected" Value="True">
-                <Setter Property="Background" Value="{StaticResource DiscordBlurpleOverlay}"/>
-            </Trigger>
-        </Style.Triggers>
     </Style>
 
 </ResourceDictionary>

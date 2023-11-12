@@ -15,6 +15,6 @@ namespace Discord.NET.SupportExtension.Models.VMModels {
         public Guid? TokenKeyIdentifier { get; set; } = null;
         public Guid? DataKeyIdentifier { get; set; } = null;
         public string Token { get; set; } = null;
-        public DateTime LatestRun { get; set; }
+        public List<RunLogEntry> RunLog { get; set; } = new List<RunLogEntry>();
     }
 }
