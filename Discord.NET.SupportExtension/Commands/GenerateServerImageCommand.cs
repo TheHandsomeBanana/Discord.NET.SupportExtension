@@ -6,7 +6,9 @@ using Discord.NET.SupportExtension.Views;
 using EnvDTE;
 using HB.NETF.Common.DependencyInjection;
 using HB.NETF.Common.Exceptions;
+using HB.NETF.Discord.NET.Toolkit.Models.Collections;
 using HB.NETF.Discord.NET.Toolkit.Services.EntityService;
+using HB.NETF.Discord.NET.Toolkit.Services.EntityService.Holder;
 using HB.NETF.Discord.NET.Toolkit.Services.TokenService;
 using HB.NETF.Services.Data.Handler;
 using HB.NETF.Services.Data.Handler.Async;
@@ -33,9 +35,6 @@ using System.Windows.Markup;
 using Task = System.Threading.Tasks.Task;
 
 namespace Discord.NET.SupportExtension.Commands {
-    /// <summary>
-    /// Command handler
-    /// </summary>
     internal sealed class GenerateServerImageCommand : AsyncCommandBase {
         protected override Guid CommandSet => PackageGuids.CommandSet;
         protected override int CommandId => PackageIds.GenerateServerImageCommand;
@@ -77,46 +76,53 @@ namespace Discord.NET.SupportExtension.Commands {
                     token = InteractionHelper.GetDecryptedToken(tokenService, model, logger);
 
                     if (string.IsNullOrWhiteSpace(token)) {
-                        logger.LogInformation("Get token failed, server image generation aborted.");
+                        logger.LogInformation(InteractionMessages.GetTokenFailed + ", " + InteractionMessages.GenerationAborted);
                         return;
                     }
 
                     IDiscordEntityService entityService = DIContainer.GetService<IDiscordEntityService>();
-                    entityService.OnTimeout += OnTimeout;
+                    try {
+                        entityService.OnTimeout += OnTimeout;
 
-                    InteractionHelper.MapDataEncryptToEntityService(entityService, model, logger, out bool cancel);
-                    if (cancel) {
-                        logger.LogInformation("Server image generation cancelled.");
-                        return;
+                        InteractionHelper.MapDataEncryptToEntityService(entityService, model, logger, out bool cancel);
+                        if (cancel) {
+                            logger.LogInformation(InteractionMessages.GenerationAborted);
+                            return;
+                        }
+
+                        await entityService.Connect(token);
+                        if (entityService.Ready) {
+                            DiscordServerCollection serverCollection = await entityService.LoadEntities();
+
+                            await entityService.SaveToFile(currentCachePath, serverCollection);
+                            logger.LogInformation(InteractionMessages.GenerateImageSuccess);
+                            UIHelper.ShowInfo(InteractionMessages.GenerateImageSuccess, "Success");
+
+                            CommandHelper.RunVSCommand(CommandSet, PackageIds.LoadServerCollectionCommand);
+
+                            status = JobStatus.Succeeded;
+                        }
+                        await entityService.Disconnect();
                     }
-
-                    await entityService.Connect(token);
-                    if (entityService.Ready) {
-                        await entityService.LoadEntities();
-                        await entityService.SaveToFile(currentCachePath);
-                        logger.LogInformation("Server image successfully generated.");
-                        UIHelper.ShowInfo("Server Image generated.", "Success");
-
-                        status = JobStatus.Succeeded;
+                    finally {
+                        await entityService.DisposeAsync();
                     }
-
-                    entityService.Dispose();
                 }
                 catch (InternalException ex) {
                     this.logger.LogError(ex.ToString());
-                    UIHelper.ShowError("Server image generation failed.", "Error");
+                    UIHelper.ShowError(InteractionMessages.GenerateImageFailure, "Error");
                 }
                 finally {
                     DateTime finishedAt = DateTime.Now;
                     model.RunLog.Add(new RunLogEntry() { StartedAt = startedAt, FinishedAt = finishedAt, Status = status });
-                    await streamHandler.WriteToFileAsync(ConfigHelper.GetConfigPath(), model);
+                    await streamHandler.WriteToFileAsync(currentConfigPath, model);
                 }
             });
         }
 
         private void OnTimeout() {
-            logger.LogError("Could not generate image, connection timed out");
-            UIHelper.ShowError("Could not generate image.", "Failure");
+            logger.LogError(InteractionMessages.GenerateImageFailure + ", " + InteractionMessages.ConnectionTimeout);
+            UIHelper.ShowError(InteractionMessages.GenerateImageFailure, "Failure");
         }
     }
 }

@@ -5,7 +5,9 @@ using Discord.NET.SupportExtension.Core.Helper;
 using Discord.NET.SupportExtension.Core.Interface;
 using HB.NETF.Common.DependencyInjection;
 using HB.NETF.Common.Exceptions;
+using HB.NETF.Discord.NET.Toolkit.Models.Collections;
 using HB.NETF.Discord.NET.Toolkit.Models.Entities;
+using HB.NETF.Discord.NET.Toolkit.Services.EntityService.Holder;
 using Microsoft.CodeAnalysis;
 using System;
 using System.Collections.Generic;
@@ -15,9 +17,7 @@ using System.Threading.Tasks;
 
 namespace Discord.NET.SupportExtension.Core {
     internal class AsyncDiscordCompletionEngine : IAsyncDiscordCompletionEngine {
-        private readonly CompletionHelper completionHelper;
         public AsyncDiscordCompletionEngine() {
-            completionHelper = new CompletionHelper();
         }
 
         public async Task<IDiscordCompletionItem[]> ProcessCompletionAsync(Solution solution, SemanticModel semanticModel, SyntaxToken token) {
@@ -29,7 +29,8 @@ namespace Discord.NET.SupportExtension.Core {
             DiscordCompletionContext foundContext = await contextDetector.Run(token.Parent);
 
             AsyncDiscordContextAnalyser analyser = new AsyncDiscordContextAnalyser(semanticModel, semanticModel.SyntaxTree, solution, project, foundContext);
-            completionItems = (await analyser.Run(token.Parent))?.Select(e => completionHelper.ToCompletionItem(e)) ?? new IDiscordCompletionItem[0];
+            DiscordServerCollection serverCollection = DIContainer.GetService<IServerCollectionHolder>().Get(project.Name);
+            completionItems = (await analyser.Run(token.Parent))?.Select(e => CompletionHelper.ToCompletionItem(e, serverCollection)) ?? new IDiscordCompletionItem[0];
 
             return completionItems.ToArray();
         }

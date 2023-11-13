@@ -1,10 +1,13 @@
 ﻿using Discord.NET.SupportExtension.Commands;
 using Discord.NET.SupportExtension.Helper;
 using Discord.NET.SupportExtension.Models.VMModels;
+using EnvDTE;
 using HB.NETF.Common;
 using HB.NETF.Common.DependencyInjection;
 using HB.NETF.Discord.NET.Toolkit;
+using HB.NETF.Discord.NET.Toolkit.Models.Collections;
 using HB.NETF.Discord.NET.Toolkit.Services.EntityService;
+using HB.NETF.Discord.NET.Toolkit.Services.EntityService.Holder;
 using HB.NETF.Services.Data.Handler;
 using HB.NETF.Services.Data.Handler.Async;
 using HB.NETF.Services.Logging;
@@ -50,7 +53,7 @@ namespace Discord.NET.SupportExtension {
     public sealed class DiscordSupportPackage : AsyncPackage {
 
         public static string EventLogPath = DiscordEnvironment.LogPath + "\\" + DateTime.Now.ToString("yyyy.MM.dd_HHmmss") + ".log";
-        private ILogger<DiscordSupportPackage> logger;
+        private readonly ILogger<DiscordSupportPackage> logger;
         public DiscordSupportPackage() {
             UIHelper.Package = this;
 
@@ -62,7 +65,11 @@ namespace Discord.NET.SupportExtension {
 
             ILoggerFactory loggerFactory = DIContainer.GetService<ILoggerFactory>();
             this.logger = loggerFactory.GetOrCreateLogger<DiscordSupportPackage>();
+
+            
         }
+
+        
 
         public static string GetCachePath() => DiscordEnvironment.CachePath + "\\" + SolutionHelper.GetCurrentProject().Name + DiscordEnvironment.CacheExtension;
 
@@ -93,7 +100,7 @@ namespace Discord.NET.SupportExtension {
                 if (File.Exists(configPath))
                     await HandleCacheAsync(projectName, configPath);
                 else
-                    logger.LogInformation(InteractionHelper.Messages.ConfigurationNotFoundFor(projectName) + ", " + InteractionHelper.Messages.ServerCollectionNotLoaded);
+                    logger.LogInformation(InteractionMessages.ConfigurationNotFoundFor(projectName) + ", " + InteractionMessages.ServerCollectionNotLoaded);
             }
             catch(Exception ex) {
                 logger.LogError(ex.Message);
@@ -113,14 +120,21 @@ namespace Discord.NET.SupportExtension {
 
             InteractionHelper.MapDataEncryptToEntityService(entityService, model, logger, out bool cancel);
             if (cancel) {
-                logger.LogWarning(InteractionHelper.Messages.CouldNotRetrieveAesKey + ", " + InteractionHelper.Messages.ServerCollectionNotLoadedFor(projectName));
+                logger.LogWarning(InteractionMessages.CouldNotRetrieveAesKey + ", " + InteractionMessages.ServerCollectionNotLoadedFor(projectName));
                 return;
             }
 
-            if (await entityService.ReadFromFile(GetCachePath()))
-                logger.LogInformation(InteractionHelper.Messages.ServerCollectionLoadedFor(projectName));
-            else
-                logger.LogWarning(InteractionHelper.Messages.ServerCollectionNotLoadedFor(projectName) + ", " + InteractionHelper.Messages.GenerateNewServerImage);
+            try {
+                DiscordServerCollection serverCollection = await entityService.ReadFromFile(GetCachePath());
+                DIContainer.GetService<IServerCollectionHolder>()
+                    .Hold(projectName, serverCollection);
+                
+                logger.LogInformation(InteractionMessages.ServerCollectionLoadedFor(projectName));
+            }
+            catch {
+                logger.LogError(InteractionMessages.ServerCollectionNotLoadedFor(projectName) + ", " + InteractionMessages.GenerateNewServerImage);
+                throw;
+            }
         }
 
         #endregion

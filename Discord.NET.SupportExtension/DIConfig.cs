@@ -19,6 +19,7 @@ using HB.NETF.Services.Serialization;
 using System.Data;
 using HB.NETF.Services.Security.DataProtection;
 using HB.NETF.Discord.NET.Toolkit.Services.EntityService;
+using HB.NETF.Discord.NET.Toolkit.Services.EntityService.Holder;
 
 namespace Discord.NET.SupportExtension {
     internal class DIConfig : IDependencyConfig {
@@ -28,6 +29,7 @@ namespace Discord.NET.SupportExtension {
                 .AddTarget(UIHelper.OutputWindowFunc)
             ))
                 .AddSingleton<IIdentifierFactory, IdentifierFactory>()
+                .AddSingleton<IServerCollectionHolder, ServerCollectionHolder>()
                 .AddTransient<IDiscordEntityService, DiscordEntityService>()
                 .AddTransient<IStreamHandler, StreamHandler>()
                 .AddTransient<IAsyncStreamHandler, AsyncStreamHandler>()

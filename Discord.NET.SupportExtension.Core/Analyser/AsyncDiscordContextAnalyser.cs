@@ -2,8 +2,10 @@
 using HB.NETF.Code.Analysis;
 using HB.NETF.Code.Analysis.Interface;
 using HB.NETF.Common.DependencyInjection;
+using HB.NETF.Discord.NET.Toolkit.Models.Collections;
 using HB.NETF.Discord.NET.Toolkit.Models.Entities;
 using HB.NETF.Discord.NET.Toolkit.Services.EntityService;
+using HB.NETF.Discord.NET.Toolkit.Services.EntityService.Holder;
 using HB.NETF.Services.Logging;
 using HB.NETF.Services.Logging.Factory;
 using Microsoft.CodeAnalysis;
@@ -17,7 +19,7 @@ using System.Threading.Tasks;
 namespace Discord.NET.SupportExtension.Core.Analyser {
     internal class AsyncDiscordContextAnalyser : ICodeAnalyser<DiscordEntity[]> {
         private readonly ILogger<AsyncDiscordContextAnalyser> logger;
-        private readonly IDiscordEntityService entityService;
+        private readonly DiscordServerCollection serverCollection;
 
         private readonly DiscordCompletionContext completionContext;
         private readonly Solution solution;
@@ -28,7 +30,7 @@ namespace Discord.NET.SupportExtension.Core.Analyser {
         public AsyncDiscordContextAnalyser(SemanticModel semanticModel, SyntaxTree syntaxTree, Solution solution, Project project, DiscordCompletionContext completionContext) {
             ILoggerFactory loggerFactory = DIContainer.GetService<ILoggerFactory>();
             logger = loggerFactory.GetOrCreateLogger<AsyncDiscordContextAnalyser>();
-            entityService = DIContainer.GetService<IDiscordEntityService>();
+            serverCollection = DIContainer.GetService<IServerCollectionHolder>().Get(project.Name);
 
             this.completionContext = completionContext;
             this.solution = solution;
@@ -39,7 +41,7 @@ namespace Discord.NET.SupportExtension.Core.Analyser {
 
         public async Task<DiscordEntity[]> Run(SyntaxNode syntaxNode) {
             if (completionContext.BaseContext == DiscordBaseCompletionContext.Server)
-                return entityService.GetServers();
+                return serverCollection.GetServers();
 
             ICodeAnalyser<IEnumerable<ulong>> serverIdAnalyser = new AsyncDiscordServerIdAnalyser(SemanticModel, syntaxTree, solution, project);
             IEnumerable<ulong> serverIdList = await serverIdAnalyser.Run(syntaxNode);
@@ -47,17 +49,17 @@ namespace Discord.NET.SupportExtension.Core.Analyser {
             switch (completionContext.BaseContext) {
                 case DiscordBaseCompletionContext.User:
                     foreach (ulong serverId in serverIdList)
-                        foundItems.AddRange(entityService.GetUsers(serverId));
+                        foundItems.AddRange(serverCollection.GetUsers(serverId));
 
                     return foundItems.ToArray();
                 case DiscordBaseCompletionContext.Role:
                     foreach (ulong serverId in serverIdList)
-                        foundItems.AddRange(entityService.GetRoles(serverId));
+                        foundItems.AddRange(serverCollection.GetRoles(serverId));
 
                     return foundItems.ToArray();
                 case DiscordBaseCompletionContext.Channel:
                     foreach (ulong serverId in serverIdList)
-                        foundItems.AddRange(entityService.GetChannels(serverId, MapChannelType(completionContext.ChannelContext)));
+                        foundItems.AddRange(serverCollection.GetChannels(serverId, MapChannelType(completionContext.ChannelContext)));
                     
 
                     return foundItems.ToArray();

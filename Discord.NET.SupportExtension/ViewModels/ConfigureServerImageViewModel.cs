@@ -118,7 +118,7 @@ namespace Discord.NET.SupportExtension.ViewModels {
         }
 
         private bool DeleteTokenDialog() {
-            int res = UIHelper.ShowWarningWithCancel("Disabling this option will remove the existing token and clear the run log.", "Existing token warning");
+            int res = UIHelper.ShowWarningWithCancel(InteractionMessages.TokenAndRunLogWillBeRemoved, "Existing token warning");
             return res == 1;
         }
 
@@ -234,7 +234,7 @@ namespace Discord.NET.SupportExtension.ViewModels {
             streamHandler.WriteToFile(configLocation, model);
 
             ProjectHelper.AddExistingFile(this.currentProject, configLocation);
-            logger.LogInformation($"Configuration saved to project {this.currentProject.Name}");
+            logger.LogInformation(InteractionMessages.ConfigurationSavedTo(this.currentProject.Name));
             Exit(o);
         }
 
@@ -263,34 +263,11 @@ namespace Discord.NET.SupportExtension.ViewModels {
                 UIHelper.ShowError(error, "Error");
             }
         }
-        private AesKey GetAesKey() {
-            KeyEntryModel keyEntry = new KeyEntryModel("Token");
-            KeyEntryView keyEntryView = new KeyEntryView() { DataContext = new KeyEntryViewModel(keyEntry) };
-            this.logger.LogInformation("Requesting key for tokens.");
-            UIHelper.Show(keyEntryView);
-            if (keyEntry.IsCanceled) {
-                this.logger.LogInformation($"Request for tokens cancelled.");
-                return null;
-            }
 
-            if (!keyEntry.ContainsKey()) {
-                this.logger.LogInformation($"No key found.");
-                return null;
-            }
-
-            if (!keyEntry.Key.Identify(model.TokenKeyIdentifier.GetValueOrDefault())) {
-                string error = $"Wrong key for token provided.";
-                UIHelper.ShowError(error, "Wrong key");
-                this.logger.LogError(error);
-                return null;
-            }
-
-            return keyEntry.Key.Reference;
-        }
         private void SaveTokenToModel() {
             switch (model.TokenEncryptionMode) {
                 case EncryptionMode.AES:
-                    AesKey key = GetAesKey();
+                    AesKey key = InteractionHelper.GetAesKeyFromUIInput(model.TokenKeyIdentifier.GetValueOrDefault(), "Token", this.logger);
                     if (key == null)
                         return;
 
@@ -301,12 +278,12 @@ namespace Discord.NET.SupportExtension.ViewModels {
                     break;
             }
 
-            logger.LogInformation($"Token encrypted and saved.");
+            logger.LogInformation(InteractionMessages.TokenSaved);
         }
         private void LoadTokenFromModel() {
             switch (model.TokenEncryptionMode) {
                 case EncryptionMode.AES:
-                    AesKey key = GetAesKey();
+                    AesKey key = InteractionHelper.GetAesKeyFromUIInput(model.TokenKeyIdentifier.GetValueOrDefault(), "Token", this.logger);
                     if (key == null)
                         return;
 
@@ -322,12 +299,12 @@ namespace Discord.NET.SupportExtension.ViewModels {
                 return true;
 
             if (token == null) {
-                UIHelper.ShowError("There is no token to save. Provide a token before saving.", "Token missing");
+                UIHelper.ShowError(InteractionMessages.NoTokenToSave + ", " + InteractionMessages.ProvideToken, "Token missing");
                 return false;
             }
 
             if (string.IsNullOrWhiteSpace(token) || token.Length != 70) {
-                UIHelper.ShowError("The provided token is invalid.", "Token invalid");
+                UIHelper.ShowError(InteractionMessages.TokenInvalid, "Token invalid");
                 return false;
             }
 

@@ -15,23 +15,20 @@ using HB.NETF.VisualStudio.Workspace;
 using System.Windows.Forms;
 using HB.NETF.VisualStudio.Commands;
 using Discord.NET.SupportExtension.Helper;
+using HB.NETF.Discord.NET.Toolkit.Models.Collections;
+using HB.NETF.Discord.NET.Toolkit.Services.EntityService.Holder;
 
 namespace Discord.NET.SupportExtension.Commands {
-    /// <summary>
-    /// Command handler
-    /// </summary>
     internal sealed class LoadServerCollectionCommand : AsyncCommandBase {
-
-
         protected override Guid CommandSet => PackageGuids.CommandSet;
         protected override int CommandId => PackageIds.LoadServerCollectionCommand;
 
         private readonly IDiscordEntityService entityService;
-        private readonly ILogger<GenerateServerImageCommand> logger;
+        private readonly ILogger<LoadServerCollectionCommand> logger;
 
         internal LoadServerCollectionCommand(AsyncPackage package, OleMenuCommandService commandService, Action<Exception> onException) : base(package, commandService, onException) {
             entityService = DIContainer.GetService<IDiscordEntityService>();
-            logger = DIContainer.GetService<ILoggerFactory>().GetOrCreateLogger<GenerateServerImageCommand>();
+            logger = DIContainer.GetService<ILoggerFactory>().GetOrCreateLogger<LoadServerCollectionCommand>();
         }
 
         public static LoadServerCollectionCommand Instance { get; private set; }
@@ -47,24 +44,20 @@ namespace Discord.NET.SupportExtension.Commands {
             string currentCachePath = DiscordSupportPackage.GetCachePath();
 
             await Package.JoinableTaskFactory.RunAsync(async () => {
-                bool success = false;
-
+                DiscordServerCollection serverCollection;
                 try {
-                    success = await entityService.ReadFromFile(currentCachePath);
-                }
-                catch (Exception ex) {
-                    logger.LogError(ex.ToString());
-                }
+                    serverCollection = await entityService.ReadFromFile(currentCachePath);
 
-                if (success) {
-                    string message = InteractionHelper.Messages.ServerCollectionLoadedFor(currentProjectName);
+                    IServerCollectionHolder serverCollectionHolder = DIContainer.GetService<IServerCollectionHolder>();
+                    serverCollectionHolder.Hold(currentProjectName, serverCollection);
+
+                    string message = InteractionMessages.ServerCollectionLoadedFor(currentProjectName);
                     UIHelper.ShowInfo(message, "Success");
                     logger.LogInformation(message);
                 }
-                else {
-                    string message = InteractionHelper.Messages.ServerCollectionNotLoadedFor(currentProjectName);
-                    UIHelper.ShowError(message, "Failure");
-                    logger.LogError(message);
+                catch (Exception ex) {
+                    logger.LogError(ex.ToString());
+                    UIHelper.ShowError(InteractionMessages.ServerCollectionNotLoadedFor(currentProjectName), "Failure");
                 }
             });
         }

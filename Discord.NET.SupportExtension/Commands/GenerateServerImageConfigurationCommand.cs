@@ -23,9 +23,6 @@ using System.Threading.Tasks;
 using Task = System.Threading.Tasks.Task;
 
 namespace Discord.NET.SupportExtension.Commands {
-    /// <summary>
-    /// Command handler
-    /// </summary>
     internal sealed class GenerateServerImageConfigurationCommand : AsyncCommandBase {
         protected override Guid CommandSet => PackageGuids.CommandSet;
         protected override int CommandId => PackageIds.GenerateServerImageConfigurationCommand;
@@ -55,12 +52,12 @@ namespace Discord.NET.SupportExtension.Commands {
                 ConfigureServerImageModel model = new ConfigureServerImageModel();
 
                 try {
-                    if (File.Exists(ConfigHelper.GetConfigPath())) {
+                    if (File.Exists(currentConfigPath)) {
                         model = await streamHandler.ReadFromFileAsync<ConfigureServerImageModel>(currentConfigPath);
-                        logger.LogInformation($"Configuration found and loaded from " + currentProjectName);
+                        logger.LogInformation(InteractionMessages.ConfigurationFoundFor(currentProjectName));
                     }
                     else
-                        logger.LogInformation("No configuration file found. Window loaded with empty configuration.");
+                        logger.LogInformation(InteractionMessages.ConfigurationNotFoundFor(currentProjectName) + ", " + InteractionMessages.WindowWithEmptyConfiguration);
                 }
                 catch (InternalException ex) {
                     logger.LogError(ex.ToString());
