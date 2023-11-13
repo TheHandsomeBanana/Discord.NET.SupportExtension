@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace Discord.NET.SupportExtension.Mef.Commit {
     public class AsyncDiscordCompletionCommitManager : IAsyncCompletionCommitManager {
-        public IEnumerable<char> PotentialCommitCharacters => ".0123456789".ToCharArray();
+        public IEnumerable<char> PotentialCommitCharacters => ".".ToCharArray();
 
         public bool ShouldCommitCompletion(IAsyncCompletionSession session, SnapshotPoint location, char typedChar, CancellationToken token) {
             return false;
