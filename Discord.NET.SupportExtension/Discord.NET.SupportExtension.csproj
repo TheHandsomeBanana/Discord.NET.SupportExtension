@@ -54,6 +54,7 @@
   <ItemGroup>
     <Compile Include="Commands\GenerateServerImageCommand.cs" />
     <Compile Include="Commands\GenerateServerImageConfigurationCommand.cs" />
+    <Compile Include="Commands\LoadServerCollectionCommand.cs" />
     <Compile Include="DIConfig.cs" />
     <Compile Include="DiscordSupportPackage1.cs">
       <AutoGen>True</AutoGen>
@@ -61,8 +62,9 @@
       <DependentUpon>DiscordSupportPackage.vsct</DependentUpon>
     </Compile>
     <Compile Include="GlobalSuppressions.cs" />
-    <Compile Include="Helper\GenerateHelper.cs" />
+    <Compile Include="Helper\ErrorHandler.cs" />
     <Compile Include="Helper\ConfigHelper.cs" />
+    <Compile Include="Helper\InteractionHelper.cs" />
     <Compile Include="Models\RunLogEntry.cs" />
     <Compile Include="Models\VMModels\ConfigureServerImageModel.cs" />
     <Compile Include="Models\VMModels\KeyEntryModel.cs" />

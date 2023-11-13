@@ -19,7 +19,6 @@ using HB.NETF.Services.Security.DataProtection;
 using HB.NETF.VisualStudio.Commands;
 using HB.NETF.VisualStudio.UI;
 using HB.NETF.VisualStudio.Workspace;
-using HB.NETF.WPF.Base.CommandBase;
 using HB.NETF.WPF.ViewModels;
 using HB.NETF.WPF.Exceptions;
 using Microsoft.VisualStudio.Shell;

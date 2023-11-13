@@ -19,6 +19,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 using System;
+using System.Drawing.Text;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Threading;
@@ -79,38 +80,47 @@ namespace Discord.NET.SupportExtension {
             // Do any initialization that requires the UI thread after switching to the UI thread.
             await this.JoinableTaskFactory.SwitchToMainThreadAsync(cancellationToken);
             UIHelper.InitOutputLog("Discord Support Extension");
-            await GenerateServerImageConfigurationCommand.InitializeAsync(this);
-            await GenerateServerImageCommand.InitializeAsync(this);
+            
+            Task initConfig = GenerateServerImageConfigurationCommand.InitializeAsync(this, OnException);
+            Task initGenerate = GenerateServerImageCommand.InitializeAsync(this, OnException);
+            Task initLoad = LoadServerCollectionCommand.InitializeAsync(this, OnException);
+            await Task.WhenAll(initConfig, initGenerate, initLoad);
 
-
+            string projectName = SolutionHelper.GetCurrentProject().Name;
+            string configPath = ConfigHelper.GetConfigPath();
             // Safe Package Load
             try {
-                if (File.Exists(ConfigHelper.GetConfigPath()))
-                    await HandleCacheAsync();
+                if (File.Exists(configPath))
+                    await HandleCacheAsync(projectName, configPath);
                 else
-                    logger.LogInformation($"No config file found in active project {SolutionHelper.GetCurrentProject().Name}. ServerCollection not loaded.");
+                    logger.LogInformation(InteractionHelper.Messages.ConfigurationNotFoundFor(projectName) + ", " + InteractionHelper.Messages.ServerCollectionNotLoaded);
             }
             catch(Exception ex) {
                 logger.LogError(ex.Message);
             }
         }
 
-        private async Task HandleCacheAsync() {
+        private void OnException(Exception exception) {
+            logger.LogError(exception.ToString());
+            UIHelper.ShowError(exception.Message, exception.Source);
+        }
+
+        private async Task HandleCacheAsync(string projectName, string configPath) {
             ILogger<DiscordSupportPackage> logger = DIContainer.GetService<ILoggerFactory>().GetOrCreateLogger<DiscordSupportPackage>();
             IAsyncStreamHandler streamHandler = DIContainer.GetService<IAsyncStreamHandler>();
-            IDiscordEntityService mergedEntityService = DIContainer.GetService<IDiscordEntityService>();
-            ConfigureServerImageModel model = await streamHandler.ReadFromFileAsync<ConfigureServerImageModel>(ConfigHelper.GetConfigPath());
+            IDiscordEntityService entityService = DIContainer.GetService<IDiscordEntityService>();
+            ConfigureServerImageModel model = await streamHandler.ReadFromFileAsync<ConfigureServerImageModel>(configPath);
 
-            GenerateHelper.ManipulateEntityServiceDataEncrypt(mergedEntityService, model, logger, out bool cancel);
+            InteractionHelper.MapDataEncryptToEntityService(entityService, model, logger, out bool cancel);
             if (cancel) {
-                logger.LogWarning("Could not retrieve aes key for data decryption. ServerCollection not loaded.");
+                logger.LogWarning(InteractionHelper.Messages.CouldNotRetrieveAesKey + ", " + InteractionHelper.Messages.ServerCollectionNotLoadedFor(projectName));
                 return;
             }
 
-            if (await mergedEntityService.ReadFromFile(GetCachePath()))
-                logger.LogInformation("ServerCollection loaded.");
+            if (await entityService.ReadFromFile(GetCachePath()))
+                logger.LogInformation(InteractionHelper.Messages.ServerCollectionLoadedFor(projectName));
             else
-                logger.LogWarning("ServerCollection not loaded. Generate new server image.");
+                logger.LogWarning(InteractionHelper.Messages.ServerCollectionNotLoadedFor(projectName) + ", " + InteractionHelper.Messages.GenerateNewServerImage);
         }
 
         #endregion
