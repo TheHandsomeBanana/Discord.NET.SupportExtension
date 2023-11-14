@@ -30,15 +30,14 @@ namespace Discord.NET.SupportExtension.Commands {
         private static IAsyncStreamHandler streamHandler;
         private readonly ILogger<GenerateServerImageConfigurationCommand> logger;
 
-        internal GenerateServerImageConfigurationCommand(AsyncPackage package, OleMenuCommandService commandService, Action<Exception> onException) : base(package, commandService, onException) {
+        internal GenerateServerImageConfigurationCommand(AsyncPackage package, IMenuCommandService commandService, Action<Exception> onException) : base(package, commandService, onException) {
             streamHandler = DIContainer.GetService<IAsyncStreamHandler>();
             logger = DIContainer.GetService<ILoggerFactory>().GetOrCreateLogger<GenerateServerImageConfigurationCommand>();
         }
 
         public static GenerateServerImageConfigurationCommand Instance { get; private set; }
-        public static async Task InitializeAsync(AsyncPackage package, Action<Exception> onException) {
+        public static async Task InitializeAsync(AsyncPackage package, IMenuCommandService commandService, Action<Exception> onException) {
             await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync(package.DisposalToken);
-            OleMenuCommandService commandService = await package.GetServiceAsync(typeof(IMenuCommandService)) as OleMenuCommandService;
             Instance = new GenerateServerImageConfigurationCommand(package, commandService, onException);
         }
 

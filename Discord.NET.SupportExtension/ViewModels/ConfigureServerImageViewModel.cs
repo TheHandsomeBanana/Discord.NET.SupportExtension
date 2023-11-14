@@ -118,7 +118,7 @@ namespace Discord.NET.SupportExtension.ViewModels {
         }
 
         private bool DeleteTokenDialog() {
-            int res = UIHelper.ShowWarningWithCancel(InteractionMessages.TokenAndRunLogWillBeRemoved, "Existing token warning");
+            int res = UIHelper.ShowWarningWithCancel(InteractionMessages.TokenAndRunLogWillBeRemoved);
             return res == 1;
         }
 
@@ -258,9 +258,8 @@ namespace Discord.NET.SupportExtension.ViewModels {
                 streamHandler.StartSaveFileDialog(key);
             }
             catch (StreamHandlerException e) {
-                string error = "Could not create key file";
-                logger.LogError(error + e.Message);
-                UIHelper.ShowError(error, "Error");
+                logger.LogError(e.ToString());
+                UIHelper.ShowError(InteractionMessages.KeyCreationFailed);
             }
         }
 
@@ -299,12 +298,12 @@ namespace Discord.NET.SupportExtension.ViewModels {
                 return true;
 
             if (token == null) {
-                UIHelper.ShowError(InteractionMessages.NoTokenToSave + ", " + InteractionMessages.ProvideToken, "Token missing");
+                UIHelper.ShowError(InteractionMessages.NoTokenToSave + ", " + InteractionMessages.ProvideToken);
                 return false;
             }
 
             if (string.IsNullOrWhiteSpace(token) || token.Length != 70) {
-                UIHelper.ShowError(InteractionMessages.TokenInvalid, "Token invalid");
+                UIHelper.ShowError(InteractionMessages.TokenInvalid);
                 return false;
             }
 

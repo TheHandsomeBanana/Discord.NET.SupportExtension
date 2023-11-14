@@ -27,15 +27,14 @@ namespace Discord.NET.SupportExtension.Commands {
         private readonly IDiscordEntityService entityService;
         private readonly ILogger<LoadServerCollectionCommand> logger;
 
-        internal LoadServerCollectionCommand(AsyncPackage package, OleMenuCommandService commandService, Action<Exception> onException) : base(package, commandService, onException) {
+        internal LoadServerCollectionCommand(AsyncPackage package, IMenuCommandService commandService, Action<Exception> onException) : base(package, commandService, onException) {
             entityService = DIContainer.GetService<IDiscordEntityService>();
             logger = DIContainer.GetService<ILoggerFactory>().GetOrCreateLogger<LoadServerCollectionCommand>();
         }
 
         public static LoadServerCollectionCommand Instance { get; private set; }
-        public static async Task InitializeAsync(AsyncPackage package, Action<Exception> onException) {
+        public static async Task InitializeAsync(AsyncPackage package, IMenuCommandService commandService, Action<Exception> onException) {
             await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync(package.DisposalToken);
-            OleMenuCommandService commandService = await package.GetServiceAsync(typeof(IMenuCommandService)) as OleMenuCommandService;
             Instance = new LoadServerCollectionCommand(package, commandService, onException);
         }
 
@@ -53,16 +52,16 @@ namespace Discord.NET.SupportExtension.Commands {
                     serverCollectionHolder.Hold(currentProjectName, serverCollection);
 
                     string message = InteractionMessages.ServerCollectionLoadedFor(currentProjectName);
-                    UIHelper.ShowInfo(message, "Success");
+                    UIHelper.ShowInfo(message);
                     logger.LogInformation(message);
                 }
                 catch(FileNotFoundException) {
                     logger.LogError(InteractionMessages.ImageNotFoundFor(currentProjectName));
-                    UIHelper.ShowError(InteractionMessages.ImageNotFoundFor(currentProjectName), "Failure");
+                    UIHelper.ShowError(InteractionMessages.ImageNotFoundFor(currentProjectName));
                 }
                 catch (Exception ex) {
                     logger.LogError(ex.ToString());
-                    UIHelper.ShowError(InteractionMessages.ServerCollectionNotLoadedFor(currentProjectName), "Failure");
+                    UIHelper.ShowError(InteractionMessages.ServerCollectionNotLoadedFor(currentProjectName));
                 }
             });
         }

@@ -18,17 +18,19 @@ namespace Discord.NET.SupportExtension.Core.Helper {
 
             string insertText = item.Id.ToString();
 
+            string displayText = item.Name;
+
             string suffix = item.Type == DiscordEntityType.Channel
-                ? $"{item.Name} ({(item as DiscordChannel)?.ChannelType.Value})"
-                : $"{item.Name} ({item.Type})"; ;
+                ? $"{item.Id} ({(item as DiscordChannel)?.ChannelType.Value})"
+                : $"{item.Id} ({item.Type})"; ;
 
             if(item.ParentId.HasValue) {
                 DiscordEntity parent = serverCollection.GetEntity(item.ParentId.Value);
-                suffix += $" -> {parent.Name}";
+                suffix += $" [{parent.Name}]";
             }
 
             return new DiscordCompletionItem {
-                DisplayText = insertText,
+                DisplayText = displayText,
                 InsertText = insertText,
                 Suffix = suffix
             };

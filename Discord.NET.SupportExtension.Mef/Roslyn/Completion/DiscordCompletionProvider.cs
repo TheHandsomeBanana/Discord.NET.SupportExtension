@@ -19,6 +19,8 @@ using System.Threading.Tasks;
 using HB.NETF.VisualStudio.Workspace;
 using Microsoft.VisualStudio.LanguageServices;
 using EnvDTE;
+using Microsoft.CodeAnalysis.Text;
+using Microsoft.CodeAnalysis.Options;
 
 namespace Discord.NET.SupportExtension.Mef.Roslyn.Completion {
     //[ExportCompletionProvider("DiscordCompletionProvider", LanguageNames.CSharp)]
@@ -51,6 +53,11 @@ namespace Discord.NET.SupportExtension.Mef.Roslyn.Completion {
                 SyntaxToken triggerToken = (await context.Document.GetSyntaxRootAsync(context.CancellationToken)).FindToken(context.Position);
 
                 IDiscordCompletionItem[] completions = await engine.ProcessCompletionAsync(vsWorkspace.CurrentSolution, semanticModel, triggerToken);
+                
+                context.AddItems(completions.Select(e =>
+                    CompletionItem.Create(e.DisplayText)
+                ));
+
 
                 if (completions.Length > 0)
                     logger.LogInformation($"{completions.Length} completions added in {stopwatch.ElapsedMilliseconds} ms.");
@@ -58,15 +65,17 @@ namespace Discord.NET.SupportExtension.Mef.Roslyn.Completion {
                 stopwatch.Stop();
 
 
-                context.AddItems(completions.Select(e =>
-                    CompletionItem.Create(e.DisplayText)
-                ));
+                
             }
             catch (Exception ex) {
                 logger.LogCritical("Completion context engine failed. " + ex.ToString());
             }
 
             return;
+        }
+
+        public override bool ShouldTriggerCompletion(SourceText text, int caretPosition, CompletionTrigger trigger, OptionSet options) {
+            return char.IsDigit(trigger.Character);
         }
     }
 }

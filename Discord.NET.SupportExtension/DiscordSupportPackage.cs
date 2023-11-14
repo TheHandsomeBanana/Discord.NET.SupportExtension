@@ -22,8 +22,10 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 using System;
+using System.ComponentModel.Design;
 using System.Drawing.Text;
 using System.IO;
+using System.IO.Packaging;
 using System.Runtime.InteropServices;
 using System.Threading;
 using Task = System.Threading.Tasks.Task;
@@ -83,20 +85,25 @@ namespace Discord.NET.SupportExtension {
         /// <param name="progress">A provider for progress updates.</param>
         /// <returns>A task representing the async work of package initialization, or an already completed task if there is none. Do not return null from this method.</returns>
         protected override async Task InitializeAsync(CancellationToken cancellationToken, IProgress<ServiceProgressData> progress) {
+
+            IMenuCommandService commandService = await this.GetServiceAsync(typeof(IMenuCommandService)) as IMenuCommandService;
+
             // When initialized asynchronously, the current thread may be a background thread at this point.
             // Do any initialization that requires the UI thread after switching to the UI thread.
             await this.JoinableTaskFactory.SwitchToMainThreadAsync(cancellationToken);
             UIHelper.InitOutputLog("Discord Support Extension");
             
-            Task initConfig = GenerateServerImageConfigurationCommand.InitializeAsync(this, OnException);
-            Task initGenerate = GenerateServerImageCommand.InitializeAsync(this, OnException);
-            Task initLoad = LoadServerCollectionCommand.InitializeAsync(this, OnException);
+            Task initConfig = GenerateServerImageConfigurationCommand.InitializeAsync(this, commandService, OnException);
+            Task initGenerate = GenerateServerImageCommand.InitializeAsync(this, commandService, OnException);
+            Task initLoad = LoadServerCollectionCommand.InitializeAsync(this, commandService, OnException);
             await Task.WhenAll(initConfig, initGenerate, initLoad);
 
-            string projectName = SolutionHelper.GetCurrentProject().Name;
-            string configPath = ConfigHelper.GetConfigPath();
+            
             // Safe Package Load
             try {
+                string projectName = SolutionHelper.GetCurrentProject().Name;
+                string configPath = ConfigHelper.GetConfigPath();
+
                 if (File.Exists(configPath))
                     await HandleCacheAsync(projectName, configPath);
                 else
@@ -109,7 +116,7 @@ namespace Discord.NET.SupportExtension {
 
         private void OnException(Exception exception) {
             logger.LogError(exception.ToString());
-            UIHelper.ShowError(exception.Message, exception.Source);
+            UIHelper.ShowError(exception.Message);
         }
 
         private async Task HandleCacheAsync(string projectName, string configPath) {

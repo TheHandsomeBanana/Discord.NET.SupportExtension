@@ -69,7 +69,7 @@ namespace Discord.NET.SupportExtension.MEF.CompletionSource {
 
                 stopwatch.Stop();
                 return new CompletionContext(completions.Select(e =>
-                    new CompletionItem(e.DisplayText, this, discordImage, discordFilters, e.Suffix, e.InsertText, e.InsertText, e.InsertText, ImmutableArray<ImageElement>.Empty)).ToImmutableArray()
+                    new CompletionItem(e.DisplayText, this, discordImage, discordFilters, e.Suffix, e.InsertText, e.DisplayText, e.DisplayText, ImmutableArray<ImageElement>.Empty)).ToImmutableArray()
                 );
             }
             catch (Exception ex) {

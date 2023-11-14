@@ -42,15 +42,14 @@ namespace Discord.NET.SupportExtension.Commands {
         private static IAsyncStreamHandler streamHandler;
         private readonly ILogger<GenerateServerImageCommand> logger;
 
-        internal GenerateServerImageCommand(AsyncPackage package, OleMenuCommandService commandService, Action<Exception> onException) : base(package, commandService, onException) {
+        internal GenerateServerImageCommand(AsyncPackage package, IMenuCommandService commandService, Action<Exception> onException) : base(package, commandService, onException) {
             streamHandler = DIContainer.GetService<IAsyncStreamHandler>();
             logger = DIContainer.GetService<ILoggerFactory>().GetOrCreateLogger<GenerateServerImageCommand>();
         }
 
         public static GenerateServerImageCommand Instance { get; private set; }
-        public static async Task InitializeAsync(AsyncPackage package, Action<Exception> onException) {
+        public static async Task InitializeAsync(AsyncPackage package, IMenuCommandService commandService, Action<Exception> onException) {
             await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync(package.DisposalToken);
-            OleMenuCommandService commandService = await package.GetServiceAsync(typeof(IMenuCommandService)) as OleMenuCommandService;
             Instance = new GenerateServerImageCommand(package, commandService, onException);
         }
 
@@ -96,7 +95,7 @@ namespace Discord.NET.SupportExtension.Commands {
 
                             await entityService.SaveToFile(currentCachePath, serverCollection);
                             logger.LogInformation(InteractionMessages.GenerateImageSuccess);
-                            UIHelper.ShowInfo(InteractionMessages.GenerateImageSuccess, "Success");
+                            UIHelper.ShowInfo(InteractionMessages.GenerateImageSuccess);
 
                             CommandHelper.RunVSCommand(CommandSet, PackageIds.LoadServerCollectionCommand);
 
@@ -110,7 +109,7 @@ namespace Discord.NET.SupportExtension.Commands {
                 }
                 catch (InternalException ex) {
                     this.logger.LogError(ex.ToString());
-                    UIHelper.ShowError(InteractionMessages.GenerateImageFailure, "Error");
+                    UIHelper.ShowError(InteractionMessages.GenerateImageFailure);
                 }
                 finally {
                     DateTime finishedAt = DateTime.Now;
@@ -122,7 +121,7 @@ namespace Discord.NET.SupportExtension.Commands {
 
         private void OnTimeout() {
             logger.LogError(InteractionMessages.GenerateImageFailure + ", " + InteractionMessages.ConnectionTimeout);
-            UIHelper.ShowError(InteractionMessages.GenerateImageFailure, "Failure");
+            UIHelper.ShowError(InteractionMessages.GenerateImageFailure);
         }
     }
 }

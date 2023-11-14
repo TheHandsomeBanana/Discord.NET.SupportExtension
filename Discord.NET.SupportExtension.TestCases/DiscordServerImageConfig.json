@@ -1,0 +1,29 @@
+{
+  "SaveToken": true,
+  "EncryptData": false,
+  "TokenEncryptionMode": 0,
+  "DataEncryptionMode": null,
+  "TokenKeyIdentifier": null,
+  "DataKeyIdentifier": null,
+  "Token": "AQAAANCMnd8BFdERjHoAwE/Cl+sBAAAAnbh2wHEny0GZdYYG2wyBTQAAAAACAAAAAAAQZgAAAAEAACAAAACQme/b2J58tMrQX88HfXtebrfBgl1NCJtU5/1U1/VW8QAAAAAOgAAAAAIAACAAAAAl17YnqRnImBN7FdSC+Uq/P0r/dNvItRMgYlZNvZA5oVAAAAAxkUwaeT0ctgyWQv2noiynHP4WCrQ6eD0elofronbCZCPh6DsF6aFVuDGoGKpwCikvfUUvsWro//AWAD4nJmU/C930YnefJWvEbSBsDNA08kAAAAAWhaBvo7M6eS+h2A/X4g7BtAuhOqv7hbKwGunyWv/KOBysV+1U8ihPqqXXSfHZU+IEWGLGyE1GgizJizNxOIe9",
+  "RunLog": [
+    {
+      "StartedAt": "2023-11-13T18:33:38.3480744+01:00",
+      "FinishedAt": "2023-11-13T18:34:08.9090773+01:00",
+      "Status": 1,
+      "Duration": "00:00:30.5610029"
+    },
+    {
+      "StartedAt": "2023-11-13T18:37:14.0133787+01:00",
+      "FinishedAt": "2023-11-13T18:37:17.6338796+01:00",
+      "Status": 1,
+      "Duration": "00:00:03.6205009"
+    },
+    {
+      "StartedAt": "2023-11-14T17:25:05.749925+01:00",
+      "FinishedAt": "2023-11-14T17:25:12.8114097+01:00",
+      "Status": 1,
+      "Duration": "00:00:07.0614847"
+    }
+  ]
+}

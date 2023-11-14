@@ -14,7 +14,6 @@ using System.Threading.Tasks;
 
 namespace Discord.NET.SupportExtension.Core.ContextDetector {
     internal class AsyncDiscordContextDetector : ICodeAnalyser<DiscordCompletionContext> {
-        private const int MAXRECURSION = 2;
         private DiscordBaseCompletionContext context;
         private DiscordChannelContext? channelContext;
         private bool hasBaseContextContext;
@@ -27,17 +26,17 @@ namespace Discord.NET.SupportExtension.Core.ContextDetector {
         }
 
         public async Task<DiscordCompletionContext> Run(SyntaxNode node) {
-            currentNode = node.Parent;
+            currentNode = node;
             if (currentNode.IsKind(SyntaxKind.NumericLiteralExpression))
                 currentNode = currentNode.Parent;
 
-            for (int i = 0; i < MAXRECURSION && !(currentNode is BlockSyntax) && currentNode != null; i++) {
-                if (currentNode is ExpressionSyntax || currentNode is AttributeSyntax)
-                    await ResolveNodeAsync(currentNode);
+            if (currentNode is ExpressionSyntax || currentNode is ArgumentListSyntax || currentNode is ArgumentSyntax)
+                await ResolveNodeAsync(currentNode);
 
-                if (hasBaseContextContext)
-                    return new DiscordCompletionContext(context, channelContext);
-            }
+            if (hasBaseContextContext)
+                return new DiscordCompletionContext(context, channelContext);
+
+            currentNode = currentNode.Parent;
 
             return new DiscordCompletionContext();
         }
@@ -65,12 +64,13 @@ namespace Discord.NET.SupportExtension.Core.ContextDetector {
                 case SwitchStatementSyntax switchStatement:
                     await ResolveNodeAsync(switchStatement.Expression);
                     break;
-                case AttributeArgumentListSyntax attributeArgument:
-                    await ResolveNodeAsync(attributeArgument.Parent);
+                case ArgumentSyntax argument:
+                    await ResolveNodeAsync(argument.Parent);
                     break;
-                case AttributeSyntax attribute:
-                    await ResolveNodeAsync(attribute.Name);
+                case ArgumentListSyntax argumentList:
+                    await ResolveNodeAsync(argumentList.Parent);
                     break;
+
             }
         }
 

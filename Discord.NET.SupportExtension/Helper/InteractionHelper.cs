@@ -81,7 +81,7 @@ namespace Discord.NET.SupportExtension.Helper {
 
             if (!keyEntry.Key.Identify(id.GetValueOrDefault())) {
                 string error = InteractionMessages.WrongKeyProvidedFor(name);
-                UIHelper.ShowError(error, "Wrong key");
+                UIHelper.ShowError(error);
                 logger.LogError(error);
                 return null;
             }
@@ -118,6 +118,7 @@ namespace Discord.NET.SupportExtension.Helper {
         public const string WrongKeyProvided = "Wrong key provided";
         public static string WrongKeyProvidedFor(string name) => $"{WrongKeyProvided} for {name}";
         public const string NoKeyFound = "No key found";
+        public const string KeyCreationFailed = "Could not create aey key";
 
         // Token
         public const string GetTokenFailed = "Get token failed";

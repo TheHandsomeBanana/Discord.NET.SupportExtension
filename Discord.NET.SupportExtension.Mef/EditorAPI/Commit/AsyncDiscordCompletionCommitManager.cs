@@ -1,4 +1,6 @@
-﻿using Microsoft.VisualStudio.Language.Intellisense.AsyncCompletion;
+﻿using Discord.NET.SupportExtension.Core.Interface;
+using Discord.NET.SupportExtension.MEF.CompletionSource;
+using Microsoft.VisualStudio.Language.Intellisense.AsyncCompletion;
 using Microsoft.VisualStudio.Language.Intellisense.AsyncCompletion.Data;
 using Microsoft.VisualStudio.Text;
 using System;
@@ -18,6 +20,11 @@ namespace Discord.NET.SupportExtension.Mef.Commit {
         }
 
         public CommitResult TryCommit(IAsyncCompletionSession session, ITextBuffer buffer, CompletionItem item, char typedChar, CancellationToken token) {
+            if(item.Source is AsyncDiscordCompletionSource) {
+                buffer.Replace(session.ApplicableToSpan.GetSpan(buffer.CurrentSnapshot), item.InsertText);
+                return CommitResult.Handled;
+            }
+
             return CommitResult.Unhandled;
         }
     }

@@ -10,7 +10,13 @@ using System.Threading.Tasks;
 namespace Discord.NET.SupportExtension.Helper {
     public static class ConfigHelper {
         public const string DiscordServerImageConfig = "DiscordServerImageConfig.json";
-        public static string GetConfigPath() => Path.GetDirectoryName(SolutionHelper.GetCurrentProject().FullName) + "\\" + DiscordServerImageConfig;
-        public static string GetConfigPath(Project project) => Path.GetDirectoryName(project.FullName) + "\\" + DiscordServerImageConfig;
+        public static string GetConfigPath() => GetConfigPath(SolutionHelper.GetCurrentProject());
+        public static string GetConfigPath(Project project) {
+            string path = "";
+            if (!string.IsNullOrWhiteSpace(project.FullName))
+                path = Path.GetDirectoryName(project.FullName) + "\\" + DiscordServerImageConfig;
+
+            return path;
+        }
     }
 }
