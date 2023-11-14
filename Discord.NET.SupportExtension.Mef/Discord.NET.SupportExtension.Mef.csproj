@@ -45,13 +45,14 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="Commit\AsyncDiscordCompletionCommitManager.cs" />
-    <Compile Include="Commit\AsyncDiscordCompletionCommitManagerProvider.cs" />
-    <Compile Include="CompletionSource\AsyncDiscordCompletionSource.cs" />
-    <Compile Include="CompletionSource\AsyncDiscordCompletionSourceProvider.cs" />
+    <Compile Include="EditorAPI\Commit\AsyncDiscordCompletionCommitManager.cs" />
+    <Compile Include="EditorAPI\Commit\AsyncDiscordCompletionCommitManagerProvider.cs" />
+    <Compile Include="EditorAPI\CompletionSource\AsyncDiscordCompletionSource.cs" />
+    <Compile Include="EditorAPI\CompletionSource\AsyncDiscordCompletionSourceProvider.cs" />
     <Compile Include="PackageImageIds.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Trigger\TextViewCreationListener.cs" />
+    <Compile Include="EditorAPI\Trigger\TextViewCreationListener.cs" />
+    <Compile Include="Roslyn\Completion\DiscordCompletionProvider.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="source.extension.vsixmanifest">

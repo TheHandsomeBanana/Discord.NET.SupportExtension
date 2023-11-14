@@ -29,12 +29,14 @@ namespace Discord.NET.SupportExtension.Mef.Trigger {
         private void TextBufferChanged(ITextView textView, TextContentChangedEventArgs e) {
             foreach (var change in e.Changes) {
                 if (change.NewText.Length == 1 && char.IsDigit(change.NewText[0])) {
-                    ITextSnapshot snapshot = e.After;
-
-                    var triggerPoint = new SnapshotPoint(snapshot, change.NewPosition);
-                    var trigger = new CompletionTrigger(CompletionTriggerReason.Invoke, snapshot, triggerPoint.GetChar());
-
                     ThreadHelper.JoinableTaskFactory.Run(async () => {
+
+                        ITextSnapshot snapshot = e.After;
+
+                        var triggerPoint = new SnapshotPoint(snapshot, change.NewPosition);
+                        var trigger = new CompletionTrigger(CompletionTriggerReason.Invoke, snapshot, triggerPoint.GetChar());
+
+
                         await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
                         CompletionBroker?.TriggerCompletion(textView, trigger, triggerPoint, CancellationToken.None);
                     });
