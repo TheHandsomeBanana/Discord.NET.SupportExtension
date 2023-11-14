@@ -17,6 +17,7 @@ using HB.NETF.VisualStudio.Commands;
 using Discord.NET.SupportExtension.Helper;
 using HB.NETF.Discord.NET.Toolkit.Models.Collections;
 using HB.NETF.Discord.NET.Toolkit.Services.EntityService.Holder;
+using System.IO;
 
 namespace Discord.NET.SupportExtension.Commands {
     internal sealed class LoadServerCollectionCommand : AsyncCommandBase {
@@ -54,6 +55,10 @@ namespace Discord.NET.SupportExtension.Commands {
                     string message = InteractionMessages.ServerCollectionLoadedFor(currentProjectName);
                     UIHelper.ShowInfo(message, "Success");
                     logger.LogInformation(message);
+                }
+                catch(FileNotFoundException) {
+                    logger.LogError(InteractionMessages.ImageNotFoundFor(currentProjectName));
+                    UIHelper.ShowError(InteractionMessages.ImageNotFoundFor(currentProjectName), "Failure");
                 }
                 catch (Exception ex) {
                     logger.LogError(ex.ToString());

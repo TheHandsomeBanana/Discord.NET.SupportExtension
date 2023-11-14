@@ -112,11 +112,11 @@ namespace Discord.NET.SupportExtension.Helper {
 
         // AES
         public const string AesRequest = "Requesting aes key";
-        public static string AesRequestFor(string name) => $"Requesting aes key for {name}";
+        public static string AesRequestFor(string name) => $"{AesRequest} for {name}";
         public const string CouldNotRetrieveAesKey = "Could not retrieve aes key for data decryption";
         public const string AesRequestCancelled = "Request for aes key cancelled";
         public const string WrongKeyProvided = "Wrong key provided";
-        public static string WrongKeyProvidedFor(string name) => $"Wrong key provided for {name}";
+        public static string WrongKeyProvidedFor(string name) => $"{WrongKeyProvided} for {name}";
         public const string NoKeyFound = "No key found";
 
         // Token
@@ -127,11 +127,13 @@ namespace Discord.NET.SupportExtension.Helper {
         public const string TokenInvalid = "Token is invalid";
         public const string TokenAndRunLogWillBeRemoved = "Token will be removed and run log cleared";
 
-        // Image Generation
+        // Image
         public const string GenerateImageSuccess = "Server image successfully generated";
         public const string GenerateImageFailure = "Server image generation failed";
         public const string GenerateNewServerImage = "Generate new server image";
         public const string GenerationAborted = "Server image generation aborted";
+        public const string ImageNotFound = "No server image found";
+        public static string ImageNotFoundFor(string project) => $"{ImageNotFound} for {project}";
 
         // Common
         public const string ConnectionTimeout = "Connection timed out";
