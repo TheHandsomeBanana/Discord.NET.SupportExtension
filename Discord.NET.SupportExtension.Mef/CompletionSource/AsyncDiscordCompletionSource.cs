@@ -25,6 +25,9 @@ using HB.NETF.Services.Logging.Factory;
 using Microsoft.VisualStudio.Core.Imaging;
 using Discord.NET.SupportExtension.Mef;
 using HB.NETF.VisualStudio.Workspace;
+using Microsoft.VisualStudio.Text.Editor;
+using Microsoft.VisualStudio.Text.Classification;
+using Microsoft.VisualStudio.Text.Operations;
 
 namespace Discord.NET.SupportExtension.MEF.CompletionSource {
     public class AsyncDiscordCompletionSource : IAsyncCompletionSource {

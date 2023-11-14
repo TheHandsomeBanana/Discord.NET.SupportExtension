@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace Discord.NET.SupportExtension.Mef.Commit {
     [Export(typeof(IAsyncCompletionCommitManagerProvider))]
-    [ContentType("code")]
+    [ContentType("CSharp")]
     [TextViewRole(PredefinedTextViewRoles.Editable)]
     [Order(Before = "default")]
     [Name("Discord Commit Provider")]

@@ -16,12 +16,11 @@ namespace Discord.NET.SupportExtension.Core.Helper {
 
         public static IDiscordCompletionItem ToCompletionItem(DiscordEntity item, DiscordServerCollection serverCollection) {
 
-            string displayText = item.Type == DiscordEntityType.Channel 
-                ? $"{item.Name} ({(item as DiscordChannel)?.ChannelType.Value})"
-                : $"{item.Name} ({item.Type})";
-            
             string insertText = item.Id.ToString();
-            string suffix = insertText;
+
+            string suffix = item.Type == DiscordEntityType.Channel
+                ? $"{item.Name} ({(item as DiscordChannel)?.ChannelType.Value})"
+                : $"{item.Name} ({item.Type})"; ;
 
             if(item.ParentId.HasValue) {
                 DiscordEntity parent = serverCollection.GetEntity(item.ParentId.Value);
@@ -29,7 +28,7 @@ namespace Discord.NET.SupportExtension.Core.Helper {
             }
 
             return new DiscordCompletionItem {
-                DisplayText = displayText,
+                DisplayText = insertText,
                 InsertText = insertText,
                 Suffix = suffix
             };
