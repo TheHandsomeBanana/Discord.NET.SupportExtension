@@ -12,7 +12,8 @@ namespace Discord.NET.SupportExtension.TestCases.User {
         private readonly SocketGuild socketGuild;
 
         public async Task Run() {
-            
+            IUser restUser1 = await restGuild.GetUsersAsync().Select(e => e.FirstOrDefault(f => f.Id == 0000)).FirstAsync();
+            IUser socketUser1 = await socketGuild.GetUsersAsync().Select(e => e.FirstOrDefault(f => f.Id == 9999)).FirstAsync();
         }
     }
 }
