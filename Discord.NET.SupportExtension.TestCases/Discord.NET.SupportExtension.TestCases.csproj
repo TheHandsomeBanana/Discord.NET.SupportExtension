@@ -7,8 +7,8 @@
     <ProjectGuid>{6AA5EE8B-AF80-4FE8-B190-1ABBF9031AC0}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>DiscordSupportExtensionTestCases</RootNamespace>
-    <AssemblyName>DiscordSupportExtensionTestCases</AssemblyName>
+    <RootNamespace>Discord.NET.SupportExtension.TestCases</RootNamespace>
+    <AssemblyName>Discord.NET.SupportExtension.TestCases</AssemblyName>
     <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
@@ -105,20 +105,30 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Channel\ChannelFindings.cs" />
-    <Compile Include="DiscordBot.cs" />
-    <Compile Include="Guild\GuildAssistor.cs" />
-    <Compile Include="Guild\GuildFindings.cs" />
-    <Compile Include="Guild\GuildHandler.cs" />
+    <Compile Include="Channel\ChannelBasicMethods.cs" />
+    <Compile Include="Channel\ChannelCustomMethods.cs" />
+    <Compile Include="Channel\ChannelLinq.cs" />
+    <Compile Include="Channel\ChannelServerId.cs" />
+    <Compile Include="SystemTest\DiscordBot.cs" />
+    <Compile Include="Guild\GuildBase.cs" />
+    <Compile Include="Guild\GuildBasicMethods.cs" />
+    <Compile Include="Guild\GuildCustomMethods.cs" />
+    <Compile Include="Guild\GuildLinq.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Role\RoleFindingHelper.cs" />
-    <Compile Include="Role\RoleFindings.cs" />
-    <Compile Include="User\UserFindings.cs" />
+    <Compile Include="Role\RoleBasicMethods.cs" />
+    <Compile Include="Role\RoleCustomMethods.cs" />
+    <Compile Include="Role\RoleLinq.cs" />
+    <Compile Include="Role\RoleServerId.cs" />
+    <Compile Include="User\UserBasicMethods.cs" />
+    <Compile Include="User\UserCustomMethods.cs" />
+    <Compile Include="User\UserLinq.cs" />
+    <Compile Include="User\UserServerId.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
     <None Include="DiscordServerImageConfig.json" />
     <None Include="packages.config" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

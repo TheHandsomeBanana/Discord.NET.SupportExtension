@@ -17,8 +17,8 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace Discord.NET.SupportExtension.Core.Analyser {
-    internal class AsyncDiscordContextAnalyser : ICodeAnalyser<DiscordEntity[]> {
-        private readonly ILogger<AsyncDiscordContextAnalyser> logger;
+    internal class AsyncDiscordAnalyser : ICodeAnalyser<DiscordEntity[]> {
+        private readonly ILogger<AsyncDiscordAnalyser> logger;
         private readonly DiscordServerCollection serverCollection;
 
         private readonly DiscordCompletionContext completionContext;
@@ -27,9 +27,9 @@ namespace Discord.NET.SupportExtension.Core.Analyser {
         private readonly SyntaxTree syntaxTree;
         public SemanticModel SemanticModel { get; }
 
-        public AsyncDiscordContextAnalyser(SemanticModel semanticModel, SyntaxTree syntaxTree, Solution solution, Project project, DiscordCompletionContext completionContext) {
+        public AsyncDiscordAnalyser(SemanticModel semanticModel, SyntaxTree syntaxTree, Solution solution, Project project, DiscordCompletionContext completionContext) {
             ILoggerFactory loggerFactory = DIContainer.GetService<ILoggerFactory>();
-            logger = loggerFactory.GetOrCreateLogger<AsyncDiscordContextAnalyser>();
+            logger = loggerFactory.GetOrCreateLogger<AsyncDiscordAnalyser>();
             serverCollection = DIContainer.GetService<IServerCollectionHolder>().Get(project.Name);
 
             this.completionContext = completionContext;

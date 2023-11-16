@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DiscordSupportExtensionTestCases.ProperCode
+namespace Discord.NET.SupportExtension.TestCases.SystemTest
 {
     public class DiscordBot
     {

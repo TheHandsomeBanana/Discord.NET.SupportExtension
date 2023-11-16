@@ -13,7 +13,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace Discord.NET.SupportExtension.Core.ContextDetector {
-    internal class AsyncDiscordContextDetector : ICodeAnalyser<DiscordCompletionContext> {
+    internal class AsyncDiscordContextAnalyser : ICodeAnalyser<DiscordCompletionContext> {
         private DiscordBaseCompletionContext context;
         private DiscordChannelContext? channelContext;
         private bool hasBaseContextContext;
@@ -21,7 +21,7 @@ namespace Discord.NET.SupportExtension.Core.ContextDetector {
         public SemanticModel SemanticModel { get; }
 
 
-        public AsyncDiscordContextDetector(SemanticModel sm) {
+        public AsyncDiscordContextAnalyser(SemanticModel sm) {
             SemanticModel = sm;
         }
 

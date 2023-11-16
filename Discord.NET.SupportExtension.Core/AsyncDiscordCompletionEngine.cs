@@ -25,10 +25,10 @@ namespace Discord.NET.SupportExtension.Core {
             Project project = solution.Projects.FirstOrDefault(e => e.Documents.Any(f => f.FilePath == token.SyntaxTree.FilePath))
                 ?? throw new InternalException($"Project from {token.SyntaxTree.FilePath} not found.");
 
-            AsyncDiscordContextDetector contextDetector = new AsyncDiscordContextDetector(semanticModel);
+            AsyncDiscordContextAnalyser contextDetector = new AsyncDiscordContextAnalyser(semanticModel);
             DiscordCompletionContext foundContext = await contextDetector.Run(token.Parent);
 
-            AsyncDiscordContextAnalyser analyser = new AsyncDiscordContextAnalyser(semanticModel, semanticModel.SyntaxTree, solution, project, foundContext);
+            AsyncDiscordAnalyser analyser = new AsyncDiscordAnalyser(semanticModel, semanticModel.SyntaxTree, solution, project, foundContext);
             DiscordServerCollection serverCollection = DIContainer.GetService<IServerCollectionHolder>().Get(project.Name);
             completionItems = (await analyser.Run(token.Parent))?.Select(e => CompletionHelper.ToCompletionItem(e, serverCollection)) ?? new IDiscordCompletionItem[0];
 
