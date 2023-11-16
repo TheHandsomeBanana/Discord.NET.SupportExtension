@@ -74,6 +74,10 @@ namespace Discord.NET.SupportExtension.Core.ContextDetector {
             }
         }
 
+        private bool InitiateDetection(SyntaxNode trigger) {
+            return false;
+        }
+
         private void CheckForContext(ExpressionSyntax expression) {
             INamedTypeSymbol contextTypeSymbol = SemanticModel.GetTypeInfo(expression).Type as INamedTypeSymbol;
 
