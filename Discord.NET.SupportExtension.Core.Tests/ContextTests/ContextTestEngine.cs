@@ -1,4 +1,4 @@
-﻿using Discord.NET.SupportExtension.Core.ContextDetector;
+﻿using Discord.NET.SupportExtension.Core.Analyser;
 using Discord.NET.SupportExtension.Core.Interface;
 using HB.NETF.Code.Analysis.Tests.Engine;
 using System;
@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 namespace Discord.NET.SupportExtension.Core.Tests.ContextTests {
     internal class ContextTestEngine : CodeAnalysisTestEngine<DiscordCompletionContext> {
         protected override async Task RunTestAsync(string key, DiscordCompletionContext value, string document) {
-            AsyncDiscordContextAnalyser contextAnalyser = new AsyncDiscordContextAnalyser(base.SemanticModel);
+            AsyncDiscordContextAnalyser contextAnalyser = new AsyncDiscordContextAnalyser(Solution, Project, SemanticModel);
             DiscordCompletionContext context = await contextAnalyser.Run(SyntaxNode);
 
             if (value != context)

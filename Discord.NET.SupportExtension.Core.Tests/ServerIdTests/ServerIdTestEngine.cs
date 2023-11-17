@@ -12,7 +12,7 @@ namespace Discord.NET.SupportExtension.Core.Tests.AnalyserTests {
     internal class ServerIdTestEngine : CodeAnalysisTestEngine<ulong[]> {
 
         protected override async Task RunTestAsync(string testString, ulong[] ids, string document) {
-            AsyncDiscordServerIdAnalyser serverIdAnalyser = new AsyncDiscordServerIdAnalyser(SemanticModel, SyntaxTree, Solution, Project);
+            AsyncDiscordServerIdAnalyser serverIdAnalyser = new AsyncDiscordServerIdAnalyser(Solution, Project, SemanticModel);
             IEnumerable<ulong> result = await serverIdAnalyser.Run(SyntaxNode);
         }
     }

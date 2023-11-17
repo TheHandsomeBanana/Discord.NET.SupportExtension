@@ -1,6 +1,5 @@
 ﻿using Discord.NET.SupportExtension.Core.Analyser;
 using Discord.NET.SupportExtension.Core.Completions;
-using Discord.NET.SupportExtension.Core.ContextDetector;
 using Discord.NET.SupportExtension.Core.Helper;
 using Discord.NET.SupportExtension.Core.Interface;
 using HB.NETF.Common.DependencyInjection;
@@ -25,12 +24,9 @@ namespace Discord.NET.SupportExtension.Core {
             Project project = solution.Projects.FirstOrDefault(e => e.Documents.Any(f => f.FilePath == token.SyntaxTree.FilePath))
                 ?? throw new InternalException($"Project from {token.SyntaxTree.FilePath} not found.");
 
-            AsyncDiscordContextAnalyser contextDetector = new AsyncDiscordContextAnalyser(semanticModel);
-            DiscordCompletionContext foundContext = await contextDetector.Run(token.Parent);
-
-            AsyncDiscordAnalyser analyser = new AsyncDiscordAnalyser(semanticModel, semanticModel.SyntaxTree, solution, project, foundContext);
+            AsyncDiscordAnalyser analyser = new AsyncDiscordAnalyser(solution, project, semanticModel);
             DiscordServerCollection serverCollection = DIContainer.GetService<IServerCollectionHolder>().Get(project.Name);
-            completionItems = (await analyser.Run(token.Parent))?.Select(e => CompletionHelper.ToCompletionItem(e, serverCollection)) ?? new IDiscordCompletionItem[0];
+            completionItems = (await analyser.Run(token.Parent)).Select(e => CompletionHelper.ToCompletionItem(e, serverCollection));
 
             return completionItems.ToArray();
         }

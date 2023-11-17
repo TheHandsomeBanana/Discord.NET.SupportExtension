@@ -1,5 +1,6 @@
 ﻿using Discord.NET.SupportExtension.Core.Interface;
 using Discord.WebSocket;
+using HB.NETF.Code.Analysis.Analyser;
 using HB.NETF.Code.Analysis.Interface;
 using HB.NETF.Common.DependencyInjection;
 using HB.NETF.Services.Logging;
@@ -7,6 +8,7 @@ using HB.NETF.Services.Logging.Factory;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Microsoft.CodeAnalysis.FindSymbols;
 using Microsoft.CodeAnalysis.Operations;
 using System;
 using System.Collections.Generic;
@@ -14,17 +16,14 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Discord.NET.SupportExtension.Core.ContextDetector {
-    internal class AsyncDiscordContextAnalyser : ICodeAnalyser<DiscordCompletionContext> {
+namespace Discord.NET.SupportExtension.Core.Analyser {
+    internal class AsyncDiscordContextAnalyser : DiscordAnalyserBase, ICodeAnalyser<DiscordCompletionContext> {
         private DiscordBaseCompletionContext context;
         private DiscordChannelContext? channelContext;
         private bool hasBaseContextContext;
         private SyntaxNode currentNode;
-        public SemanticModel SemanticModel { get; }
 
-
-        public AsyncDiscordContextAnalyser(SemanticModel sm) {
-            SemanticModel = sm;
+        public AsyncDiscordContextAnalyser(Solution solution, Project project, SemanticModel semanticModel) : base(solution, project, semanticModel) {
         }
 
         public async Task<DiscordCompletionContext> Run(SyntaxNode node) {
@@ -37,8 +36,6 @@ namespace Discord.NET.SupportExtension.Core.ContextDetector {
 
             if (hasBaseContextContext)
                 return new DiscordCompletionContext(context, channelContext);
-
-            currentNode = currentNode.Parent;
 
             return new DiscordCompletionContext();
         }
@@ -56,6 +53,7 @@ namespace Discord.NET.SupportExtension.Core.ContextDetector {
             return trigger is ExpressionSyntax || trigger is ArgumentListSyntax || trigger is ArgumentSyntax;
         }
 
+        private static readonly string[] ulongTypes = { "ulong", nameof(UInt64) };
         private async Task<bool> CheckMethodArgumentUsage(SyntaxNode trigger) {
             int argumentIndex = -1;
             InvocationExpressionSyntax parentInvocation;
@@ -79,14 +77,20 @@ namespace Discord.NET.SupportExtension.Core.ContextDetector {
             if (argumentIndex == -1)
                 return false;
 
-            IMethodSymbol declaredMethodSymbol = SemanticModel.GetSymbolInfo(parentInvocation).Symbol as IMethodSymbol;
-            SyntaxReference methodSyntaxReference = declaredMethodSymbol.DeclaringSyntaxReferences.FirstOrDefault();
+            IMethodSymbol methodSymbol = SemanticModel.GetSymbolInfo(parentInvocation).Symbol as IMethodSymbol;
+            SyntaxReference methodSyntaxReference = methodSymbol.DeclaringSyntaxReferences.FirstOrDefault();
             if (methodSyntaxReference == null) // Basic Methods from Discord are out of assembly
                 return true;
 
             MethodDeclarationSyntax methodDeclaration = (await methodSyntaxReference.GetSyntaxAsync()) as MethodDeclarationSyntax;
             ParameterSyntax parameterFromArgumentIndex = methodDeclaration.ParameterList.Parameters[argumentIndex];
+            if (!ulongTypes.Contains(parameterFromArgumentIndex.Type.ToString())) // Only resolve param with ulong type
+                return false;
+
+
+            IEnumerable<ReferencedSymbol> parameterReferenceSymbols = await SymbolFinder.FindReferencesAsync(SemanticModel.GetDeclaredSymbol(methodDeclaration), Solution, Documents);
             
+
 
             return false;
         }

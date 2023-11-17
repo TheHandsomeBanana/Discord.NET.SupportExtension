@@ -17,36 +17,29 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace Discord.NET.SupportExtension.Core.Analyser {
-    internal class AsyncDiscordAnalyser : ICodeAnalyser<DiscordEntity[]> {
+    internal class AsyncDiscordAnalyser : DiscordAnalyserBase, ICodeAnalyser<DiscordEntity[]> {
         private readonly ILogger<AsyncDiscordAnalyser> logger;
         private readonly DiscordServerCollection serverCollection;
 
-        private readonly DiscordCompletionContext completionContext;
-        private readonly Solution solution;
-        private readonly Project project;
-        private readonly SyntaxTree syntaxTree;
-        public SemanticModel SemanticModel { get; }
-
-        public AsyncDiscordAnalyser(SemanticModel semanticModel, SyntaxTree syntaxTree, Solution solution, Project project, DiscordCompletionContext completionContext) {
+        public AsyncDiscordAnalyser(Solution solution, Project project, SemanticModel semanticModel) : base(solution, project, semanticModel) {
             ILoggerFactory loggerFactory = DIContainer.GetService<ILoggerFactory>();
             logger = loggerFactory.GetOrCreateLogger<AsyncDiscordAnalyser>();
             serverCollection = DIContainer.GetService<IServerCollectionHolder>().Get(project.Name);
-
-            this.completionContext = completionContext;
-            this.solution = solution;
-            this.project = project;
-            this.SemanticModel = semanticModel;
-            this.syntaxTree = syntaxTree;
         }
 
         public async Task<DiscordEntity[]> Run(SyntaxNode syntaxNode) {
-            if (completionContext.BaseContext == DiscordBaseCompletionContext.Server)
+            AsyncDiscordContextAnalyser contextDetector = new AsyncDiscordContextAnalyser(Solution, Project, SemanticModel);
+            DiscordCompletionContext foundContext = await contextDetector.Run(syntaxNode);
+            if (foundContext == DiscordCompletionContext.Undefined)
+                return Array.Empty<DiscordEntity>();
+
+            if (foundContext.BaseContext == DiscordBaseCompletionContext.Server)
                 return serverCollection.GetServers();
 
-            ICodeAnalyser<IEnumerable<ulong>> serverIdAnalyser = new AsyncDiscordServerIdAnalyser(SemanticModel, syntaxTree, solution, project);
+            ICodeAnalyser<IEnumerable<ulong>> serverIdAnalyser = new AsyncDiscordServerIdAnalyser(Solution, Project, SemanticModel);
             IEnumerable<ulong> serverIdList = await serverIdAnalyser.Run(syntaxNode);
             List<DiscordEntity> foundItems = new List<DiscordEntity>();
-            switch (completionContext.BaseContext) {
+            switch (foundContext.BaseContext) {
                 case DiscordBaseCompletionContext.User:
                     foreach (ulong serverId in serverIdList)
                         foundItems.AddRange(serverCollection.GetUsers(serverId));
@@ -59,13 +52,13 @@ namespace Discord.NET.SupportExtension.Core.Analyser {
                     return foundItems.ToArray();
                 case DiscordBaseCompletionContext.Channel:
                     foreach (ulong serverId in serverIdList)
-                        foundItems.AddRange(serverCollection.GetChannels(serverId, MapChannelType(completionContext.ChannelContext)));
+                        foundItems.AddRange(serverCollection.GetChannels(serverId, MapChannelType(foundContext.ChannelContext)));
                     
 
                     return foundItems.ToArray();
             }
 
-            return null;
+            return Array.Empty<DiscordEntity>(); ;
         }
 
 

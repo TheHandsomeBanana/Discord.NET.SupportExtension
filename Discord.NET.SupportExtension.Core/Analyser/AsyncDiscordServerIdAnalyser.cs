@@ -20,26 +20,16 @@ using System.Threading.Tasks;
 using System.Xml.Linq;
 
 namespace Discord.NET.SupportExtension.Core.Analyser {
-    internal class AsyncDiscordServerIdAnalyser : ICodeAnalyser<IEnumerable<ulong>> {
-        private ILogger<AsyncDiscordServerIdAnalyser> logger;
+    internal class AsyncDiscordServerIdAnalyser : DiscordAnalyserBase, ICodeAnalyser<IEnumerable<ulong>> {
+        private readonly ILogger<AsyncDiscordServerIdAnalyser> logger;
         private const int RECURSIONLEVEL = 4;
-        private Solution solution;
-        private Project project;
-        private IImmutableSet<Microsoft.CodeAnalysis.Document> documents;
-        private SyntaxTree syntaxTree;
-        private SyntaxNode currentNode;
         private List<ulong> serverIds = new List<ulong>();
 
+        private SyntaxNode currentNode;
 
-        public SemanticModel SemanticModel { get; }
-        public AsyncDiscordServerIdAnalyser(SemanticModel semanticModel, SyntaxTree syntaxTree, Solution solution, Project project) {
+        public AsyncDiscordServerIdAnalyser(Solution solution, Project project, SemanticModel semanticModel) : base(solution, project, semanticModel) {
             ILoggerFactory loggerFactory = DIContainer.GetService<ILoggerFactory>();
             logger = loggerFactory.GetOrCreateLogger<AsyncDiscordServerIdAnalyser>();
-
-            this.SemanticModel = semanticModel;
-            this.syntaxTree = syntaxTree;
-            this.solution = solution;
-            this.project = project;
         }
 
         public async Task<IEnumerable<ulong>> Run(SyntaxNode node) {
@@ -133,7 +123,7 @@ namespace Discord.NET.SupportExtension.Core.Analyser {
 
             SyntaxNode foundDefinitionSyntax = await foundDefinition.GetSyntaxAsync();
 
-            IEnumerable<ReferencedSymbol> references = await SymbolFinder.FindReferencesAsync(identifierSymbol, solution, documents);
+            IEnumerable<ReferencedSymbol> references = await SymbolFinder.FindReferencesAsync(identifierSymbol, Solution, Documents);
             IEnumerable<Location> referenceLocations = references.SelectMany(l => l.Locations.Select(s => s.Location));
 
             foreach (var location in referenceLocations) {
@@ -143,9 +133,9 @@ namespace Discord.NET.SupportExtension.Core.Analyser {
                     continue;
 
                 AsyncDiscordServerIdAnalyser serverIdAnalyser;
-                if (referencedNode.SyntaxTree.FilePath != syntaxTree.FilePath) {
+                if (referencedNode.SyntaxTree.FilePath != SyntaxTree.FilePath) {
                     SemanticModel sm = SemanticModel.Compilation.GetSemanticModel(referencedNode.SyntaxTree);
-                    serverIdAnalyser = new AsyncDiscordServerIdAnalyser(sm, referencedNode.SyntaxTree, solution, project) { serverIds = this.serverIds }; // Pass current server-id-list to new analyser;
+                    serverIdAnalyser = new AsyncDiscordServerIdAnalyser(Solution, Project, sm) { serverIds = this.serverIds }; // Pass current server-id-list to new analyser;
                 }
                 else
                     serverIdAnalyser = this;
@@ -187,7 +177,7 @@ namespace Discord.NET.SupportExtension.Core.Analyser {
             if (declarationSymbol == null)
                 return;
 
-            IEnumerable<SymbolCallerInfo> callerInfo = await SymbolFinder.FindCallersAsync(declarationSymbol, solution, documents);
+            IEnumerable<SymbolCallerInfo> callerInfo = await SymbolFinder.FindCallersAsync(declarationSymbol, Solution, Documents);
             IEnumerable<Location> callerLocations = callerInfo.SelectMany(e => e.Locations);
             List<Location> distinctLocations = new List<Location>();
 
@@ -210,7 +200,7 @@ namespace Discord.NET.SupportExtension.Core.Analyser {
                     SyntaxTree syntaxTree = locationNode.SyntaxTree;
                     SemanticModel semanticModel = this.SemanticModel.Compilation.GetSemanticModel(syntaxTree);
 
-                    serverIdAnalyser = new AsyncDiscordServerIdAnalyser(semanticModel, syntaxTree, solution, project);
+                    serverIdAnalyser = new AsyncDiscordServerIdAnalyser(Solution, Project, semanticModel);
                 }
                 else
                     serverIdAnalyser = this;

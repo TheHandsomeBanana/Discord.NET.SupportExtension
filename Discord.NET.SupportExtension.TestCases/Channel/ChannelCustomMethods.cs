@@ -21,7 +21,7 @@ namespace Discord.NET.SupportExtension.TestCases.Channel {
             ITextChannel socketTextChannel = SocketTextChannel(9998);
         }
 
-        public IChannel RestChannel(ulong channelId) {
+        public IChannel RestChannel(UInt64 channelId) {
             return restGuild.GetChannelAsync(channelId).Result;
         }
 
