@@ -24,6 +24,16 @@ namespace Discord.NET.SupportExtension.Core.Interface {
         public static DiscordCompletionContext User => new DiscordCompletionContext(DiscordBaseCompletionContext.User);
         public static DiscordCompletionContext Role => new DiscordCompletionContext(DiscordBaseCompletionContext.Role);
         public static DiscordCompletionContext Channel => new DiscordCompletionContext(DiscordBaseCompletionContext.Channel);
+        public static DiscordCompletionContext TextChannel => new DiscordCompletionContext(DiscordBaseCompletionContext.Channel, DiscordChannelContext.Text);
+        public static DiscordCompletionContext VoiceChannel => new DiscordCompletionContext(DiscordBaseCompletionContext.Channel, DiscordChannelContext.Voice);
+        public static DiscordCompletionContext CategoryChannel => new DiscordCompletionContext(DiscordBaseCompletionContext.Channel, DiscordChannelContext.Category);
+        public static DiscordCompletionContext DMChannel => new DiscordCompletionContext(DiscordBaseCompletionContext.Channel, DiscordChannelContext.DM);
+        public static DiscordCompletionContext GroupChannel => new DiscordCompletionContext(DiscordBaseCompletionContext.Channel, DiscordChannelContext.Group);
+        public static DiscordCompletionContext ForumChannel => new DiscordCompletionContext(DiscordBaseCompletionContext.Channel, DiscordChannelContext.Forum);
+        public static DiscordCompletionContext GuildChannel => new DiscordCompletionContext(DiscordBaseCompletionContext.Channel, DiscordChannelContext.Guild);
+        public static DiscordCompletionContext StageChannel => new DiscordCompletionContext(DiscordBaseCompletionContext.Channel, DiscordChannelContext.Stage);
+        public static DiscordCompletionContext ThreadChannel => new DiscordCompletionContext(DiscordBaseCompletionContext.Channel, DiscordChannelContext.Thread);
+        public static DiscordCompletionContext PrivateChannel => new DiscordCompletionContext(DiscordBaseCompletionContext.Channel, DiscordChannelContext.Private);
 
         public static bool operator == (DiscordCompletionContext left, DiscordCompletionContext right) {
             return left.ChannelContext == right.ChannelContext && left.BaseContext == right.BaseContext;
@@ -68,6 +78,7 @@ namespace Discord.NET.SupportExtension.Core.Interface {
         Forum,
         Guild,
         Stage,
-        Thread
+        Thread,
+        Private
     }
 }

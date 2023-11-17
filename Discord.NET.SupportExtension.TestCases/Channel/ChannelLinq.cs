@@ -20,7 +20,7 @@ namespace Discord.NET.SupportExtension.TestCases.Channel {
             IVoiceChannel restVoiceChannel = (await restGuild.GetVoiceChannelsAsync()).FirstOrDefault(e => e.Id == 0002);
 
             IChannel socketChannel = socketGuild.Channels.FirstOrDefault(e => e.Id == 9999);
-            ITextChannel socketTextChannel = socketGuild.TextChannels.GroupBy(e => e.Id).FirstOrDefault(e => e.Key == 9998).First();
+            ITextChannel socketTextChannel = socketGuild.TextChannels.Select(e => e).FirstOrDefault(e => e.Id == 9998);
         }
     }
 }

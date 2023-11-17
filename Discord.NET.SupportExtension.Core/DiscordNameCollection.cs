@@ -24,24 +24,15 @@ namespace Discord.NET.SupportExtension.Core {
         public const string IGUILDCHANNEL = "Discord.IGuildChannel";
         public const string ISTAGECHANNEL = "Discord.IStageChannel";
         public const string ITHREADCHANNEL = "Discord.IThreadChannel";
+        public const string IPRIVATECHANNEL = "Discord.IPrivateChannel";
 
-        // Attributes
-        public const string SERVERID = "HB.NETF.Discord.NET.Toolkit.SupportExtension.ServerIdAttribute";
-        public const string SERVERIDLIST = "HB.NETF.Discord.NET.Toolkit.SupportExtension.ServerIdListAttribute";
-        public const string SERVERNAME = "HB.NETF.Discord.NET.Toolkit.SupportExtension.ServerNameAttribute";
-        public const string SERVERNAMELIST = "HB.NETF.Discord.NET.Toolkit.SupportExtension.ServerNameListAttribute";
-
+        
         private static string[] names = {
             IDISCORDCLIENT,
             IGUILD,
             IUSER,
             IROLE,
             ICHANNEL,
-
-            SERVERID,
-            SERVERIDLIST,
-            SERVERNAME,
-            SERVERNAMELIST,
         };
 
         private static string[] channels = {
@@ -53,7 +44,8 @@ namespace Discord.NET.SupportExtension.Core {
             IGROUPCHANNEL,
             IGUILDCHANNEL,
             ISTAGECHANNEL,
-            ITHREADCHANNEL
+            ITHREADCHANNEL,
+            IPRIVATECHANNEL
         };
 
         public static bool Contains(string name) {

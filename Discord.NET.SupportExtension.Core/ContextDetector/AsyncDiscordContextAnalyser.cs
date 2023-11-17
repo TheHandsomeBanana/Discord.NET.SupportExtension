@@ -1,4 +1,5 @@
 ﻿using Discord.NET.SupportExtension.Core.Interface;
+using Discord.WebSocket;
 using HB.NETF.Code.Analysis.Interface;
 using HB.NETF.Common.DependencyInjection;
 using HB.NETF.Services.Logging;
@@ -80,12 +81,12 @@ namespace Discord.NET.SupportExtension.Core.ContextDetector {
 
         private void CheckForContext(ExpressionSyntax expression) {
             INamedTypeSymbol contextTypeSymbol = SemanticModel.GetTypeInfo(expression).Type as INamedTypeSymbol;
-
-            if (contextTypeSymbol?.Name == "Task") // Overwrite symbol with generic type
-                contextTypeSymbol = contextTypeSymbol.TypeArguments[0] as INamedTypeSymbol;
-
             if (contextTypeSymbol == null)
                 return;
+
+            if (contextTypeSymbol.Name.Contains("Task")) // Get first type argument of Task / ValueTask
+                contextTypeSymbol = contextTypeSymbol.TypeArguments[0] as INamedTypeSymbol;
+
 
             // Set context with found interface
             if (DiscordNameCollection.Contains(contextTypeSymbol.ToDisplayString())) {
@@ -110,10 +111,6 @@ namespace Discord.NET.SupportExtension.Core.ContextDetector {
         private void SetContext(ITypeSymbol interfaceSymbol) {
             switch (interfaceSymbol.ToDisplayString()) {
                 case DiscordNameCollection.IGUILD:
-                case DiscordNameCollection.SERVERID:
-                case DiscordNameCollection.SERVERIDLIST:
-                case DiscordNameCollection.SERVERNAME:
-                case DiscordNameCollection.SERVERNAMELIST:
                     context = DiscordBaseCompletionContext.Server;
                     break;
                 case DiscordNameCollection.IUSER:
@@ -146,6 +143,8 @@ namespace Discord.NET.SupportExtension.Core.ContextDetector {
             switch (name) {
                 case DiscordNameCollection.ITEXTCHANNEL:
                     return DiscordChannelContext.Text;
+                case DiscordNameCollection.IVOICECHANNEL:
+                    return DiscordChannelContext.Voice;
                 case DiscordNameCollection.ICATEGORYCHANNEL:
                     return DiscordChannelContext.Category;
                 case DiscordNameCollection.IDMCHANNEL:
@@ -160,14 +159,24 @@ namespace Discord.NET.SupportExtension.Core.ContextDetector {
                     return DiscordChannelContext.Stage;
                 case DiscordNameCollection.ITHREADCHANNEL:
                     return DiscordChannelContext.Thread;
+                case DiscordNameCollection.IPRIVATECHANNEL:
+                    return DiscordChannelContext.Private;
             }
-
             return null;
         }
 
         private DiscordChannelContext? ResolveChannelType(IEnumerable<string> allInterfaces) {
             // Order is important
             // Some Interfaces inherit from same --> Less specific Interfaces first
+            if (allInterfaces.Any(e => e == DiscordNameCollection.ISTAGECHANNEL))
+                return DiscordChannelContext.Stage;
+
+            if (allInterfaces.Any(e => e == DiscordNameCollection.IDMCHANNEL))
+                return DiscordChannelContext.DM;
+
+            if (allInterfaces.Any(e => e == DiscordNameCollection.IPRIVATECHANNEL))
+                return DiscordChannelContext.Private;
+
             if (allInterfaces.Any(e => e == DiscordNameCollection.IVOICECHANNEL))
                 return DiscordChannelContext.Voice;
 
@@ -176,6 +185,9 @@ namespace Discord.NET.SupportExtension.Core.ContextDetector {
 
             if (allInterfaces.Any(e => e == DiscordNameCollection.ICATEGORYCHANNEL))
                 return DiscordChannelContext.Category;
+
+            if (allInterfaces.Any(e => e == DiscordNameCollection.ITHREADCHANNEL))
+                return DiscordChannelContext.Thread;
 
             if (allInterfaces.Any(e => e == DiscordNameCollection.ITEXTCHANNEL))
                 return DiscordChannelContext.Text;
