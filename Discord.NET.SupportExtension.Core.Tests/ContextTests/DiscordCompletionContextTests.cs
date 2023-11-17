@@ -20,9 +20,9 @@ namespace Discord.NET.SupportExtension.Core.Tests.ContextDetectorTests {
             completionContextTests.Reset();
         }
 
-
+        #region Positive Testing
         [TestMethod]
-        public async Task GuildTests() {
+        public async Task Guild_PositiveTests() {
             completionContextTests.Add("GuildBasicMethods.cs", DiscordCompletionContext.Server)
                 .Add("0000") // IGuild restServer1 = await restClient.GetGuildAsync(0000);
                 .Add("0001") // RestGuild restServer2 = restClient.GetGuildAsync(0001).Result;
@@ -44,7 +44,7 @@ namespace Discord.NET.SupportExtension.Core.Tests.ContextDetectorTests {
         }
 
         [TestMethod]
-        public async Task UserTests() {
+        public async Task User_PositiveTests() {
             completionContextTests.Add("UserBasicMethods.cs", DiscordCompletionContext.User)
                 .Add("0000") // IGuildUser restGuildUser = await restGuild.GetUserAsync(0000);
                 .Add("0001") // IUser restUser = await restClient.GetUserAsync(0001);
@@ -65,7 +65,7 @@ namespace Discord.NET.SupportExtension.Core.Tests.ContextDetectorTests {
         }
 
         [TestMethod]
-        public async Task RoleTests() {
+        public async Task Role_PositiveTests() {
             completionContextTests.Add("RoleBasicMethods.cs", DiscordCompletionContext.Role)
                 .Add("0000") // IRole restRole = restGuild.GetRole(0000);
                 .Add("9999"); // IRole socketRole = socketGuild.GetRole(9999);
@@ -86,7 +86,7 @@ namespace Discord.NET.SupportExtension.Core.Tests.ContextDetectorTests {
         }
 
         [TestMethod]
-        public async Task ChannelTests() {
+        public async Task Channel_PositiveTests() {
             completionContextTests.Add("ChannelBasicMethods.cs")
                 .Add("0000", DiscordCompletionContext.GuildChannel) // IGuildChannel restGuildChannel = restGuild.GetChannelAsync(0000).Result;
                 .Add("0001", DiscordCompletionContext.StageChannel) // IStageChannel restStageChannel = await restGuild.GetStageChannelAsync(0001);
@@ -123,5 +123,13 @@ namespace Discord.NET.SupportExtension.Core.Tests.ContextDetectorTests {
 
             await completionContextTests.RunEngineAsync();
         }
+        #endregion
+
+        #region Negative Testing
+        [TestMethod]
+        public async Task Guild_NegativeTests() {
+
+        }
+        #endregion
     }
 }

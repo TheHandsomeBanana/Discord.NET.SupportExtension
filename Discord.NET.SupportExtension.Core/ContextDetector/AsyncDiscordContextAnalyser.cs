@@ -7,6 +7,7 @@ using HB.NETF.Services.Logging.Factory;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Microsoft.CodeAnalysis.Operations;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -31,8 +32,8 @@ namespace Discord.NET.SupportExtension.Core.ContextDetector {
             if (currentNode.IsKind(SyntaxKind.NumericLiteralExpression))
                 currentNode = currentNode.Parent;
 
-            if (currentNode is ExpressionSyntax || currentNode is ArgumentListSyntax || currentNode is ArgumentSyntax)
-                await ResolveNodeAsync(currentNode);
+            if (await InitiateDetection(currentNode))
+                await ResolveNode(currentNode);
 
             if (hasBaseContextContext)
                 return new DiscordCompletionContext(context, channelContext);
@@ -44,39 +45,82 @@ namespace Discord.NET.SupportExtension.Core.ContextDetector {
 
         async Task<object> ICodeAnalyser.Run(SyntaxNode syntaxNode) => await Run(syntaxNode);
 
-        // Recursive node detection
-        public async Task ResolveNodeAsync(SyntaxNode node) {
+        #region Initiate Analysis
+        private async Task<bool> InitiateDetection(SyntaxNode trigger) {
+            if (trigger is ExpressionSyntax)
+                return true;
+
+            if (trigger is ArgumentListSyntax || trigger is ArgumentSyntax)
+                return await CheckMethodArgumentUsage(trigger);
+
+            return trigger is ExpressionSyntax || trigger is ArgumentListSyntax || trigger is ArgumentSyntax;
+        }
+
+        private async Task<bool> CheckMethodArgumentUsage(SyntaxNode trigger) {
+            int argumentIndex = -1;
+            InvocationExpressionSyntax parentInvocation;
+            switch (trigger) {
+                case ArgumentSyntax argument:
+                    if (!argument.Expression.IsKind(SyntaxKind.NumericLiteralExpression))
+                        return false;
+
+                    argumentIndex = ((ArgumentListSyntax)argument.Parent).Arguments.IndexOf(argument);
+                    parentInvocation = argument.Parent.Parent as InvocationExpressionSyntax;
+                    break;
+                case ArgumentListSyntax argumentList:
+                    if (argumentList.Arguments.Count > 0)
+                        argumentIndex = 0;
+                    parentInvocation = argumentList.Parent as InvocationExpressionSyntax;
+                    break;
+                default:
+                    return false;
+            }
+
+            if (argumentIndex == -1)
+                return false;
+
+            IMethodSymbol declaredMethodSymbol = SemanticModel.GetSymbolInfo(parentInvocation).Symbol as IMethodSymbol;
+            SyntaxReference methodSyntaxReference = declaredMethodSymbol.DeclaringSyntaxReferences.FirstOrDefault();
+            if (methodSyntaxReference == null) // Basic Methods from Discord are out of assembly
+                return true;
+
+            MethodDeclarationSyntax methodDeclaration = (await methodSyntaxReference.GetSyntaxAsync()) as MethodDeclarationSyntax;
+            ParameterSyntax parameterFromArgumentIndex = methodDeclaration.ParameterList.Parameters[argumentIndex];
+            
+
+            return false;
+        }
+        #endregion
+
+        #region Analysis
+        private async Task ResolveNode(SyntaxNode node) {
             switch (node) {
                 case InvocationExpressionSyntax invocation:
                     CheckForContext(invocation);
                     break;
                 case BinaryExpressionSyntax binary when binary.Kind() == SyntaxKind.EqualsExpression || binary.Kind() == SyntaxKind.NotEqualsExpression:
-                    await ResolveNodeAsync(binary.Left);
+                    await ResolveNode(binary.Left);
                     break;
                 case MemberAccessExpressionSyntax memberAccess:
-                    await ResolveNodeAsync(memberAccess.Expression);
+                    await ResolveNode(memberAccess.Expression);
                     break;
                 case ConditionalAccessExpressionSyntax conditionalAccess:
-                    await ResolveNodeAsync(conditionalAccess.Expression);
+                    await ResolveNode(conditionalAccess.Expression);
                     break;
                 case IdentifierNameSyntax identifier:
                     CheckForContext(identifier);
                     break;
                 case SwitchStatementSyntax switchStatement:
-                    await ResolveNodeAsync(switchStatement.Expression);
+                    await ResolveNode(switchStatement.Expression);
                     break;
                 case ArgumentSyntax argument:
-                    await ResolveNodeAsync(argument.Parent);
+                    await ResolveNode(argument.Parent);
                     break;
                 case ArgumentListSyntax argumentList:
-                    await ResolveNodeAsync(argumentList.Parent);
+                    await ResolveNode(argumentList.Parent);
                     break;
 
             }
-        }
-
-        private bool InitiateDetection(SyntaxNode trigger) {
-            return false;
         }
 
         private void CheckForContext(ExpressionSyntax expression) {
@@ -201,5 +245,6 @@ namespace Discord.NET.SupportExtension.Core.ContextDetector {
 
             return null;
         }
+        #endregion
     }
 }

@@ -14,7 +14,7 @@ namespace Discord.NET.SupportExtension.TestCases.Channel {
 
         public async Task Run() {
             IChannel restChannel = RestChannel(0000);
-            IStageChannel restStageChannel = await RestStageChannel(0001);
+            IStageChannel restStageChannel = await RestStageChannel(0001, "NT0001");
             IVoiceChannel restVoiceChannel = RestVoiceChannel(0002).Result;
 
             IChannel socketChannel = SocketChannel(9999);
@@ -25,7 +25,7 @@ namespace Discord.NET.SupportExtension.TestCases.Channel {
             return restGuild.GetChannelAsync(channelId).Result;
         }
 
-        public async Task<IStageChannel> RestStageChannel(ulong channel) {
+        public async Task<IStageChannel> RestStageChannel(ulong channel, string s) {
             return await restGuild.GetStageChannelAsync(channel);
         }
 

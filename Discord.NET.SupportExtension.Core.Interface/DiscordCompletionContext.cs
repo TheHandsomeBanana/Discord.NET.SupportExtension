@@ -20,6 +20,7 @@ namespace Discord.NET.SupportExtension.Core.Interface {
             ChannelContext = null;
         }
 
+        public static DiscordCompletionContext Undefined => new DiscordCompletionContext(DiscordBaseCompletionContext.Undefined);
         public static DiscordCompletionContext Server => new DiscordCompletionContext(DiscordBaseCompletionContext.Server);
         public static DiscordCompletionContext User => new DiscordCompletionContext(DiscordBaseCompletionContext.User);
         public static DiscordCompletionContext Role => new DiscordCompletionContext(DiscordBaseCompletionContext.Role);

@@ -13,13 +13,14 @@ namespace Discord.NET.SupportExtension.TestCases.Guild {
         private readonly DiscordSocketRestClient restClient;
 
         public async Task Run() {
-            IGuild restServer1 = GetRestServer1(0000);
+            IGuild restServer1 = GetRestServer1("NT0000", 0000);
             RestGuild restServer2 = await GetRestServer2(0001);
             SocketGuild socketServer1 = GetSocketServer1(9999);
             SocketGuild socketServer2 = GetSocketServer2(9998);
+            IGuild socketServerNT1 = GetSocketServerNT1(9996);
         }
 
-        private IGuild GetRestServer1(ulong serverId) {
+        private IGuild GetRestServer1(string s, ulong serverId) {
             return restClient.GetGuildAsync(serverId).Result;
         }
 
@@ -33,6 +34,10 @@ namespace Discord.NET.SupportExtension.TestCases.Guild {
 
         private SocketGuild GetSocketServer2(ulong id) {
             return GetSocketServer1(id);
+        }
+
+        private IGuild GetSocketServerNT1(ulong serverId) { // Negative test, serverId should not have IGuild context
+            return socketClient.GetGuild(9997);
         }
     }
 }
