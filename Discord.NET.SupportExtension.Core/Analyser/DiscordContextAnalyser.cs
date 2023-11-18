@@ -17,14 +17,12 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace Discord.NET.SupportExtension.Core.Analyser {
-    internal class AsyncDiscordContextAnalyser : DiscordAnalyserBase, ICodeAnalyser<DiscordCompletionContext> {
+    internal class DiscordContextAnalyser : DiscordAnalyserBase, ICodeAnalyser<DiscordCompletionContext> {
         private DiscordBaseCompletionContext context;
         private DiscordChannelContext? channelContext;
         private bool hasBaseContextContext;
         private SyntaxNode currentNode;
 
-        public AsyncDiscordContextAnalyser(Solution solution, Project project, SemanticModel semanticModel) : base(solution, project, semanticModel) {
-        }
 
         public async Task<DiscordCompletionContext> Run(SyntaxNode node) {
             currentNode = node;
@@ -40,7 +38,6 @@ namespace Discord.NET.SupportExtension.Core.Analyser {
             return new DiscordCompletionContext();
         }
 
-        async Task<object> ICodeAnalyser.Run(SyntaxNode syntaxNode) => await Run(syntaxNode);
 
         #region Initiate Analysis
         private async Task<bool> InitiateDetection(SyntaxNode trigger) {

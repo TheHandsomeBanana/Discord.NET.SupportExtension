@@ -38,7 +38,7 @@ namespace Discord.NET.SupportExtension.Mef.Roslyn.Completion {
                 return;
 
             ILogger<AsyncDiscordCompletionSource> logger = loggerFactory.GetOrCreateLogger<AsyncDiscordCompletionSource>();
-            IAsyncDiscordCompletionEngine engine = DIContainer.GetService<IAsyncDiscordCompletionEngine>();
+            IDiscordCompletionEngine engine = DIContainer.GetService<IDiscordCompletionEngine>();
 
             try {
                 if (context.CancellationToken.IsCancellationRequested) {

@@ -16,7 +16,7 @@ using System.Threading.Tasks;
 namespace Discord.NET.SupportExtension.Core {
     public class DIConfig : IDependencyConfig {
         public void Configure(DIBuilder builder) {
-            builder.Services.AddSingleton<IAsyncDiscordCompletionEngine, AsyncDiscordCompletionEngine>();
+            builder.Services.AddSingleton<IDiscordCompletionEngine, AsyncDiscordCompletionEngine>();
         }
     }
 }
