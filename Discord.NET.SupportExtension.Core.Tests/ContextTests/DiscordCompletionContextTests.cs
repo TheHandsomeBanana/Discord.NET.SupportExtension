@@ -128,7 +128,16 @@ namespace Discord.NET.SupportExtension.Core.Tests.ContextDetectorTests {
         #region Negative Testing
         [TestMethod]
         public async Task Guild_NegativeTests() {
+            completionContextTests.Add("GuildCustomMethods.cs", DiscordCompletionContext.Undefined)
+                .Add("NT0000") // IGuild restServer1 = GetRestServer1("NT0000", 0000);
+                .Add("9996"); // IGuild socketServerNT1 = GetSocketServerNT1(9996); 
 
+            await completionContextTests.RunEngineAsync();
+        }
+
+        [TestMethod]
+        public async Task Channel_NegativeTests() {
+            
         }
         #endregion
     }

@@ -31,7 +31,7 @@ namespace Discord.NET.SupportExtension.Core.Analyser {
             if (currentNode.IsKind(SyntaxKind.NumericLiteralExpression))
                 currentNode = currentNode.Parent;
 
-            if (await InitiateDetection(currentNode))
+            if (InitiateDetection(currentNode))
                 await ResolveNode(currentNode);
 
             if (hasBaseContextContext)
@@ -43,18 +43,17 @@ namespace Discord.NET.SupportExtension.Core.Analyser {
         async Task<object> ICodeAnalyser.Run(SyntaxNode syntaxNode) => await Run(syntaxNode);
 
         #region Initiate Analysis
-        private async Task<bool> InitiateDetection(SyntaxNode trigger) {
+        private bool InitiateDetection(SyntaxNode trigger) {
             if (trigger is ExpressionSyntax)
                 return true;
 
             if (trigger is ArgumentListSyntax || trigger is ArgumentSyntax)
-                return await CheckMethodArgumentUsage(trigger);
+                return CheckMethodArgumentUsage(trigger);
 
-            return trigger is ExpressionSyntax || trigger is ArgumentListSyntax || trigger is ArgumentSyntax;
+            return false;
         }
-
-        private static readonly string[] ulongTypes = { "ulong", nameof(UInt64) };
-        private async Task<bool> CheckMethodArgumentUsage(SyntaxNode trigger) {
+        
+        private bool CheckMethodArgumentUsage(SyntaxNode trigger) {
             int argumentIndex = -1;
             InvocationExpressionSyntax parentInvocation;
             switch (trigger) {
@@ -62,7 +61,7 @@ namespace Discord.NET.SupportExtension.Core.Analyser {
                     if (!argument.Expression.IsKind(SyntaxKind.NumericLiteralExpression))
                         return false;
 
-                    argumentIndex = ((ArgumentListSyntax)argument.Parent).Arguments.IndexOf(argument);
+                    argumentIndex = GetArgumentIndex(argument);
                     parentInvocation = argument.Parent.Parent as InvocationExpressionSyntax;
                     break;
                 case ArgumentListSyntax argumentList:
@@ -78,21 +77,7 @@ namespace Discord.NET.SupportExtension.Core.Analyser {
                 return false;
 
             IMethodSymbol methodSymbol = SemanticModel.GetSymbolInfo(parentInvocation).Symbol as IMethodSymbol;
-            SyntaxReference methodSyntaxReference = methodSymbol.DeclaringSyntaxReferences.FirstOrDefault();
-            if (methodSyntaxReference == null) // Basic Methods from Discord are out of assembly
-                return true;
-
-            MethodDeclarationSyntax methodDeclaration = (await methodSyntaxReference.GetSyntaxAsync()) as MethodDeclarationSyntax;
-            ParameterSyntax parameterFromArgumentIndex = methodDeclaration.ParameterList.Parameters[argumentIndex];
-            if (!ulongTypes.Contains(parameterFromArgumentIndex.Type.ToString())) // Only resolve param with ulong type
-                return false;
-
-
-            IEnumerable<ReferencedSymbol> parameterReferenceSymbols = await SymbolFinder.FindReferencesAsync(SemanticModel.GetDeclaredSymbol(methodDeclaration), Solution, Documents);
-            
-
-
-            return false;
+            return methodSymbol.Parameters[argumentIndex].Type.ToString() == "ulong";
         }
         #endregion
 
@@ -118,13 +103,22 @@ namespace Discord.NET.SupportExtension.Core.Analyser {
                     await ResolveNode(switchStatement.Expression);
                     break;
                 case ArgumentSyntax argument:
-                    await ResolveNode(argument.Parent);
+                    await ResolveArgument(argument);
                     break;
                 case ArgumentListSyntax argumentList:
                     await ResolveNode(argumentList.Parent);
                     break;
 
             }
+        }
+
+        private async Task ResolveArgument(ArgumentSyntax argument) {
+            InvocationExpressionSyntax invocation = GetInvocationFromArgument(argument);
+            if (invocation == null)
+                return;
+
+
+
         }
 
         private void CheckForContext(ExpressionSyntax expression) {
@@ -249,6 +243,11 @@ namespace Discord.NET.SupportExtension.Core.Analyser {
 
             return null;
         }
+        #endregion
+
+        #region Helper
+        private static int GetArgumentIndex(ArgumentSyntax argument) => ((ArgumentListSyntax)argument.Parent).Arguments.IndexOf(argument);
+        private static InvocationExpressionSyntax GetInvocationFromArgument(ArgumentSyntax argument) => argument.Parent.Parent as InvocationExpressionSyntax;
         #endregion
     }
 }
