@@ -1,4 +1,5 @@
 ﻿using Discord.NET.SupportExtension.Core.Interface;
+using Discord.NET.SupportExtension.Core.Interface.Analyser;
 using HB.NETF.Code.Analysis;
 using HB.NETF.Code.Analysis.Interface;
 using HB.NETF.Common.DependencyInjection;
@@ -8,6 +9,7 @@ using HB.NETF.Discord.NET.Toolkit.Services.EntityService;
 using HB.NETF.Discord.NET.Toolkit.Services.EntityService.Holder;
 using HB.NETF.Services.Logging;
 using HB.NETF.Services.Logging.Factory;
+using Humanizer.DateTimeHumanizeStrategy;
 using Microsoft.CodeAnalysis;
 using System;
 using System.Collections.Generic;
@@ -17,27 +19,36 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace Discord.NET.SupportExtension.Core.Analyser {
-    internal class AsyncDiscordAnalyser : DiscordAnalyserBase, ICodeAnalyser<DiscordEntity[]> {
-        private readonly ILogger<AsyncDiscordAnalyser> logger;
-        private readonly DiscordServerCollection serverCollection;
+    internal class DiscordAnalyser : DiscordAnalyserBase, IDiscordAnalyser {
+        private readonly ILogger<DiscordAnalyser> logger;
+        private readonly IServerCollectionHolder serverHolder;
+        private readonly IDiscordContextAnalyser contextAnalyser;
+        private readonly IDiscordServerIdAnalyser serverIdAnalyser;
+        private DiscordServerCollection serverCollection;
 
-        public AsyncDiscordAnalyser(Solution solution, Project project, SemanticModel semanticModel) : base(solution, project, semanticModel) {
-            ILoggerFactory loggerFactory = DIContainer.GetService<ILoggerFactory>();
-            logger = loggerFactory.GetOrCreateLogger<AsyncDiscordAnalyser>();
-            serverCollection = DIContainer.GetService<IServerCollectionHolder>().Get(project.Name);
+        public DiscordAnalyser(ILoggerFactory loggerFactory, IServerCollectionHolder holder, IDiscordContextAnalyser contextAnalyser, IDiscordServerIdAnalyser serverIdAnalyser) {
+            logger = loggerFactory.GetOrCreateLogger<DiscordAnalyser>();
+            serverHolder = holder; 
+            this.contextAnalyser = contextAnalyser;
+            this.serverIdAnalyser = serverIdAnalyser;
+        }
+
+        public override void Initialize(Solution solution, Project project, SemanticModel semanticModel) {
+            base.Initialize(solution, project, semanticModel);
+            serverCollection = serverHolder.Get(project.Name);
         }
 
         public async Task<DiscordEntity[]> Run(SyntaxNode syntaxNode) {
-            AsyncDiscordContextAnalyser contextDetector = new AsyncDiscordContextAnalyser(Solution, Project, SemanticModel);
-            DiscordCompletionContext foundContext = await contextDetector.Run(syntaxNode);
+            contextAnalyser.Initialize(Solution, Project, SemanticModel);
+
+            DiscordCompletionContext foundContext = await contextAnalyser.Run(syntaxNode);
             if (foundContext == DiscordCompletionContext.Undefined)
                 return Array.Empty<DiscordEntity>();
 
             if (foundContext.BaseContext == DiscordBaseCompletionContext.Server)
                 return serverCollection.GetServers();
 
-            ICodeAnalyser<IEnumerable<ulong>> serverIdAnalyser = new AsyncDiscordServerIdAnalyser(Solution, Project, SemanticModel);
-            IEnumerable<ulong> serverIdList = await serverIdAnalyser.Run(syntaxNode);
+            ImmutableArray<ulong> serverIdList = await serverIdAnalyser.Run(syntaxNode);
             List<DiscordEntity> foundItems = new List<DiscordEntity>();
             switch (foundContext.BaseContext) {
                 case DiscordBaseCompletionContext.User:
@@ -62,7 +73,6 @@ namespace Discord.NET.SupportExtension.Core.Analyser {
         }
 
 
-        async Task<object> ICodeAnalyser.Run(SyntaxNode syntaxNode) => await Run(syntaxNode);
 
         private DiscordChannelType? MapChannelType(DiscordChannelContext? context) {
             switch (context) {

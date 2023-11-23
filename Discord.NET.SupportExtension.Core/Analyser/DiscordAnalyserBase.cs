@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Discord.NET.SupportExtension.Core.Analyser {
     public class DiscordAnalyserBase : AnalyserBase {
-        public DiscordAnalyserBase(Solution solution, Project project, SemanticModel semanticModel) : base(solution, project, semanticModel) {
+        public DiscordAnalyserBase() {
         }
     }
 }

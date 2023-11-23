@@ -105,8 +105,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Analyser\IDiscordAnalyser.cs" />
+    <Compile Include="Analyser\IDiscordContextAnalyser.cs" />
+    <Compile Include="Analyser\IDiscordServerIdAnalyser.cs" />
     <Compile Include="DiscordCompletionContext.cs" />
-    <Compile Include="IAsyncDiscordCompletionEngine.cs" />
+    <Compile Include="IDiscordCompletionEngine.cs" />
     <Compile Include="IDiscordCompletionItem.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -116,6 +119,16 @@
   <ItemGroup>
     <Analyzer Include="..\packages\Microsoft.CodeAnalysis.Analyzers.3.3.4\analyzers\dotnet\cs\Microsoft.CodeAnalysis.Analyzers.dll" />
     <Analyzer Include="..\packages\Microsoft.CodeAnalysis.Analyzers.3.3.4\analyzers\dotnet\cs\Microsoft.CodeAnalysis.CSharp.Analyzers.dll" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\HB\HB.NETF.Code.Analysis\HB.NETF.Code.Analysis.csproj">
+      <Project>{41c3c462-030e-45c3-8c92-48175905c624}</Project>
+      <Name>HB.NETF.Code.Analysis</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\HB\HB.NETF.Discord.NET.Toolkit\HB.NETF.Discord.NET.Toolkit.csproj">
+      <Project>{35CFC0BF-8442-43CC-9F30-695E19532AEE}</Project>
+      <Name>HB.NETF.Discord.NET.Toolkit</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

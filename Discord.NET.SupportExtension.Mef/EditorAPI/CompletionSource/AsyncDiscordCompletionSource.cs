@@ -45,7 +45,7 @@ namespace Discord.NET.SupportExtension.MEF.CompletionSource {
                 return default;
 
             ILogger<AsyncDiscordCompletionSource> logger = loggerFactory.GetOrCreateLogger<AsyncDiscordCompletionSource>();
-            IAsyncDiscordCompletionEngine engine = DIContainer.GetService<IAsyncDiscordCompletionEngine>();
+            IDiscordCompletionEngine engine = DIContainer.GetService<IDiscordCompletionEngine>();
 
             try {
                 if(token.IsCancellationRequested) {

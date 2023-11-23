@@ -1,4 +1,5 @@
-﻿using HB.NETF.Code.Analysis;
+﻿using Discord.NET.SupportExtension.Core.Interface.Analyser;
+using HB.NETF.Code.Analysis;
 using HB.NETF.Code.Analysis.Interface;
 using HB.NETF.Common.DependencyInjection;
 using HB.NETF.Common.Exceptions;
@@ -20,19 +21,18 @@ using System.Threading.Tasks;
 using System.Xml.Linq;
 
 namespace Discord.NET.SupportExtension.Core.Analyser {
-    internal class AsyncDiscordServerIdAnalyser : DiscordAnalyserBase, ICodeAnalyser<IEnumerable<ulong>> {
-        private readonly ILogger<AsyncDiscordServerIdAnalyser> logger;
+    internal class DiscordServerIdAnalyser : DiscordAnalyserBase, IDiscordServerIdAnalyser {
+        private readonly ILogger<DiscordServerIdAnalyser> logger;
         private const int RECURSIONLEVEL = 4;
         private List<ulong> serverIds = new List<ulong>();
 
         private SyntaxNode currentNode;
 
-        public AsyncDiscordServerIdAnalyser(Solution solution, Project project, SemanticModel semanticModel) : base(solution, project, semanticModel) {
-            ILoggerFactory loggerFactory = DIContainer.GetService<ILoggerFactory>();
-            logger = loggerFactory.GetOrCreateLogger<AsyncDiscordServerIdAnalyser>();
+        public DiscordServerIdAnalyser() {
+            logger = DIContainer.GetService<ILoggerFactory>().GetOrCreateLogger<DiscordServerIdAnalyser>();
         }
 
-        public async Task<IEnumerable<ulong>> Run(SyntaxNode node) {
+        public async Task<ImmutableArray<ulong>> Run(SyntaxNode node) {
             currentNode = node;
 
             for (int i = 0; i < RECURSIONLEVEL && !(currentNode is BlockSyntax) && currentNode != null; i++) {
@@ -40,16 +40,14 @@ namespace Discord.NET.SupportExtension.Core.Analyser {
                     await ResolveNodeAsync(currentNode);
 
                 if (serverIds.Any())
-                    return serverIds;
+                    return serverIds.ToImmutableArray();
 
                 currentNode = currentNode.Parent;
             }
 
-            return serverIds;
+            return serverIds.ToImmutableArray();
         }
 
-
-        async Task<object> ICodeAnalyser.Run(SyntaxNode syntaxNode) => await Run(syntaxNode);
 
         public async Task ResolveNodeAsync(SyntaxNode node) {
             switch (node) {
@@ -132,10 +130,12 @@ namespace Discord.NET.SupportExtension.Core.Analyser {
                 if (referencedNode.FullSpan == identifier.FullSpan)
                     continue;
 
-                AsyncDiscordServerIdAnalyser serverIdAnalyser;
+                DiscordServerIdAnalyser serverIdAnalyser;
                 if (referencedNode.SyntaxTree.FilePath != SyntaxTree.FilePath) {
                     SemanticModel sm = SemanticModel.Compilation.GetSemanticModel(referencedNode.SyntaxTree);
-                    serverIdAnalyser = new AsyncDiscordServerIdAnalyser(Solution, Project, sm) { serverIds = this.serverIds }; // Pass current server-id-list to new analyser;
+                    serverIdAnalyser = new DiscordServerIdAnalyser();
+                    serverIdAnalyser.Initialize(Solution, Project, SemanticModel);
+                    serverIdAnalyser.serverIds = this.serverIds;
                 }
                 else
                     serverIdAnalyser = this;
@@ -194,18 +194,19 @@ namespace Discord.NET.SupportExtension.Core.Analyser {
 
             foreach (var location in distinctLocations) {
                 SyntaxNode locationNode = (await location.SourceTree.GetRootAsync()).FindNode(location.SourceSpan);
-                AsyncDiscordServerIdAnalyser serverIdAnalyser;
+                IDiscordServerIdAnalyser serverIdAnalyser;
                 if (parameter.SyntaxTree.FilePath != location.SourceTree.FilePath) {
 
                     SyntaxTree syntaxTree = locationNode.SyntaxTree;
                     SemanticModel semanticModel = this.SemanticModel.Compilation.GetSemanticModel(syntaxTree);
 
-                    serverIdAnalyser = new AsyncDiscordServerIdAnalyser(Solution, Project, semanticModel);
+                    serverIdAnalyser = DIContainer.GetService<IDiscordServerIdAnalyser>();
+                    serverIdAnalyser.Initialize(Solution, Project, semanticModel);
                 }
                 else
                     serverIdAnalyser = this;
 
-                IEnumerable<ulong> temp = await serverIdAnalyser.Run(locationNode);
+                ImmutableArray<ulong> temp = await serverIdAnalyser.Run(locationNode);
                 foreach (ulong value in temp) {
                     if (!serverIds.Contains(value))
                         serverIds.Add(value);

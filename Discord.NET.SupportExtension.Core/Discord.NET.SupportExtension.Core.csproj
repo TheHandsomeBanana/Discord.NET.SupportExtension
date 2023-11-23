@@ -144,12 +144,12 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Analyser\AsyncDiscordAnalyser.cs" />
-    <Compile Include="Analyser\AsyncDiscordServerIdAnalyser.cs" />
+    <Compile Include="Analyser\DiscordAnalyser.cs" />
+    <Compile Include="Analyser\DiscordServerIdAnalyser.cs" />
     <Compile Include="Analyser\DiscordAnalyserBase.cs" />
     <Compile Include="AsyncDiscordCompletionEngine.cs" />
     <Compile Include="Completions\DiscordCompletionItem.cs" />
-    <Compile Include="Analyser\AsyncDiscordContextAnalyser.cs" />
+    <Compile Include="Analyser\DiscordContextAnalyser.cs" />
     <Compile Include="DIConfig.cs" />
     <Compile Include="DiscordNameCollection.cs" />
     <Compile Include="Helper\CompletionHelper.cs" />
