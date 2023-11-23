@@ -17,10 +17,10 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace Discord.NET.SupportExtension.Core {
-    internal class AsyncDiscordCompletionEngine : IDiscordCompletionEngine {
+    internal class DiscordCompletionEngine : IDiscordCompletionEngine {
         private readonly IDiscordAnalyser discordAnalyser;
         private readonly IServerCollectionHolder serverHolder;
-        public AsyncDiscordCompletionEngine(IDiscordAnalyser discordAnalyser, IServerCollectionHolder serverHolder) {
+        public DiscordCompletionEngine(IDiscordAnalyser discordAnalyser, IServerCollectionHolder serverHolder) {
             this.discordAnalyser = discordAnalyser;
             this.serverHolder = serverHolder;
         }

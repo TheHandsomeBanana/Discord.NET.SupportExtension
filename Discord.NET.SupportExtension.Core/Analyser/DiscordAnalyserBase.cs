@@ -9,13 +9,28 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace Discord.NET.SupportExtension.Core.Analyser {
-    public class DiscordAnalyserBase : AnalyserBase {
+    public abstract class DiscordAnalyserBase {
+        protected Solution Solution { get; private set; }
+        protected Project Project { get; private set; }
+        protected IImmutableSet<Document> Documents { get; private set; }
+        protected SemanticModel SemanticModel { get; private set; }
+        protected SyntaxTree SyntaxTree { get; private set; }
+
         public DiscordAnalyserBase() {
         }
 
-        protected DiscordAnalyserBase(Solution solution, Project project, SemanticModel semanticModel, IImmutableSet<Document> documents) {
-            base.Initialize(solution, project, documents, semanticModel);
+        public virtual void Initialize(Solution solution, Project project, SemanticModel semanticModel) {
+            this.Initialize(solution, project, project.Documents.ToImmutableHashSet(), semanticModel);
         }
+
+        public void Initialize(Solution solution, Project project, IImmutableSet<Document> documents, SemanticModel semanticModel) {
+            this.Solution = solution;
+            this.Project = project;
+            this.Documents = documents;
+            this.SemanticModel = semanticModel;
+            this.SyntaxTree = semanticModel.SyntaxTree;
+        }
+        
 
         protected bool HasSameSemantics(SyntaxNode node) => this.SyntaxTree.FilePath == node.SyntaxTree.FilePath;
         protected T GetNewAnalyser<T>(SyntaxNode node) where T : DiscordAnalyserBase, new() {

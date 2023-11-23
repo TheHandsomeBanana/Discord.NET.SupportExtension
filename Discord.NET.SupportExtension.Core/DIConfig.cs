@@ -1,5 +1,7 @@
-﻿using Discord.NET.SupportExtension.Core.Completions;
+﻿using Discord.NET.SupportExtension.Core.Analyser;
+using Discord.NET.SupportExtension.Core.Completions;
 using Discord.NET.SupportExtension.Core.Interface;
+using Discord.NET.SupportExtension.Core.Interface.Analyser;
 using HB.NETF.Common.DependencyInjection;
 using HB.NETF.Services.Data.Handler;
 using HB.NETF.Services.Data.Handler.Async;
@@ -16,7 +18,10 @@ using System.Threading.Tasks;
 namespace Discord.NET.SupportExtension.Core {
     public class DIConfig : IDependencyConfig {
         public void Configure(DIBuilder builder) {
-            builder.Services.AddSingleton<IDiscordCompletionEngine, AsyncDiscordCompletionEngine>();
+            builder.Services.AddSingleton<IDiscordCompletionEngine, DiscordCompletionEngine>()
+                .AddTransient<IDiscordAnalyser, DiscordAnalyser>()
+                .AddTransient<IDiscordContextAnalyser, DiscordContextAnalyser>()
+                .AddTransient<IDiscordServerIdAnalyser, DiscordServerIdAnalyser>();
         }
     }
 }
