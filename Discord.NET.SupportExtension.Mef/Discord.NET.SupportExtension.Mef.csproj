@@ -90,6 +90,10 @@
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\HB\HB.NETF.Code.Analysis\HB.NETF.Code.Analysis.csproj">
+      <Project>{41C3C462-030E-45C3-8C92-48175905C624}</Project>
+      <Name>HB.NETF.Code.Analysis</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\HB\HB.NETF.Common\HB.NETF.Common.csproj">
       <Project>{7A6DD6BD-D679-4AD7-94F6-4AE5189BF75A}</Project>
       <Name>HB.NETF.Common</Name>

@@ -109,6 +109,7 @@
     <Compile Include="Channel\ChannelCustomMethods.cs" />
     <Compile Include="Channel\ChannelLinq.cs" />
     <Compile Include="Channel\ChannelServerId.cs" />
+    <Compile Include="Guild\GuildCustomMethodsExtra.cs" />
     <Compile Include="SystemTest\DiscordBot.cs" />
     <Compile Include="Guild\GuildBase.cs" />
     <Compile Include="Guild\GuildBasicMethods.cs" />

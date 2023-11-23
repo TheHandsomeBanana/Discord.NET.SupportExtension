@@ -28,13 +28,13 @@ using HB.NETF.VisualStudio.Workspace;
 using Microsoft.VisualStudio.Text.Editor;
 using Microsoft.VisualStudio.Text.Classification;
 using Microsoft.VisualStudio.Text.Operations;
+using HB.NETF.Code.Analysis.Models;
 
 namespace Discord.NET.SupportExtension.MEF.CompletionSource {
     public class AsyncDiscordCompletionSource : IAsyncCompletionSource {
         private bool _isDisposed;
         private DocumentId documentIdentifier;
         private readonly VisualStudioWorkspace vsWorkspace;
-
         public AsyncDiscordCompletionSource() {
             vsWorkspace = WorkspaceHelper.VisualStudioWorkspace;
         }

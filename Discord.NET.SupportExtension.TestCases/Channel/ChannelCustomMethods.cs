@@ -14,7 +14,7 @@ namespace Discord.NET.SupportExtension.TestCases.Channel {
 
         public async Task Run() {
             IChannel restChannel = RestChannel(0000);
-            IStageChannel restStageChannel = await RestStageChannel(0001, "NT0001");
+            IStageChannel restStageChannel = await RestStageChannel(0001, "NT001");
             IVoiceChannel restVoiceChannel = RestVoiceChannel(0002).Result;
 
             IChannel socketChannel = SocketChannel(9999);

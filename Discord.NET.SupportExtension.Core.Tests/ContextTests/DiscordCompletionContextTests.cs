@@ -1,5 +1,6 @@
 ﻿using Discord.NET.SupportExtension.Core.Interface;
 using Discord.NET.SupportExtension.Core.Tests.ContextTests;
+using Discord.WebSocket;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
@@ -32,7 +33,8 @@ namespace Discord.NET.SupportExtension.Core.Tests.ContextDetectorTests {
                 .Add("0000") // IGuild restServer1 = GetRestServer1(0000);
                 .Add("0001") // RestGuild restServer2 = await GetRestServer2(0001);
                 .Add("9999") // SocketGuild socketServer1 = GetSocketServer1(9999);
-                .Add("9998"); // SocketGuild socketServer2 = GetSocketServer2(9998);
+                .Add("9998") // SocketGuild socketServer2 = GetSocketServer2(9998);
+                .Add("9995"); // SocketGuild socketServer3 = GetSocketServer3(9995);
 
             completionContextTests.Add("GuildLinq.cs", DiscordCompletionContext.Server)
                 .Add("0000") // IGuild restServer1 = (await restClient.GetGuildsAsync()).FirstOrDefault(e => e.Id == 0000);
@@ -106,10 +108,10 @@ namespace Discord.NET.SupportExtension.Core.Tests.ContextDetectorTests {
                 .Add("9991", DiscordCompletionContext.Channel); // IChannel socketChannel = socketClient.GetChannel(9991);
 
             completionContextTests.Add("ChannelCustomMethods.cs")
-                .Add("0000", DiscordCompletionContext.Channel) // IChannel restChannel = RestChannel(0000);
+                .Add("0000", DiscordCompletionContext.GuildChannel) // IChannel restChannel = RestChannel(0000);
                 .Add("0001", DiscordCompletionContext.StageChannel) // IStageChannel restStageChannel = await RestStageChannel(0001);
                 .Add("0002", DiscordCompletionContext.VoiceChannel) // IVoiceChannel restVoiceChannel = RestVoiceChannel(0002).Result;
-                .Add("9999", DiscordCompletionContext.Channel) // IChannel socketChannel = SocketChannel(9999);
+                .Add("9999", DiscordCompletionContext.GuildChannel) // IChannel socketChannel = SocketChannel(9999);
                 .Add("9998", DiscordCompletionContext.TextChannel); // ITextChannel socketTextChannel = SocketTextChannel(9998);
 
             completionContextTests.Add("ChannelLinq.cs")
@@ -129,7 +131,7 @@ namespace Discord.NET.SupportExtension.Core.Tests.ContextDetectorTests {
         [TestMethod]
         public async Task Guild_NegativeTests() {
             completionContextTests.Add("GuildCustomMethods.cs", DiscordCompletionContext.Undefined)
-                .Add("NT0000") // IGuild restServer1 = GetRestServer1("NT0000", 0000);
+                .Add("NT000") // IGuild restServer1 = GetRestServer1("NT0000", 0000);
                 .Add("9996"); // IGuild socketServerNT1 = GetSocketServerNT1(9996); 
 
             await completionContextTests.RunEngineAsync();

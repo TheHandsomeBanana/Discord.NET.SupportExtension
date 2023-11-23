@@ -1,7 +1,9 @@
 ﻿using Discord.NET.SupportExtension.Core.Interface;
+using Discord.NET.SupportExtension.Core.Interface.Analyser;
 using Discord.WebSocket;
 using HB.NETF.Code.Analysis.Analyser;
 using HB.NETF.Code.Analysis.Interface;
+using HB.NETF.Code.Analysis.Resolver;
 using HB.NETF.Common.DependencyInjection;
 using HB.NETF.Services.Logging;
 using HB.NETF.Services.Logging.Factory;
@@ -12,17 +14,16 @@ using Microsoft.CodeAnalysis.FindSymbols;
 using Microsoft.CodeAnalysis.Operations;
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace Discord.NET.SupportExtension.Core.Analyser {
-    internal class DiscordContextAnalyser : DiscordAnalyserBase, ICodeAnalyser<DiscordCompletionContext> {
+    internal class DiscordContextAnalyser : DiscordAnalyserBase, IDiscordContextAnalyser {
         private DiscordBaseCompletionContext context;
         private DiscordChannelContext? channelContext;
-        private bool hasBaseContextContext;
         private SyntaxNode currentNode;
-
 
         public async Task<DiscordCompletionContext> Run(SyntaxNode node) {
             currentNode = node;
@@ -32,10 +33,10 @@ namespace Discord.NET.SupportExtension.Core.Analyser {
             if (InitiateDetection(currentNode))
                 await ResolveNode(currentNode);
 
-            if (hasBaseContextContext)
+            if (context != DiscordBaseCompletionContext.Undefined)
                 return new DiscordCompletionContext(context, channelContext);
 
-            return new DiscordCompletionContext();
+            return DiscordCompletionContext.Undefined;
         }
 
 
@@ -43,13 +44,13 @@ namespace Discord.NET.SupportExtension.Core.Analyser {
         private bool InitiateDetection(SyntaxNode trigger) {
             if (trigger is ExpressionSyntax)
                 return true;
-
+            
             if (trigger is ArgumentListSyntax || trigger is ArgumentSyntax)
                 return CheckMethodArgumentUsage(trigger);
 
             return false;
         }
-        
+
         private bool CheckMethodArgumentUsage(SyntaxNode trigger) {
             int argumentIndex = -1;
             InvocationExpressionSyntax parentInvocation;
@@ -105,17 +106,52 @@ namespace Discord.NET.SupportExtension.Core.Analyser {
                 case ArgumentListSyntax argumentList:
                     await ResolveNode(argumentList.Parent);
                     break;
-
             }
         }
 
         private async Task ResolveArgument(ArgumentSyntax argument) {
-            InvocationExpressionSyntax invocation = GetInvocationFromArgument(argument);
-            if (invocation == null)
+            int argumentIndex = GetArgumentIndex(argument);
+            if (!(argument.Parent.Parent is InvocationExpressionSyntax invocation))
                 return;
 
+            IMethodSymbol methodSymbol = SemanticModel.GetSymbolInfo(invocation).Symbol as IMethodSymbol;
+            if (methodSymbol.IsExtensionMethod && !methodSymbol.IsStatic) 
+                argumentIndex++;
+            
+            SyntaxReference declaringMethodReference = methodSymbol?.DeclaringSyntaxReferences.FirstOrDefault();
+            if (declaringMethodReference == null) { // Method chain stops here -> Resolve invocation
+                await ResolveNode(invocation);
+                return;
+            }
 
+            if (!((await declaringMethodReference.GetSyntaxAsync()) is MethodDeclarationSyntax methodDeclaration))
+                return;
 
+            // Check indexing
+            if (methodDeclaration.ParameterList.Parameters.Count < argumentIndex + 1)
+                return;
+
+            ParameterSyntax parameter = methodDeclaration.ParameterList.Parameters[argumentIndex];
+
+            // parameter could be out of semanticModel => Get analyser for the right semantic model
+            DiscordContextAnalyser contextAnalyser = HasSameSemantics(parameter) ? this : GetNewAnalyser<DiscordContextAnalyser>(parameter);
+
+            IParameterSymbol parameterSymbol = contextAnalyser.SemanticModel.GetDeclaredSymbol(parameter);
+
+            IEnumerable<Location> parameterLocations = await LocationResolver.FindReferenceLocations(parameterSymbol, Solution, Documents);
+            IEnumerable<SyntaxNode> locationNodes = LocationResolver.GetNodesFromLocations(parameterLocations);
+
+            foreach (SyntaxNode node in locationNodes) {
+                if (FoundContext)
+                    return;
+
+                await contextAnalyser.ResolveNode(node);
+            }
+
+            if (contextAnalyser.context != DiscordBaseCompletionContext.Undefined) {
+                this.context = contextAnalyser.context;
+                this.channelContext = contextAnalyser.channelContext;
+            }
         }
 
         private void CheckForContext(ExpressionSyntax expression) {
@@ -130,18 +166,19 @@ namespace Discord.NET.SupportExtension.Core.Analyser {
             // Set context with found interface
             if (DiscordNameCollection.Contains(contextTypeSymbol.ToDisplayString())) {
                 SetContext(contextTypeSymbol);
-                hasBaseContextContext = true;
                 return;
             }
 
             // If interface not found check inheritance 
-            foreach (INamedTypeSymbol interfaceSymbol in contextTypeSymbol.AllInterfaces) {
+            IEnumerable<INamedTypeSymbol> foundInterfaces = contextTypeSymbol.AllInterfaces
+                .Where(e => DiscordNameCollection.Contains(e.ToDisplayString()));
+
+            foreach (INamedTypeSymbol interfaceSymbol in foundInterfaces) {
                 SetContext(interfaceSymbol);
                 if (context != DiscordBaseCompletionContext.Undefined) {
                     if (context == DiscordBaseCompletionContext.Channel)
                         HandleChannelType(contextTypeSymbol);
 
-                    hasBaseContextContext = true;
                     return;
                 }
             }
@@ -170,7 +207,11 @@ namespace Discord.NET.SupportExtension.Core.Analyser {
                 return;
             }
 
-            DiscordChannelContext? temp = ResolveChannelType(contextTypeSymbol.AllInterfaces.Select(e => e.ToDisplayString()));
+            IEnumerable<string> foundNames = contextTypeSymbol.AllInterfaces
+                .Select(e => e.ToDisplayString())
+                .Where(e => DiscordNameCollection.ChannelContains(e));
+
+            DiscordChannelContext? temp = ResolveChannelType(foundNames);
 
             if (temp.HasValue) {
                 channelContext = temp;
@@ -243,8 +284,8 @@ namespace Discord.NET.SupportExtension.Core.Analyser {
         #endregion
 
         #region Helper
+        private bool FoundContext => this.context != DiscordBaseCompletionContext.Undefined;
         private static int GetArgumentIndex(ArgumentSyntax argument) => ((ArgumentListSyntax)argument.Parent).Arguments.IndexOf(argument);
-        private static InvocationExpressionSyntax GetInvocationFromArgument(ArgumentSyntax argument) => argument.Parent.Parent as InvocationExpressionSyntax;
         #endregion
     }
 }
