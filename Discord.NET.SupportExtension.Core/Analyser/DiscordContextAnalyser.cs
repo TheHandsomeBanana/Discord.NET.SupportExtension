@@ -30,7 +30,7 @@ namespace Discord.NET.SupportExtension.Core.Analyser {
             if (currentNode.IsKind(SyntaxKind.NumericLiteralExpression))
                 currentNode = currentNode.Parent;
 
-            if (InitiateDetection(currentNode))
+            if (InitiateAnalysis(currentNode))
                 await ResolveNode(currentNode);
 
             if (context != DiscordBaseCompletionContext.Undefined)
@@ -41,7 +41,7 @@ namespace Discord.NET.SupportExtension.Core.Analyser {
 
 
         #region Initiate Analysis
-        private bool InitiateDetection(SyntaxNode trigger) {
+        private bool InitiateAnalysis(SyntaxNode trigger) {
             if (trigger is ExpressionSyntax)
                 return true;
             
