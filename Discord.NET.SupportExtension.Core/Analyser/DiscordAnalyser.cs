@@ -20,15 +20,13 @@ using System.Threading.Tasks;
 
 namespace Discord.NET.SupportExtension.Core.Analyser {
     internal class DiscordAnalyser : DiscordAnalyserBase, IDiscordAnalyser {
-        private readonly ILogger<DiscordAnalyser> logger;
         private readonly IServerCollectionHolder serverHolder;
         private readonly IDiscordContextAnalyser contextAnalyser;
         private readonly IDiscordServerIdAnalyser serverIdAnalyser;
         private DiscordServerCollection serverCollection;
 
-        public DiscordAnalyser(ILoggerFactory loggerFactory, IServerCollectionHolder holder, IDiscordContextAnalyser contextAnalyser, IDiscordServerIdAnalyser serverIdAnalyser) {
-            logger = loggerFactory.GetOrCreateLogger<DiscordAnalyser>();
-            serverHolder = holder; 
+        public DiscordAnalyser(IServerCollectionHolder holder, IDiscordContextAnalyser contextAnalyser, IDiscordServerIdAnalyser serverIdAnalyser) {
+            this.serverHolder = holder;
             this.contextAnalyser = contextAnalyser;
             this.serverIdAnalyser = serverIdAnalyser;
         }
@@ -64,7 +62,7 @@ namespace Discord.NET.SupportExtension.Core.Analyser {
                 case DiscordBaseCompletionContext.Channel:
                     foreach (ulong serverId in serverIdList)
                         foundItems.AddRange(serverCollection.GetChannels(serverId, MapChannelType(foundContext.ChannelContext)));
-                    
+
 
                     return foundItems.ToArray();
             }
@@ -84,6 +82,9 @@ namespace Discord.NET.SupportExtension.Core.Analyser {
                 case DiscordChannelContext.Stage: return DiscordChannelType.Stage;
                 case DiscordChannelContext.Thread: return DiscordChannelType.Thread;
                 case DiscordChannelContext.DM: return DiscordChannelType.DM;
+                case DiscordChannelContext.Forum: return DiscordChannelType.Forum;
+                case DiscordChannelContext.Private: return DiscordChannelType.Private;
+
             }
 
             return null;

@@ -30,7 +30,7 @@ namespace Discord.NET.SupportExtension {
             ))
                 .AddSingleton<IIdentifierFactory, IdentifierFactory>()
                 .AddSingleton<IServerCollectionHolder, ServerCollectionHolder>()
-                .AddTransient<IDiscordEntityService, DiscordEntityService>()
+                .AddTransient<IDiscordEntityService, DiscordRestEntityService>()
                 .AddTransient<IStreamHandler, StreamHandler>()
                 .AddTransient<IAsyncStreamHandler, AsyncStreamHandler>()
                 .AddTransient<IDiscordTokenService, DiscordTokenService>()
