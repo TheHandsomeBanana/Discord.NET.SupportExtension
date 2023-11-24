@@ -128,7 +128,7 @@ namespace Discord.NET.SupportExtension.Core.Analyser {
                 return;
 
             // Check indexing
-            if (methodDeclaration.ParameterList.Parameters.Count < argumentIndex + 1)
+            if (methodDeclaration.ParameterList.Parameters.Count < argumentIndex)
                 return;
 
             ParameterSyntax parameter = methodDeclaration.ParameterList.Parameters[argumentIndex];
