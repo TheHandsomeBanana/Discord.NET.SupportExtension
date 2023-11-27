@@ -1,5 +1,4 @@
-﻿using Discord.NET.SupportExtension.Core.Completions;
-using Discord.NET.SupportExtension.Core.Interface;
+﻿using Discord.NET.SupportExtension.Core.Interface;
 using HB.NETF.Common.DependencyInjection;
 using HB.NETF.Discord.NET.Toolkit.Models.Collections;
 using HB.NETF.Discord.NET.Toolkit.Models.Entities;
@@ -14,7 +13,7 @@ using System.Threading.Tasks;
 namespace Discord.NET.SupportExtension.Core.Helper {
     internal static class CompletionHelper {
 
-        public static IDiscordCompletionItem ToCompletionItem(DiscordEntity item, DiscordServerCollection serverCollection) {
+        public static Interface.DiscordCompletionItem ToCompletionItem(DiscordEntity item, DiscordServerCollection serverCollection) {
 
             string insertText = item.Id.ToString();
 

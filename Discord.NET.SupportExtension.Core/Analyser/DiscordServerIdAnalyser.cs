@@ -22,32 +22,18 @@ using System.Xml.Linq;
 
 namespace Discord.NET.SupportExtension.Core.Analyser {
     internal class DiscordServerIdAnalyser : DiscordAnalyserBase, IDiscordServerIdAnalyser {
-        private readonly ILogger<DiscordServerIdAnalyser> logger;
-        private const int RECURSIONLEVEL = 4;
         private List<ulong> serverIds = new List<ulong>();
 
-        private SyntaxNode currentNode;
-
-        public DiscordServerIdAnalyser() {
-            logger = DIContainer.GetService<ILoggerFactory>().GetOrCreateLogger<DiscordServerIdAnalyser>();
-        }
-
         public async Task<ImmutableArray<ulong>> Run(SyntaxNode node) {
-            currentNode = node;
-
-            for (int i = 0; i < RECURSIONLEVEL && !(currentNode is BlockSyntax) && currentNode != null; i++) {
-                if (currentNode is ExpressionSyntax)
-                    await ResolveNodeAsync(currentNode);
-
-                if (serverIds.Any())
-                    return serverIds.ToImmutableArray();
-
-                currentNode = currentNode.Parent;
-            }
+            if(InitiateAnalysis(node))
+                await ResolveNodeAsync(node);
 
             return serverIds.ToImmutableArray();
         }
 
+        private bool InitiateAnalysis(SyntaxNode contextNode) {
+            return contextNode is InvocationExpressionSyntax || contextNode is IdentifierNameSyntax;
+        }
 
         public async Task ResolveNodeAsync(SyntaxNode node) {
             switch (node) {
@@ -101,7 +87,6 @@ namespace Discord.NET.SupportExtension.Core.Analyser {
                 guildId = Convert.ToUInt64(numericLiteral.Token.Value);
             }
             catch {
-                logger.LogError($"Cannot cast {numericLiteral.Token.Value} to a valid guild id.");
                 return true;
             }
 

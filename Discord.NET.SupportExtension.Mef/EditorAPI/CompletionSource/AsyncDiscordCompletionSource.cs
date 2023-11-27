@@ -62,7 +62,7 @@ namespace Discord.NET.SupportExtension.MEF.CompletionSource {
                 SemanticModel semanticModel = await document.GetSemanticModelAsync(token);
                 SyntaxToken triggerToken = (await document.GetSyntaxRootAsync(token)).FindToken(triggerLocation);
 
-                IDiscordCompletionItem[] completions = await engine.ProcessCompletionAsync(vsWorkspace.CurrentSolution, semanticModel, triggerToken);
+                DiscordCompletionItem[] completions = await engine.ProcessCompletionAsync(vsWorkspace.CurrentSolution, semanticModel, triggerToken);
 
                 if (completions.Length > 0)
                     logger.LogInformation($"{completions.Length} completions added in {stopwatch.ElapsedMilliseconds} ms.");

@@ -46,31 +46,29 @@ namespace Discord.NET.SupportExtension.Core.Analyser {
             if (foundContext.BaseContext == DiscordBaseCompletionContext.Server)
                 return serverCollection.GetServers();
 
-            ImmutableArray<ulong> serverIdList = await serverIdAnalyser.Run(syntaxNode);
+            ImmutableArray<ulong> serverIdList = await serverIdAnalyser.Run(foundContext.ContextNode);
+            if (serverIdList.IsEmpty)
+                serverIdList = serverCollection.Keys.ToImmutableArray();
+
             List<DiscordEntity> foundItems = new List<DiscordEntity>();
             switch (foundContext.BaseContext) {
                 case DiscordBaseCompletionContext.User:
                     foreach (ulong serverId in serverIdList)
                         foundItems.AddRange(serverCollection.GetUsers(serverId));
-
-                    return foundItems.ToArray();
+                    break;
                 case DiscordBaseCompletionContext.Role:
                     foreach (ulong serverId in serverIdList)
                         foundItems.AddRange(serverCollection.GetRoles(serverId));
-
-                    return foundItems.ToArray();
+                    break;
                 case DiscordBaseCompletionContext.Channel:
                     foreach (ulong serverId in serverIdList)
                         foundItems.AddRange(serverCollection.GetChannels(serverId, MapChannelType(foundContext.ChannelContext)));
+                    break;
 
-
-                    return foundItems.ToArray();
             }
 
-            return Array.Empty<DiscordEntity>(); ;
+            return foundItems.ToArray();
         }
-
-
 
         private DiscordChannelType? MapChannelType(DiscordChannelContext? context) {
             switch (context) {
@@ -84,7 +82,6 @@ namespace Discord.NET.SupportExtension.Core.Analyser {
                 case DiscordChannelContext.DM: return DiscordChannelType.DM;
                 case DiscordChannelContext.Forum: return DiscordChannelType.Forum;
                 case DiscordChannelContext.Private: return DiscordChannelType.Private;
-
             }
 
             return null;

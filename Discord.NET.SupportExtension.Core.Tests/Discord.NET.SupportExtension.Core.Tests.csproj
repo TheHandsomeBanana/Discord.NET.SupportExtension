@@ -238,9 +238,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ServerIdTests\ServerIdTestEngine.cs" />
-    <Compile Include="ServerIdTests\DiscordAnalyserTests.cs" />
+    <Compile Include="ServerIdTests\DiscordServerIdAnalyserTests.cs" />
     <Compile Include="ContextTests\ContextTestEngine.cs" />
-    <Compile Include="ContextTests\DiscordCompletionContextTests.cs" />
+    <Compile Include="ContextTests\DiscordContextAnalyserTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

@@ -1,5 +1,4 @@
 ﻿using Discord.NET.SupportExtension.Core.Analyser;
-using Discord.NET.SupportExtension.Core.Completions;
 using Discord.NET.SupportExtension.Core.Helper;
 using Discord.NET.SupportExtension.Core.Interface;
 using Discord.NET.SupportExtension.Core.Interface.Analyser;
@@ -25,8 +24,8 @@ namespace Discord.NET.SupportExtension.Core {
             this.serverHolder = serverHolder;
         }
 
-        public async Task<IDiscordCompletionItem[]> ProcessCompletionAsync(Solution solution, SemanticModel semanticModel, SyntaxToken token) {
-            IDiscordCompletionItem[] completionItems = Array.Empty<IDiscordCompletionItem>();
+        public async Task<Interface.DiscordCompletionItem[]> ProcessCompletionAsync(Solution solution, SemanticModel semanticModel, SyntaxToken token) {
+            DiscordCompletionItem[] completionItems = Array.Empty<DiscordCompletionItem>();
             Project project = solution.Projects.FirstOrDefault(e => e.Documents.Any(f => f.FilePath == token.SyntaxTree.FilePath))
                 ?? throw new InternalException($"Project from {token.SyntaxTree.FilePath} not found.");
 

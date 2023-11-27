@@ -1,5 +1,4 @@
 ﻿using Discord.NET.SupportExtension.Core.Analyser;
-using Discord.NET.SupportExtension.Core.Completions;
 using Discord.NET.SupportExtension.Core.Interface;
 using Discord.NET.SupportExtension.Core.Interface.Analyser;
 using HB.NETF.Common.DependencyInjection;

@@ -1,4 +1,5 @@
-﻿using Microsoft.CodeAnalysis.CSharp.Syntax;
+﻿using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -6,18 +7,25 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace Discord.NET.SupportExtension.Core.Interface {
-    public struct DiscordCompletionContext {
-        public DiscordBaseCompletionContext BaseContext { get; set; }
-        public DiscordChannelContext? ChannelContext { get; set; }
+    public readonly struct DiscordCompletionContext {
+        public DiscordBaseCompletionContext BaseContext { get; }
+        public DiscordChannelContext? ChannelContext { get; }
+        public SyntaxNode ContextNode { get; }
+
+        public DiscordCompletionContext(DiscordBaseCompletionContext baseContext = DiscordBaseCompletionContext.Undefined) {
+            ContextNode = null;
+            BaseContext = baseContext;
+            ChannelContext = null;
+        }
 
         public DiscordCompletionContext(DiscordBaseCompletionContext baseContext, DiscordChannelContext? channelContext) {
+            ContextNode = null;
             BaseContext = baseContext;
             ChannelContext = channelContext;
         }
 
-        public DiscordCompletionContext(DiscordBaseCompletionContext baseContext = DiscordBaseCompletionContext.Undefined) {
-            BaseContext = baseContext;
-            ChannelContext = null;
+        public DiscordCompletionContext(SyntaxNode contextNode, DiscordBaseCompletionContext baseContext, DiscordChannelContext? channelContext) : this(baseContext, channelContext) {
+            this.ContextNode = contextNode;
         }
 
         public static DiscordCompletionContext Undefined => new DiscordCompletionContext(DiscordBaseCompletionContext.Undefined);

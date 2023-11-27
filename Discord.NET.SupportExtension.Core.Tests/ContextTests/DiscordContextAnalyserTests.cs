@@ -10,9 +10,9 @@ using System.Threading.Tasks;
 
 namespace Discord.NET.SupportExtension.Core.Tests.ContextDetectorTests {
     [TestClass]
-    public class DiscordCompletionContextTests {
+    public class DiscordContextAnalyserTests {
         private readonly ContextTestEngine completionContextTests = new ContextTestEngine();
-        public DiscordCompletionContextTests() {
+        public DiscordContextAnalyserTests() {
             completionContextTests.Initialize(@"../../../Discord.NET.SupportExtension.sln", "Discord.NET.SupportExtension.TestCases");
         }
 

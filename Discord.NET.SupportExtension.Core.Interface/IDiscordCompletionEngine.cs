@@ -7,6 +7,6 @@ using System.Threading.Tasks;
 
 namespace Discord.NET.SupportExtension.Core.Interface {
     public interface IDiscordCompletionEngine {
-        Task<IDiscordCompletionItem[]> ProcessCompletionAsync(Solution solution, SemanticModel semanticModel, SyntaxToken token);
+        Task<DiscordCompletionItem[]> ProcessCompletionAsync(Solution solution, SemanticModel semanticModel, SyntaxToken token);
     }
 }

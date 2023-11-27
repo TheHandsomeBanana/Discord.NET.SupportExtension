@@ -148,7 +148,6 @@
     <Compile Include="Analyser\DiscordServerIdAnalyser.cs" />
     <Compile Include="Analyser\DiscordAnalyserBase.cs" />
     <Compile Include="DiscordCompletionEngine.cs" />
-    <Compile Include="Completions\DiscordCompletionItem.cs" />
     <Compile Include="Analyser\DiscordContextAnalyser.cs" />
     <Compile Include="DIConfig.cs" />
     <Compile Include="DiscordNameCollection.cs" />

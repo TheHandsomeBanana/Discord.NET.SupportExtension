@@ -52,7 +52,7 @@ namespace Discord.NET.SupportExtension.Mef.Roslyn.Completion {
                 SemanticModel semanticModel = await context.Document.GetSemanticModelAsync(context.CancellationToken);
                 SyntaxToken triggerToken = (await context.Document.GetSyntaxRootAsync(context.CancellationToken)).FindToken(context.Position);
 
-                IDiscordCompletionItem[] completions = await engine.ProcessCompletionAsync(vsWorkspace.CurrentSolution, semanticModel, triggerToken);
+                DiscordCompletionItem[] completions = await engine.ProcessCompletionAsync(vsWorkspace.CurrentSolution, semanticModel, triggerToken);
                 
                 context.AddItems(completions.Select(e =>
                     CompletionItem.Create(e.DisplayText)

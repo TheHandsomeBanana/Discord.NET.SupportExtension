@@ -105,12 +105,13 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Analyser\ICodeAnalyser.cs" />
     <Compile Include="Analyser\IDiscordAnalyser.cs" />
     <Compile Include="Analyser\IDiscordContextAnalyser.cs" />
     <Compile Include="Analyser\IDiscordServerIdAnalyser.cs" />
     <Compile Include="DiscordCompletionContext.cs" />
     <Compile Include="IDiscordCompletionEngine.cs" />
-    <Compile Include="IDiscordCompletionItem.cs" />
+    <Compile Include="DiscordCompletionItem.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

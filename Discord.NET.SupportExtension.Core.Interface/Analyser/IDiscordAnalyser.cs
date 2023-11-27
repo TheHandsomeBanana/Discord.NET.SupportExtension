@@ -1,5 +1,4 @@
-﻿using HB.NETF.Code.Analysis.Interface;
-using HB.NETF.Discord.NET.Toolkit.Models.Entities;
+﻿using HB.NETF.Discord.NET.Toolkit.Models.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;

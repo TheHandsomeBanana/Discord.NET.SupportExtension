@@ -23,10 +23,10 @@ namespace Discord.NET.SupportExtension.Core.Analyser {
     internal class DiscordContextAnalyser : DiscordAnalyserBase, IDiscordContextAnalyser {
         private DiscordBaseCompletionContext context;
         private DiscordChannelContext? channelContext;
-        private SyntaxNode currentNode;
+        private SyntaxNode contextNode;
 
         public async Task<DiscordCompletionContext> Run(SyntaxNode node) {
-            currentNode = node;
+            SyntaxNode currentNode = node;
             if (currentNode.IsKind(SyntaxKind.NumericLiteralExpression))
                 currentNode = currentNode.Parent;
 
@@ -34,7 +34,7 @@ namespace Discord.NET.SupportExtension.Core.Analyser {
                 await ResolveNode(currentNode);
 
             if (context != DiscordBaseCompletionContext.Undefined)
-                return new DiscordCompletionContext(context, channelContext);
+                return new DiscordCompletionContext(contextNode, context, channelContext);
 
             return DiscordCompletionContext.Undefined;
         }
@@ -42,7 +42,7 @@ namespace Discord.NET.SupportExtension.Core.Analyser {
 
         #region Initiate Analysis
         private bool InitiateAnalysis(SyntaxNode trigger) {
-            if (trigger is ExpressionSyntax)
+            if (trigger is BinaryExpressionSyntax)
                 return true;
             
             if (trigger is ArgumentListSyntax || trigger is ArgumentSyntax)
@@ -166,6 +166,7 @@ namespace Discord.NET.SupportExtension.Core.Analyser {
             // Set context with found interface
             if (DiscordNameCollection.Contains(contextTypeSymbol.ToDisplayString())) {
                 SetContext(contextTypeSymbol);
+                this.contextNode = expression;
                 return;
             }
 
@@ -176,6 +177,7 @@ namespace Discord.NET.SupportExtension.Core.Analyser {
             foreach (INamedTypeSymbol interfaceSymbol in foundInterfaces) {
                 SetContext(interfaceSymbol);
                 if (context != DiscordBaseCompletionContext.Undefined) {
+                    this.contextNode = expression;
                     if (context == DiscordBaseCompletionContext.Channel)
                         HandleChannelType(contextTypeSymbol);
 

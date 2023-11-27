@@ -5,10 +5,10 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace Discord.NET.SupportExtension.Core.Interface {
-    public interface IDiscordCompletionItem {
-        string DisplayText { get; }
-        string InsertText { get; }
-        string Suffix { get; }
+    public class DiscordCompletionItem {
+        public string DisplayText { get; set; }
+        public string InsertText { get; set; }
+        public string Suffix { get; set; }
         
 
     }
