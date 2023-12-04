@@ -19,20 +19,20 @@ namespace Discord.NET.SupportExtension.Core.Analyser {
         public IDiscordContextAnalyser ContextAnalyser { get; set; }
         [Dependency]
         public IDiscordServerIdAnalyser ServerIdAnalyser { get; set; }
-        private DiscordServerCollection serverCollection;
 
         public override void Initialize(Solution solution, Project project, SemanticModel semanticModel) {
             base.Initialize(solution, project, semanticModel);
-            serverCollection = ServerHolder.Get(project.Name);
         }
 
         public async Task<DiscordEntity[]> Run(SyntaxNode syntaxNode) {
             ContextAnalyser.Initialize(Solution, Project, SemanticModel);
             ServerIdAnalyser.Initialize(Solution, Project, SemanticModel);
-
+            
             DiscordCompletionContext foundContext = await ContextAnalyser.Run(syntaxNode);
             if (foundContext == DiscordCompletionContext.Undefined)
                 return Array.Empty<DiscordEntity>();
+
+            DiscordServerCollection serverCollection = ServerHolder.Get(Project.Name);
 
             if (foundContext.BaseContext == DiscordBaseCompletionContext.Server)
                 return serverCollection.GetServers();
