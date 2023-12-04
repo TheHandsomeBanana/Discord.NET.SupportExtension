@@ -21,7 +21,7 @@ namespace Discord.NET.SupportExtension.Mef.Commit {
 
         public CommitResult TryCommit(IAsyncCompletionSession session, ITextBuffer buffer, CompletionItem item, char typedChar, CancellationToken token) {
             if(item.Source is AsyncDiscordCompletionSource) {
-                buffer.Replace(session.ApplicableToSpan.GetSpan(buffer.CurrentSnapshot), item.InsertText);
+                buffer.Replace(session.ApplicableToSpan.GetSpan(buffer.CurrentSnapshot), item.InsertText + $"/* {item.DisplayText} ({item.Suffix}) */");
                 return CommitResult.Handled;
             }
 

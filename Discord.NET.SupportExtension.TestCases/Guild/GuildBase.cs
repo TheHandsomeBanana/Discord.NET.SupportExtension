@@ -10,28 +10,28 @@ using System.Threading.Tasks;
 namespace Discord.NET.SupportExtension.TestCases.Guild {
     // Required for entities per server (ServerIdAnalyser)
     public class GuildBase {
-        private readonly static DiscordRestClient restClient;
-        private readonly static DiscordSocketClient socketClient;
+        public static DiscordRestClient RestClient { get; }
+        public static DiscordSocketClient SocketClient { get; }
 
-        public static async Task<RestGuild> GetRestGuild1() => await restClient.GetGuildAsync(0000);
-        public RestGuild GetRestGuild2() => restClient.GetGuildAsync(0001).Result;
+        public static async Task<RestGuild> GetRestGuild1() => await RestClient.GetGuildAsync(0000);
+        public RestGuild GetRestGuild2() => RestClient.GetGuildAsync(0001).Result;
 
         public async Task<IGuild> GetRestGuild3() {
-            return (await restClient.GetGuildsAsync()).FirstOrDefault(e => e.Id == 0002);
+            return (await RestClient.GetGuildsAsync()).FirstOrDefault(e => e.Id == 0002);
         }
 
-        public SocketGuild SocketGuild1 => socketClient.GetGuild(9999);
+        public SocketGuild SocketGuild1 => SocketClient.GetGuild(9999);
         public SocketGuild SocketGuild2 {
             get {
-                return socketClient.GetGuild(9998);
+                return SocketClient.GetGuild(9998);
             }
         }
         public SocketGuild SocketGuild3 {
-            get => socketClient.Guilds.Where(e => e.Id == 9997).FirstOrDefault();
+            get => SocketClient.Guilds.Where(e => e.Id == 9997).FirstOrDefault();
         }
 
         public IGuild GetSocketGuild4() {
-            return socketClient.GetGuild(9996);
+            return SocketClient.GetGuild(9996);
         }
     }
 }

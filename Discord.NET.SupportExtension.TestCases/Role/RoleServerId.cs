@@ -24,6 +24,9 @@ namespace Discord.NET.SupportExtension.TestCases.Role {
             
             IGuild socketGuild = ServerBase.SocketGuild2;
             IRole socketRole2 = socketGuild.GetRole(9998); // guild id = 9998
+
+            IGuild socketGuild2 = GuildBase.SocketClient.GetGuild(99997);
+            IRole socketRole3 = socketGuild2.GetRole(9997);
         }
     }
 }

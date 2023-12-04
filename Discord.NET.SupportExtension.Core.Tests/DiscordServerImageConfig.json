@@ -1,0 +1,17 @@
+{
+  "SaveToken": false,
+  "EncryptData": false,
+  "TokenEncryptionMode": null,
+  "DataEncryptionMode": null,
+  "TokenKeyIdentifier": null,
+  "DataKeyIdentifier": null,
+  "Token": null,
+  "RunLog": [
+    {
+      "StartedAt": "2023-12-04T21:04:28.9873302+01:00",
+      "FinishedAt": "2023-12-04T21:04:30.6545823+01:00",
+      "Status": 0,
+      "Duration": "00:00:01.6672521"
+    }
+  ]
+}

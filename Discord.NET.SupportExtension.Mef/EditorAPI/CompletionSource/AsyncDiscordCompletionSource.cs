@@ -29,6 +29,8 @@ using Microsoft.VisualStudio.Text.Editor;
 using Microsoft.VisualStudio.Text.Classification;
 using Microsoft.VisualStudio.Text.Operations;
 using HB.NETF.Code.Analysis.Models;
+using HB.NETF.Unity;
+using Unity;
 
 namespace Discord.NET.SupportExtension.MEF.CompletionSource {
     public class AsyncDiscordCompletionSource : IAsyncCompletionSource {
@@ -40,12 +42,21 @@ namespace Discord.NET.SupportExtension.MEF.CompletionSource {
         }
 
         public async Task<CompletionContext> GetCompletionContextAsync(IAsyncCompletionSession session, CompletionTrigger trigger, SnapshotPoint triggerLocation, SnapshotSpan applicableToSpan, CancellationToken token) {
-            ILoggerFactory loggerFactory = DIContainer.GetService<ILoggerFactory>();
+            IUnityContainer supportPackageContainer;
+
+            try {
+                supportPackageContainer = UnityBase.GetChildContainer("DiscordSupportPackage");
+            }
+            catch {
+                return default;
+            }
+            
+            ILoggerFactory loggerFactory = supportPackageContainer.Resolve<ILoggerFactory>();
             if (loggerFactory == null) // Package not loaded => Nullref
                 return default;
 
             ILogger<AsyncDiscordCompletionSource> logger = loggerFactory.GetOrCreateLogger<AsyncDiscordCompletionSource>();
-            IDiscordCompletionEngine engine = DIContainer.GetService<IDiscordCompletionEngine>();
+            IDiscordCompletionEngine engine = supportPackageContainer.Resolve<IDiscordCompletionEngine>();
 
             try {
                 if(token.IsCancellationRequested) {
@@ -68,9 +79,11 @@ namespace Discord.NET.SupportExtension.MEF.CompletionSource {
                     logger.LogInformation($"{completions.Length} completions added in {stopwatch.ElapsedMilliseconds} ms.");
 
                 stopwatch.Stop();
-                return new CompletionContext(completions.Select(e =>
-                    new CompletionItem(e.DisplayText, this, discordImage, discordFilters, e.Suffix, e.InsertText, e.DisplayText, e.DisplayText, ImmutableArray<ImageElement>.Empty)).ToImmutableArray()
-                );
+                return new CompletionContext(completions.Select(e => {
+                    CompletionItem ci = new CompletionItem(e.DisplayText, this, discordImage, discordFilters, e.Suffix, e.InsertText, e.DisplayText, e.DisplayText, ImmutableArray<ImageElement>.Empty);
+                    ci.Properties.AddProperty("description", e.Description);
+                    return ci;
+                }).ToImmutableArray());
             }
             catch (Exception ex) {
                 logger.LogCritical("Completion context engine failed. " + ex.ToString());
@@ -92,8 +105,6 @@ namespace Discord.NET.SupportExtension.MEF.CompletionSource {
                 if (dte?.ActiveDocument != null)
                     documentIdentifier = vsWorkspace.CurrentSolution.GetDocumentIdsWithFilePath(dte.ActiveDocument.FullName).FirstOrDefault();
             }
-
-            
 
             return CompletionStartData.ParticipatesInCompletionIfAny;
         }

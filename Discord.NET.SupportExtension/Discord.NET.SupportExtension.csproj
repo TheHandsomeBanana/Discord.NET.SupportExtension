@@ -55,7 +55,6 @@
     <Compile Include="Commands\GenerateServerImageCommand.cs" />
     <Compile Include="Commands\GenerateServerImageConfigurationCommand.cs" />
     <Compile Include="Commands\LoadServerCollectionCommand.cs" />
-    <Compile Include="DIConfig.cs" />
     <Compile Include="DiscordSupportPackage1.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -71,6 +70,7 @@
     <Compile Include="Models\VMModels\TokenEntryModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="DiscordSupportPackage.cs" />
+    <Compile Include="UnitySetup.cs" />
     <Compile Include="ViewModels\ConfigureServerImageViewModel.cs" />
     <Compile Include="ViewModels\KeyEntryViewModel.cs" />
     <Compile Include="ViewModels\TokenEntryViewModel.cs" />
@@ -181,6 +181,12 @@
     <PackageReference Include="System.Collections.Immutable">
       <Version>7.0.0</Version>
     </PackageReference>
+    <PackageReference Include="System.Linq.Async">
+      <Version>5.0.0</Version>
+    </PackageReference>
+    <PackageReference Include="Unity">
+      <Version>5.11.10</Version>
+    </PackageReference>
     <Reference Include="Newtonsoft.Json, Version=13.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\packages\Newtonsoft.Json.13.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
@@ -220,6 +226,10 @@
     <ProjectReference Include="..\..\HB\HB.NETF.Services.Serialization\HB.NETF.Services.Serialization.csproj">
       <Project>{802DE704-2F70-48AA-9734-CA9C0D1E2D38}</Project>
       <Name>HB.NETF.Services.Serialization</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\HB\HB.NETF.Unity\HB.NETF.Unity.csproj">
+      <Project>{e2106acf-1416-4f8e-b00d-6b36f3ad21da}</Project>
+      <Name>HB.NETF.Unity</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\HB\HB.NETF.VisualStudio\HB.NETF.VisualStudio.csproj">
       <Project>{f017e1b9-c8e3-4c09-bc41-4c6e6f8e7c98}</Project>

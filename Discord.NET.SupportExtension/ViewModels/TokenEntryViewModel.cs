@@ -17,13 +17,11 @@ namespace Discord.NET.SupportExtension.ViewModels {
         public RelayCommand ExitCommand { get; }
         public RelayCommand FinishCommand { get; }
 
-        public string Token => model.Token;
 
-        private string tokenText;
         public string TokenText {
-            get { return tokenText; }
+            get { return model.Token; }
             set {
-                tokenText = value;
+                model.Token = value;
                 OnPropertyChanged(nameof(TokenText));
             }
         }

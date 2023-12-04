@@ -16,6 +16,7 @@ using HB.NETF.Services.Logging;
 using HB.NETF.Services.Logging.Factory;
 using HB.NETF.Services.Security.Cryptography.Keys;
 using HB.NETF.Services.Security.Cryptography.Settings;
+using HB.NETF.Unity;
 using HB.NETF.VisualStudio.Commands;
 using HB.NETF.VisualStudio.UI;
 using HB.NETF.VisualStudio.Workspace;
@@ -23,6 +24,7 @@ using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.ComponentModel.Design;
 using System.Globalization;
 using System.IO;
@@ -32,6 +34,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Documents;
 using System.Windows.Markup;
+using Unity;
 using Task = System.Threading.Tasks.Task;
 
 namespace Discord.NET.SupportExtension.Commands {
@@ -39,18 +42,25 @@ namespace Discord.NET.SupportExtension.Commands {
         protected override Guid CommandSet => PackageGuids.CommandSet;
         protected override int CommandId => PackageIds.GenerateServerImageCommand;
 
-        private static IAsyncStreamHandler streamHandler;
-        private readonly ILogger<GenerateServerImageCommand> logger;
 
+        [Dependency]
+        public IAsyncStreamHandler StreamHandler { get; set; }
+
+        private readonly IUnityContainer container;
+        private readonly ILogger<GenerateServerImageCommand> logger;
         internal GenerateServerImageCommand(AsyncPackage package, IMenuCommandService commandService, Action<Exception> onException) : base(package, commandService, onException) {
-            streamHandler = DIContainer.GetService<IAsyncStreamHandler>();
-            logger = DIContainer.GetService<ILoggerFactory>().GetOrCreateLogger<GenerateServerImageCommand>();
+            container = UnityBase.GetChildContainer(nameof(DiscordSupportPackage));
+            container.BuildUp(this);
+
+            logger = container.Resolve<ILoggerFactory>().GetOrCreateLogger<GenerateServerImageCommand>();
         }
 
         public static GenerateServerImageCommand Instance { get; private set; }
         public static async Task InitializeAsync(AsyncPackage package, IMenuCommandService commandService, Action<Exception> onException) {
             await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync(package.DisposalToken);
             Instance = new GenerateServerImageCommand(package, commandService, onException);
+
+            
         }
 
         protected override async Task ExecuteAsync(object sender, EventArgs e) {
@@ -58,19 +68,19 @@ namespace Discord.NET.SupportExtension.Commands {
             string currentConfigPath = ConfigHelper.GetConfigPath();
             string currentCachePath = DiscordSupportPackage.GetCachePath();
 
-            await Package.JoinableTaskFactory.RunAsync(async () => {
+            await Package.JoinableTaskFactory.RunAsync((Func<Task>)(async () => {
                 ConfigureServerImageModel model = new ConfigureServerImageModel();
 
                 DateTime startedAt = DateTime.Now;
                 JobStatus status = JobStatus.Failed;
 
-                IDiscordTokenService tokenService = DIContainer.GetService<IDiscordTokenService>();
+                IDiscordTokenService tokenService = container.Resolve<IDiscordTokenService>();
 
                 string token;
 
                 try {
                     if (File.Exists(ConfigHelper.GetConfigPath()))
-                        model = await streamHandler.ReadFromFileAsync<ConfigureServerImageModel>(currentConfigPath);
+                        model = await this.StreamHandler.ReadFromFileAsync<ConfigureServerImageModel>(currentConfigPath);
 
                     token = InteractionHelper.GetDecryptedToken(tokenService, model, logger);
 
@@ -79,7 +89,7 @@ namespace Discord.NET.SupportExtension.Commands {
                         return;
                     }
 
-                    IDiscordEntityService entityService = DIContainer.GetService<IDiscordEntityService>();
+                    IDiscordEntityService entityService = container.Resolve<IDiscordEntityService>(nameof(DiscordRestEntityService));
                     try {
                         entityService.OnTimeout += OnTimeout;
 
@@ -114,9 +124,9 @@ namespace Discord.NET.SupportExtension.Commands {
                 finally {
                     DateTime finishedAt = DateTime.Now;
                     model.RunLog.Add(new RunLogEntry() { StartedAt = startedAt, FinishedAt = finishedAt, Status = status });
-                    await streamHandler.WriteToFileAsync(currentConfigPath, model);
+                    await this.StreamHandler.WriteToFileAsync<ConfigureServerImageModel>(currentConfigPath, model);
                 }
-            });
+            }));
         }
 
         private void OnTimeout() {

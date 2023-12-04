@@ -1,4 +1,5 @@
 ﻿using HB.NETF.Code.Analysis.Analyser;
+using HB.NETF.Code.Analysis.Resolver;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System;
@@ -30,7 +31,7 @@ namespace Discord.NET.SupportExtension.Core.Analyser {
             this.SemanticModel = semanticModel;
             this.SyntaxTree = semanticModel.SyntaxTree;
         }
-        
+
 
         protected bool HasSameSemantics(SyntaxNode node) => this.SyntaxTree.FilePath == node.SyntaxTree.FilePath;
         protected T GetNewAnalyser<T>(SyntaxNode node) where T : DiscordAnalyserBase, new() {
@@ -38,6 +39,16 @@ namespace Discord.NET.SupportExtension.Core.Analyser {
             T newAnalyser = new T();
             newAnalyser.Initialize(Solution, Project, Documents, sm);
             return newAnalyser;
+        }
+
+        protected async Task<IEnumerable<SyntaxNode>> GetReferences(ISymbol symbol) {
+            IEnumerable<Location> locations = await LocationResolver.FindReferenceLocations(symbol, Solution, Documents);
+            return LocationResolver.GetNodesFromLocations(locations);
+        }
+
+        protected async Task<IEnumerable<SyntaxNode>> GetCallers(ISymbol symbol) {
+            IEnumerable<Location> locations = await LocationResolver.FindCallerLocations(symbol, Solution, Documents);
+            return LocationResolver.GetNodesFromLocations(locations);
         }
     }
 }

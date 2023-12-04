@@ -16,6 +16,7 @@ using HB.NETF.Services.Security.Cryptography;
 using HB.NETF.Services.Security.Cryptography.Interfaces;
 using HB.NETF.Services.Security.Cryptography.Keys;
 using HB.NETF.Services.Security.Cryptography.Settings;
+using HB.NETF.Unity;
 using HB.NETF.VisualStudio.UI;
 using HB.NETF.VisualStudio.Workspace;
 using Microsoft.Extensions.DependencyInjection;
@@ -28,6 +29,7 @@ using System.IO;
 using System.IO.Packaging;
 using System.Runtime.InteropServices;
 using System.Threading;
+using Unity;
 using Task = System.Threading.Tasks.Task;
 
 namespace Discord.NET.SupportExtension {
@@ -60,15 +62,25 @@ namespace Discord.NET.SupportExtension {
             UIHelper.Package = this;
 
             // Setup DI Container
-            DIBuilder builder = new DIBuilder();
-            new DIConfig().Configure(builder);
-            new Core.DIConfig().Configure(builder);
-            DIContainer.BuildServiceProvider(builder);
+            UnityBase.Boot(
+                new HB.NETF.Discord.NET.Toolkit.UnitySetup(),
+                new HB.NETF.Services.Data.UnitySetup(),
+                new HB.NETF.Services.Logging.UnitySetup(),
+                new HB.NETF.Services.Security.UnitySetup(),
+                new HB.NETF.Services.Serialization.UnitySetup());
 
-            ILoggerFactory loggerFactory = DIContainer.GetService<ILoggerFactory>();
+            IUnityContainer container = UnityBase.CreateChildContainer(nameof(DiscordSupportPackage)); // Add child container for Unity
+            UnityBase.Boot(container, 
+                new UnitySetup(),
+                new Core.UnitySetup());
+
+
+            ILoggerFactory loggerFactory = UnityBase.UnityContainer.Resolve<ILoggerFactory>();
+            loggerFactory.InvokeLoggingBuilder(b => b
+               .AddTarget(EventLogPath)
+               .AddTarget(UIHelper.OutputWindowFunc));
+
             this.logger = loggerFactory.GetOrCreateLogger<DiscordSupportPackage>();
-
-            
         }
 
         
@@ -120,9 +132,9 @@ namespace Discord.NET.SupportExtension {
         }
 
         private async Task HandleCacheAsync(string projectName, string configPath) {
-            ILogger<DiscordSupportPackage> logger = DIContainer.GetService<ILoggerFactory>().GetOrCreateLogger<DiscordSupportPackage>();
-            IAsyncStreamHandler streamHandler = DIContainer.GetService<IAsyncStreamHandler>();
-            IDiscordEntityService entityService = DIContainer.GetService<IDiscordEntityService>();
+            ILogger<DiscordSupportPackage> logger = UnityBase.UnityContainer.Resolve<ILoggerFactory>().GetOrCreateLogger<DiscordSupportPackage>();
+            IAsyncStreamHandler streamHandler = UnityBase.UnityContainer.Resolve<IAsyncStreamHandler>();
+            IDiscordEntityService entityService = UnityBase.UnityContainer.Resolve<IDiscordEntityService>(nameof(DiscordRestEntityService));
             ConfigureServerImageModel model = await streamHandler.ReadFromFileAsync<ConfigureServerImageModel>(configPath);
 
             InteractionHelper.MapDataEncryptToEntityService(entityService, model, logger, out bool cancel);
@@ -133,7 +145,7 @@ namespace Discord.NET.SupportExtension {
 
             try {
                 DiscordServerCollection serverCollection = await entityService.ReadFromFile(GetCachePath());
-                DIContainer.GetService<IServerCollectionHolder>()
+                UnityBase.UnityContainer.Resolve<IServerCollectionHolder>()
                     .Hold(projectName, serverCollection);
                 
                 logger.LogInformation(InteractionMessages.ServerCollectionLoadedFor(projectName));

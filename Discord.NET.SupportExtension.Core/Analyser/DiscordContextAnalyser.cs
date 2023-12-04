@@ -71,11 +71,24 @@ namespace Discord.NET.SupportExtension.Core.Analyser {
                     return false;
             }
 
-            if (argumentIndex == -1)
-                return false;
-
             IMethodSymbol methodSymbol = SemanticModel.GetSymbolInfo(parentInvocation).Symbol as IMethodSymbol;
-            return methodSymbol.Parameters[argumentIndex].Type.ToString() == "ulong";
+
+            if(methodSymbol == null) { // Context can already be found while initiating
+                CheckForContext(parentInvocation);
+                return false;
+            }
+
+            return argumentIndex >= 0 && methodSymbol.Parameters[argumentIndex].Type.ToString() == "ulong"
+                    // Linq methods should also trigger context detection => .FirstOrDefault(e => e.Id == )
+                    || CheckLinq(methodSymbol, trigger);
+        }
+
+        private bool CheckLinq(IMethodSymbol methodSymbol, SyntaxNode trigger) {
+            return methodSymbol.IsExtensionMethod
+                && methodSymbol.ContainingNamespace.ToString() == "System.Linq"
+                && trigger is ArgumentListSyntax argumentList
+                && argumentList.Arguments.ElementAtOrDefault(0)?.Expression is SimpleLambdaExpressionSyntax lambda
+                && lambda.Body is BinaryExpressionSyntax;
         }
         #endregion
 
@@ -138,10 +151,7 @@ namespace Discord.NET.SupportExtension.Core.Analyser {
 
             IParameterSymbol parameterSymbol = contextAnalyser.SemanticModel.GetDeclaredSymbol(parameter);
 
-            IEnumerable<Location> parameterLocations = await LocationResolver.FindReferenceLocations(parameterSymbol, Solution, Documents);
-            IEnumerable<SyntaxNode> locationNodes = LocationResolver.GetNodesFromLocations(parameterLocations);
-
-            foreach (SyntaxNode node in locationNodes) {
+            foreach (SyntaxNode node in await GetReferences(parameterSymbol)) {
                 if (FoundContext)
                     return;
 
@@ -161,7 +171,6 @@ namespace Discord.NET.SupportExtension.Core.Analyser {
 
             if (contextTypeSymbol.Name.Contains("Task")) // Get first type argument of Task / ValueTask
                 contextTypeSymbol = contextTypeSymbol.TypeArguments[0] as INamedTypeSymbol;
-
 
             // Set context with found interface
             if (DiscordNameCollection.Contains(contextTypeSymbol.ToDisplayString())) {

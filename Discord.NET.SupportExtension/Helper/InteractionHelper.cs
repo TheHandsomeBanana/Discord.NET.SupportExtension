@@ -6,12 +6,15 @@ using HB.NETF.Discord.NET.Toolkit.Services.TokenService;
 using HB.NETF.Services.Logging;
 using HB.NETF.Services.Security.Cryptography.Keys;
 using HB.NETF.Services.Security.Cryptography.Settings;
+using HB.NETF.Unity;
 using HB.NETF.VisualStudio.UI;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Unity;
+using Unity.Resolution;
 
 namespace Discord.NET.SupportExtension.Helper {
     internal static class InteractionHelper {
@@ -65,8 +68,10 @@ namespace Discord.NET.SupportExtension.Helper {
             return null;
         }
         public static AesKey GetAesKeyFromUIInput(Guid? id, string name, ILogger logger) {
+            IUnityContainer container = UnityBase.GetChildContainer(nameof(DiscordSupportPackage));
+
             KeyEntryModel keyEntry = new KeyEntryModel(name);
-            KeyEntryView view = new KeyEntryView() { DataContext = new KeyEntryViewModel(keyEntry) };
+            KeyEntryView view = new KeyEntryView() { DataContext = container.Resolve<KeyEntryViewModel>(new ParameterOverride("model", keyEntry)) };
             logger.LogInformation(InteractionMessages.AesRequestFor(name));
             UIHelper.Show(view);
             if(keyEntry.IsCanceled) {

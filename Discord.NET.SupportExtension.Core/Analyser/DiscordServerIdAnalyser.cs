@@ -1,6 +1,7 @@
 ﻿using Discord.NET.SupportExtension.Core.Interface.Analyser;
 using HB.NETF.Code.Analysis;
 using HB.NETF.Code.Analysis.Interface;
+using HB.NETF.Code.Analysis.Resolver;
 using HB.NETF.Common.DependencyInjection;
 using HB.NETF.Common.Exceptions;
 using HB.NETF.Services.Logging;
@@ -16,16 +17,18 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Reflection.Metadata;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 
 namespace Discord.NET.SupportExtension.Core.Analyser {
     internal class DiscordServerIdAnalyser : DiscordAnalyserBase, IDiscordServerIdAnalyser {
+        private HashSet<FileLinePositionSpan> visited = new HashSet<FileLinePositionSpan>();
         private List<ulong> serverIds = new List<ulong>();
 
         public async Task<ImmutableArray<ulong>> Run(SyntaxNode node) {
-            if(InitiateAnalysis(node))
+            if (InitiateAnalysis(node))
                 await ResolveNodeAsync(node);
 
             return serverIds.ToImmutableArray();
@@ -36,6 +39,15 @@ namespace Discord.NET.SupportExtension.Core.Analyser {
         }
 
         public async Task ResolveNodeAsync(SyntaxNode node) {
+            if (serverIds.Count > 0 || node is null)
+                return;
+
+            FileLinePositionSpan nodeSpan = node.GetLocation().GetLineSpan();
+            if (visited.Contains(nodeSpan))
+                return;
+
+            visited.Add(nodeSpan);
+
             switch (node) {
                 case IdentifierNameSyntax identifier:
                     await HandleIdentifierAsync(identifier);
@@ -45,53 +57,49 @@ namespace Discord.NET.SupportExtension.Core.Analyser {
                     await ResolveNodeAsync(binary.Right);
                     break;
                 case InvocationExpressionSyntax invocation:
-                    await ResolveInvocationArguments(invocation.ArgumentList.Arguments);
-                    if (await CheckInvocationType(invocation))
+                    bool success = false;
+                    if (IsGuildType(invocation)) {
+                        success = AddServerId(invocation);
+                        if (!success)
+                            await CheckMethodImplementation(invocation);
+                    }
+
+                    if (!success)
                         await ResolveNodeAsync(invocation.Expression);
+
                     break;
                 case MemberAccessExpressionSyntax memberAccess:
-                    await ResolveNodeAsync(memberAccess.Name);
+                    if (memberAccess.Name is IdentifierNameSyntax memberIdentifier && IsGuildType(memberIdentifier))
+                        await ResolveNodeAsync(memberAccess.Name);
+
                     await ResolveNodeAsync(memberAccess.Expression);
                     break;
                 case AwaitExpressionSyntax awaitExpression:
                     await ResolveNodeAsync(awaitExpression.Expression);
                     break;
+                case ParenthesizedExpressionSyntax parenthesizedExpression:
+                    await ResolveNodeAsync(parenthesizedExpression.Expression);
+                    break;
             }
         }
 
-        private async Task ResolveInvocationArguments(SeparatedSyntaxList<ArgumentSyntax> arguments) {
-            foreach (ArgumentSyntax argument in arguments) {
-                if (argument.Expression is IdentifierNameSyntax identifier)
-                    await ResolveNodeAsync(identifier);
-            }
-        }
 
-        private async Task<bool> CheckInvocationType(InvocationExpressionSyntax invocation) {
-            INamedTypeSymbol typeSymbol = SemanticModel.GetTypeInfo(invocation).Type as INamedTypeSymbol;
 
-            if (typeSymbol?.Name == "Task") // Overwrite symbol with generic type
-                typeSymbol = typeSymbol.TypeArguments[0] as INamedTypeSymbol;
+        private async Task CheckMethodImplementation(InvocationExpressionSyntax invocation) {
+            if (!(SemanticModel.GetSymbolInfo(invocation).Symbol is IMethodSymbol methodSymbol))
+                return;
 
-            if (typeSymbol == null)
-                return true;
+            SyntaxReference foundMethod = methodSymbol.DeclaringSyntaxReferences.FirstOrDefault();
+            if (foundMethod == null)
+                return;
 
-            if (typeSymbol.ToDisplayString() != DiscordNameCollection.IGUILD && typeSymbol.AllInterfaces.All(e => e.ToDisplayString() != DiscordNameCollection.IGUILD))
-                return true;
+            SyntaxNode foundMethodSyntax = await foundMethod.GetSyntaxAsync();
+            if (!(foundMethodSyntax is MethodDeclarationSyntax methodDeclaration))
+                return;
 
-            LiteralExpressionSyntax numericLiteral = invocation.ArgumentList.Arguments.FirstOrDefault()?.Expression as LiteralExpressionSyntax;
-            if (numericLiteral == null || !numericLiteral.IsKind(SyntaxKind.NumericLiteralExpression))
-                return true;
-
-            ulong guildId;
-            try {
-                guildId = Convert.ToUInt64(numericLiteral.Token.Value);
-            }
-            catch {
-                return true;
-            }
-
-            serverIds.Add(guildId);
-            return false;
+            DiscordServerIdAnalyser analyser = HasSameSemantics(methodDeclaration) ? this : CreateNew(methodDeclaration);
+            foreach (InvocationExpressionSyntax childInvocation in methodDeclaration.DescendantNodes().OfType<InvocationExpressionSyntax>())
+                await analyser.ResolveNodeAsync(childInvocation);
         }
 
         private async Task HandleIdentifierAsync(IdentifierNameSyntax identifier) {
@@ -100,102 +108,88 @@ namespace Discord.NET.SupportExtension.Core.Analyser {
             if (identifierSymbol == null)
                 return;
 
-            SyntaxReference foundDefinition = identifierSymbol.DeclaringSyntaxReferences.FirstOrDefault();
-            if (foundDefinition == null)
+            SyntaxReference foundIdentifier = identifierSymbol.DeclaringSyntaxReferences.FirstOrDefault();
+            if (foundIdentifier == null)
                 return;
 
-            SyntaxNode foundDefinitionSyntax = await foundDefinition.GetSyntaxAsync();
+            SyntaxNode foundIdentifierSyntax = await foundIdentifier.GetSyntaxAsync();
 
-            IEnumerable<ReferencedSymbol> references = await SymbolFinder.FindReferencesAsync(identifierSymbol, Solution, Documents);
-            IEnumerable<Location> referenceLocations = references.SelectMany(l => l.Locations.Select(s => s.Location));
+            foreach (SyntaxNode node in await GetReferences(identifierSymbol)) {
+                DiscordServerIdAnalyser analyser = HasSameSemantics(node) ? this : CreateNew(node);
 
-            foreach (var location in referenceLocations) {
-                SyntaxNode referencedNode = (await location.SourceTree.GetRootAsync()).FindNode(location.SourceSpan);
+                if (node.Parent is AssignmentExpressionSyntax assignment)
+                    await analyser.ResolveNodeAsync(assignment.Right);
 
-                if (referencedNode.FullSpan == identifier.FullSpan)
-                    continue;
+                if (node.Parent is MemberAccessExpressionSyntax memberAccess && memberAccess.Parent is AssignmentExpressionSyntax parentAssignment)
+                    await analyser.ResolveNodeAsync(parentAssignment);
 
-                DiscordServerIdAnalyser serverIdAnalyser;
-                if (referencedNode.SyntaxTree.FilePath != SyntaxTree.FilePath) {
-                    SemanticModel sm = SemanticModel.Compilation.GetSemanticModel(referencedNode.SyntaxTree);
-                    serverIdAnalyser = new DiscordServerIdAnalyser();
-                    serverIdAnalyser.Initialize(Solution, Project, SemanticModel);
-                    serverIdAnalyser.serverIds = this.serverIds;
-                }
-                else
-                    serverIdAnalyser = this;
-
-                if (referencedNode.Parent is AssignmentExpressionSyntax assignment)
-                    await serverIdAnalyser.ResolveNodeAsync(assignment.Right);
-
-                if (referencedNode.Parent is MemberAccessExpressionSyntax memberAccess && memberAccess.Parent is AssignmentExpressionSyntax parentAssignment)
-                    await serverIdAnalyser.ResolveNodeAsync(parentAssignment);
-
-                if (foundDefinitionSyntax is ClassDeclarationSyntax) {
-                    if (referencedNode.Parent is VariableDeclarationSyntax variableDeclaration) {
+                if (foundIdentifierSyntax is ClassDeclarationSyntax) {
+                    if (node.Parent is VariableDeclarationSyntax variableDeclaration) {
                         ObjectCreationExpressionSyntax objectCreation = variableDeclaration.Variables[0].Initializer?.Value as ObjectCreationExpressionSyntax;
                         foreach (ArgumentSyntax argumentSyntax in objectCreation?.ArgumentList.Arguments)
-                            await serverIdAnalyser.ResolveNodeAsync(argumentSyntax.Expression);
+                            await analyser.ResolveNodeAsync(argumentSyntax.Expression);
                     }
                 }
             }
 
-            switch (foundDefinitionSyntax) {
+            DiscordServerIdAnalyser serverIdAnalyser = HasSameSemantics(foundIdentifierSyntax) ? this : CreateNew(foundIdentifierSyntax);
+
+            switch (foundIdentifierSyntax) {
                 case ParameterSyntax parameter:
-                    await HandleIncomingParameterAsync(parameter);
+                    await serverIdAnalyser.HandleIncomingParameterAsync(parameter);
                     break;
                 case PropertyDeclarationSyntax propertyDeclaration:
-                    await ResolveNodeAsync(propertyDeclaration.Initializer?.Value);
+                    await serverIdAnalyser.ResolvePropertyDeclaration(propertyDeclaration);
                     break;
                 case VariableDeclaratorSyntax variableDeclarator:
-                    await ResolveNodeAsync(variableDeclarator.Initializer?.Value);
+                    await serverIdAnalyser.ResolveNodeAsync(variableDeclarator.Initializer?.Value);
                     break;
             }
         }
 
-        private async Task HandleIncomingParameterAsync(ParameterSyntax parameter) {
-            ISymbol declarationSymbol = SemanticModel.GetDeclaredSymbol(parameter.Parent.Parent);
-
-            if (declarationSymbol == null && parameter.Parent is LambdaExpressionSyntax lambda)
-                await HandleLambdaParameter(lambda);
-
-            if (declarationSymbol == null)
+        private async Task ResolvePropertyDeclaration(PropertyDeclarationSyntax propertyDeclaration) {
+            if (propertyDeclaration.ExpressionBody is ArrowExpressionClauseSyntax arrowExpression) {
+                await ResolveNodeAsync(arrowExpression.Expression);
                 return;
-
-            IEnumerable<SymbolCallerInfo> callerInfo = await SymbolFinder.FindCallersAsync(declarationSymbol, Solution, Documents);
-            IEnumerable<Location> callerLocations = callerInfo.SelectMany(e => e.Locations);
-            List<Location> distinctLocations = new List<Location>();
-
-            // Identifiers will be resolved in new analyser --> Only start 1 new analyser for all identifiers found in file
-            foreach (Location location in callerLocations) {
-                SyntaxNode locationNode = (await location.SourceTree.GetRootAsync()).FindNode(location.SourceSpan);
-                if (locationNode is IdentifierNameSyntax) {
-                    if (distinctLocations.Any(e => e.SourceTree.FilePath == location.SourceTree.FilePath))
-                        continue;
-                }
-
-                distinctLocations.Add(location);
             }
 
-            foreach (var location in distinctLocations) {
-                SyntaxNode locationNode = (await location.SourceTree.GetRootAsync()).FindNode(location.SourceSpan);
-                IDiscordServerIdAnalyser serverIdAnalyser;
-                if (parameter.SyntaxTree.FilePath != location.SourceTree.FilePath) {
+            await ResolveNodeAsync(propertyDeclaration.Initializer?.Value);
 
-                    SyntaxTree syntaxTree = locationNode.SyntaxTree;
-                    SemanticModel semanticModel = this.SemanticModel.Compilation.GetSemanticModel(syntaxTree);
+            AccessorDeclarationSyntax getAccessor = GetAccessor(propertyDeclaration, SyntaxKind.GetAccessorDeclaration);
+            await ResolvePropertyAccessor(getAccessor);
 
-                    serverIdAnalyser = DIContainer.GetService<IDiscordServerIdAnalyser>();
-                    serverIdAnalyser.Initialize(Solution, Project, semanticModel);
+            AccessorDeclarationSyntax setAccessor = GetAccessor(propertyDeclaration, SyntaxKind.SetAccessorDeclaration);
+            await ResolvePropertyAccessor(setAccessor);
+        }
+
+        private AccessorDeclarationSyntax GetAccessor(PropertyDeclarationSyntax propertyDeclaration, SyntaxKind accessorKind)
+            => propertyDeclaration.AccessorList?.Accessors.FirstOrDefault(e => e.IsKind(accessorKind));
+        private async Task ResolvePropertyAccessor(AccessorDeclarationSyntax accessorDeclaration) {
+            if (accessorDeclaration != null) {
+                if (accessorDeclaration.ExpressionBody != null)
+                    await ResolveNodeAsync(accessorDeclaration.ExpressionBody.Expression);
+                else {
+                    IEnumerable<SyntaxNode> children = accessorDeclaration.Body?.DescendantNodes() ?? Array.Empty<SyntaxNode>();
+                    foreach (SyntaxNode child in children)
+                        await ResolveNodeAsync(child);
                 }
-                else
-                    serverIdAnalyser = this;
+            }
+        }
 
-                ImmutableArray<ulong> temp = await serverIdAnalyser.Run(locationNode);
-                foreach (ulong value in temp) {
-                    if (!serverIds.Contains(value))
-                        serverIds.Add(value);
-                }
+        private async Task HandleIncomingParameterAsync(ParameterSyntax parameter) {
+            ISymbol methodSymbol = SemanticModel.GetDeclaredSymbol(parameter.Parent.Parent);
+
+            if (methodSymbol == null && parameter.Parent is LambdaExpressionSyntax lambda)
+                await HandleLambdaParameter(lambda);
+
+            if (methodSymbol == null)
+                return;
+
+            foreach (SyntaxNode node in await GetCallers(methodSymbol)) {
+                DiscordServerIdAnalyser analyser = HasSameSemantics(node) ? this : CreateNew(node);
+
+                await analyser.ResolveNodeAsync(node);
+                MapFromAnalyser(analyser);
             }
         }
 
@@ -210,6 +204,70 @@ namespace Discord.NET.SupportExtension.Core.Analyser {
 
                 temp = temp.Parent;
             }
+        }
+
+        private bool IsGuildType(INamedTypeSymbol typeSymbol) => typeSymbol.ToDisplayString() == DiscordNameCollection.IGUILD
+            || typeSymbol.AllInterfaces.Any(e => e.ToDisplayString() == DiscordNameCollection.IGUILD);
+        private bool IsGuildType(InvocationExpressionSyntax invocation) {
+            INamedTypeSymbol typeSymbol = SemanticModel.GetTypeInfo(invocation).Type as INamedTypeSymbol;
+
+            if (typeSymbol?.Name == "Task") // Overwrite symbol with generic type
+                typeSymbol = typeSymbol.TypeArguments[0] as INamedTypeSymbol;
+
+            if (typeSymbol == null)
+                return false;
+
+            return IsGuildType(typeSymbol);
+        }
+        private bool IsGuildType(IdentifierNameSyntax identifier) {
+            INamedTypeSymbol typeSymbol = SemanticModel.GetTypeInfo(identifier).Type as INamedTypeSymbol;
+            if (typeSymbol?.Name == "Task") // Overwrite symbol with generic type
+                typeSymbol = typeSymbol.TypeArguments[0] as INamedTypeSymbol;
+
+            if (typeSymbol == null)
+                return false;
+
+            return IsGuildType(typeSymbol);
+        }
+        private bool AddServerId(InvocationExpressionSyntax invocation) {
+            ExpressionSyntax expression = invocation.ArgumentList.Arguments.FirstOrDefault()?.Expression;
+            if (expression is null)
+                return false;
+
+            ulong? guildId = null;
+
+            if (expression is SimpleLambdaExpressionSyntax simpleLambdaExpression && simpleLambdaExpression.ExpressionBody is BinaryExpressionSyntax binaryExpression)
+                expression = binaryExpression.Right; // Right expression can be numeric literal .FirstOrDefault(e => e.Id == 0002);
+
+            if (expression is LiteralExpressionSyntax numericLiteral && numericLiteral.IsKind(SyntaxKind.NumericLiteralExpression)) {
+                try {
+                    guildId = Convert.ToUInt64(numericLiteral.Token.Value);
+                }
+                catch {
+                    return false;
+                }
+            }
+
+            if (guildId.HasValue) {
+                serverIds.Add(guildId.Value);
+                return true;
+            }
+
+            return false;
+        }
+
+        private DiscordServerIdAnalyser CreateNew(SyntaxNode node) {
+            DiscordServerIdAnalyser analyser = GetNewAnalyser<DiscordServerIdAnalyser>(node);
+            MapToAnalyser(analyser);
+            return analyser;
+        }
+        private void MapFromAnalyser(DiscordServerIdAnalyser analyser) {
+            this.serverIds = analyser.serverIds;
+            this.visited = analyser.visited;
+        }
+        private void MapToAnalyser(DiscordServerIdAnalyser analyser) {
+            analyser.serverIds = this.serverIds;
+            analyser.visited = this.visited;
         }
     }
 }

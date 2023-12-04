@@ -18,7 +18,7 @@ namespace Discord.NET.SupportExtension.Core.Tests.AnalyserTests {
             DiscordServerIdAnalyser serverIdAnalyser = new DiscordServerIdAnalyser();
             serverIdAnalyser.Initialize(Solution, Project, SemanticModel);
 
-            IEnumerable<ulong> result = await serverIdAnalyser.Run(FindAccordingParentNode());
+            IEnumerable<ulong> result = await serverIdAnalyser.Run(FindFittingParentNode());
 
             foreach(ulong id in ids) {
                 if (!result.Contains(id))
@@ -26,7 +26,7 @@ namespace Discord.NET.SupportExtension.Core.Tests.AnalyserTests {
             }
         }
 
-        private SyntaxNode FindAccordingParentNode() {
+        private SyntaxNode FindFittingParentNode() {
             SyntaxNode n = SyntaxNode;
             while (!n.IsKind(SyntaxKind.Block) && !n.IsKind(SyntaxKind.InvocationExpression)) {
                 if (n is SimpleLambdaExpressionSyntax lambda)

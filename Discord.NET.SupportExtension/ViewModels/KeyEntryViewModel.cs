@@ -6,6 +6,7 @@ using HB.NETF.Services.Data.Identifier;
 using HB.NETF.Services.Logging;
 using HB.NETF.Services.Logging.Factory;
 using HB.NETF.Services.Security.Cryptography.Keys;
+using HB.NETF.Unity;
 using HB.NETF.WPF.Commands;
 using HB.NETF.WPF.ViewModels;
 using Microsoft.Win32;
@@ -16,6 +17,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Input;
+using Unity;
 
 namespace Discord.NET.SupportExtension.ViewModels {
     internal class KeyEntryViewModel : ViewModelBase, ICloseableWindow {
@@ -51,6 +53,7 @@ namespace Discord.NET.SupportExtension.ViewModels {
         public Action Close { get; set; }
 
         private readonly KeyEntryModel model;
+        [Dependency]
         private readonly IStreamHandler streamHandler;
         private readonly ILogger<DiscordSupportPackage> logger;
         public KeyEntryViewModel(KeyEntryModel model) {
@@ -58,8 +61,7 @@ namespace Discord.NET.SupportExtension.ViewModels {
             BrowseKeyCommand = new RelayCommand(BrowseKey, null);
             ExtractCommand = new RelayCommand(Extract, (o) => !string.IsNullOrWhiteSpace(KeyPath) && File.Exists(KeyPath));
             this.model = model;
-            this.streamHandler = DIContainer.GetService<IStreamHandler>();
-            this.logger = DIContainer.GetService<ILoggerFactory>().GetOrCreateLogger<DiscordSupportPackage>();
+            this.logger = UnityBase.GetChildContainer(nameof(DiscordSupportPackage)).Resolve<ILoggerFactory>().GetOrCreateLogger<DiscordSupportPackage>();
         }
 
         public bool CanClose() => true;

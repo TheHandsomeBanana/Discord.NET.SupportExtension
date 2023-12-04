@@ -18,18 +18,22 @@ using Discord.NET.SupportExtension.Helper;
 using HB.NETF.Discord.NET.Toolkit.Models.Collections;
 using HB.NETF.Discord.NET.Toolkit.Services.EntityService.Holder;
 using System.IO;
+using Unity;
+using HB.NETF.Unity;
 
 namespace Discord.NET.SupportExtension.Commands {
     internal sealed class LoadServerCollectionCommand : AsyncCommandBase {
         protected override Guid CommandSet => PackageGuids.CommandSet;
         protected override int CommandId => PackageIds.LoadServerCollectionCommand;
 
+        private readonly IUnityContainer container;
         private readonly IDiscordEntityService entityService;
         private readonly ILogger<LoadServerCollectionCommand> logger;
 
         internal LoadServerCollectionCommand(AsyncPackage package, IMenuCommandService commandService, Action<Exception> onException) : base(package, commandService, onException) {
-            entityService = DIContainer.GetService<IDiscordEntityService>();
-            logger = DIContainer.GetService<ILoggerFactory>().GetOrCreateLogger<LoadServerCollectionCommand>();
+            container = UnityBase.GetChildContainer(nameof(DiscordSupportPackage));
+            entityService = container.Resolve<IDiscordEntityService>(nameof(DiscordRestEntityService));
+            logger = container.Resolve<ILoggerFactory>().GetOrCreateLogger<LoadServerCollectionCommand>();
         }
 
         public static LoadServerCollectionCommand Instance { get; private set; }
@@ -48,7 +52,7 @@ namespace Discord.NET.SupportExtension.Commands {
                 try {
                     serverCollection = await entityService.ReadFromFile(currentCachePath);
 
-                    IServerCollectionHolder serverCollectionHolder = DIContainer.GetService<IServerCollectionHolder>();
+                    IServerCollectionHolder serverCollectionHolder = container.Resolve<IServerCollectionHolder>();
                     serverCollectionHolder.Hold(currentProjectName, serverCollection);
 
                     string message = InteractionMessages.ServerCollectionLoadedFor(currentProjectName);

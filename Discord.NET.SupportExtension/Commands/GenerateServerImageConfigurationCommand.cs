@@ -8,6 +8,7 @@ using HB.NETF.Services.Data.Handler;
 using HB.NETF.Services.Data.Handler.Async;
 using HB.NETF.Services.Logging;
 using HB.NETF.Services.Logging.Factory;
+using HB.NETF.Unity;
 using HB.NETF.VisualStudio.Commands;
 using HB.NETF.VisualStudio.UI;
 using HB.NETF.VisualStudio.Workspace;
@@ -20,6 +21,8 @@ using System.Globalization;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
+using Unity;
+using Unity.Resolution;
 using Task = System.Threading.Tasks.Task;
 
 namespace Discord.NET.SupportExtension.Commands {
@@ -29,10 +32,10 @@ namespace Discord.NET.SupportExtension.Commands {
 
         private static IAsyncStreamHandler streamHandler;
         private readonly ILogger<GenerateServerImageConfigurationCommand> logger;
-
+        private readonly IUnityContainer container = UnityBase.GetChildContainer(nameof(DiscordSupportPackage));
         internal GenerateServerImageConfigurationCommand(AsyncPackage package, IMenuCommandService commandService, Action<Exception> onException) : base(package, commandService, onException) {
-            streamHandler = DIContainer.GetService<IAsyncStreamHandler>();
-            logger = DIContainer.GetService<ILoggerFactory>().GetOrCreateLogger<GenerateServerImageConfigurationCommand>();
+            streamHandler = container.Resolve<IAsyncStreamHandler>();
+            logger = container.Resolve<ILoggerFactory>().GetOrCreateLogger<GenerateServerImageConfigurationCommand>();
         }
 
         public static GenerateServerImageConfigurationCommand Instance { get; private set; }
@@ -62,7 +65,7 @@ namespace Discord.NET.SupportExtension.Commands {
                     logger.LogError(ex.ToString());
                 }
 
-                ConfigureServerImageView view = new ConfigureServerImageView() { DataContext = new ConfigureServerImageViewModel(model) };
+                ConfigureServerImageView view = new ConfigureServerImageView() { DataContext = container.Resolve<ConfigureServerImageViewModel>(new ParameterOverride("model", model)) };
                 UIHelper.Show(view);
             });
            

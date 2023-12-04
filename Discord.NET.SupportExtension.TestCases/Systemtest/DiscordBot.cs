@@ -17,9 +17,10 @@ namespace Discord.NET.SupportExtension.TestCases.SystemTest
         }
 
         public void Run() {
-            IGuild server = client.GetGuild(1157751183184760953);
+            IGuild server = client.GetGuild(948571888148443156);
 
             IChannel channel = server.GetTextChannelAsync(1157751183822311496).Result; // Allgemein Channel
+
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.VisualStudio.Text.Adornments;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -9,7 +10,6 @@ namespace Discord.NET.SupportExtension.Core.Interface {
         public string DisplayText { get; set; }
         public string InsertText { get; set; }
         public string Suffix { get; set; }
-        
-
+        public ContainerElement Description { get; set; }
     }
 }

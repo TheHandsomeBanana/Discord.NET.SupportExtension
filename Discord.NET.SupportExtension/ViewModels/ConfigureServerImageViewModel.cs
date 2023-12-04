@@ -28,7 +28,6 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
-using System.Runtime.CompilerServices;
 using System.Security.RightsManagement;
 using System.Text;
 using System.Threading.Tasks;
@@ -39,6 +38,8 @@ using static Microsoft.VisualStudio.Shell.RegistrationAttribute;
 using HB.NETF.WPF.Commands;
 using HB.NETF.Discord.NET.Toolkit.Services.TokenService;
 using Discord.NET.SupportExtension.Models;
+using Unity;
+using HB.NETF.Unity;
 
 namespace Discord.NET.SupportExtension.ViewModels {
     public class ConfigureServerImageViewModel : ViewModelBase, ICloseableWindow {
@@ -188,22 +189,23 @@ namespace Discord.NET.SupportExtension.ViewModels {
         #endregion
 
         private readonly ILogger<DiscordSupportPackage> logger;
-        private readonly IAesCryptoService aesCryptoService;
-        private readonly IAsyncStreamHandler streamHandler;
-        private readonly IDiscordTokenService tokenService;
-        private readonly IIdentifierFactory identifierFactory;
+        [Dependency]
+        public IAesCryptoService AesCryptoService { get; set; }
+        [Dependency]
+        public IAsyncStreamHandler StreamHandler { get; set; }
+        [Dependency]
+        public IDiscordTokenService TokenService { get; set; }
+        [Dependency] 
+        public IIdentifierFactory IdentifierFactory { get; set; }
+
         private readonly Project currentProject;
         private readonly ConfigureServerImageModel model;
 
         public Action Close { get; set; }
 
         public ConfigureServerImageViewModel(ConfigureServerImageModel model) {
-            this.logger = DIContainer.GetService<ILoggerFactory>().GetOrCreateLogger<DiscordSupportPackage>();
-            this.streamHandler = DIContainer.GetService<IAsyncStreamHandler>();
+            this.logger = UnityBase.GetChildContainer(nameof(DiscordSupportPackage)).Resolve<ILoggerFactory>().GetOrCreateLogger<DiscordSupportPackage>();
             this.currentProject = SolutionHelper.GetCurrentProject();
-            this.identifierFactory = DIContainer.GetService<IIdentifierFactory>();
-            this.tokenService = DIContainer.GetService<IDiscordTokenService>();
-            this.aesCryptoService = DIContainer.GetService<IAesCryptoService>();
 
             GenerateCommand = new RelayCommand(GenerateServerImage, null);
             SaveCommand = new RelayCommand(Save, null);
@@ -211,7 +213,10 @@ namespace Discord.NET.SupportExtension.ViewModels {
             CreateTokenAESKeyFileCommand = new RelayCommand(CreateTokenAESKeyFile, null);
             CreateDataAESKeyFileCommand = new RelayCommand(CreateDataAESKeyFile, null);
             this.model = model;
+        }
 
+        [InjectionMethod]
+        public void Init() {
             if (model.Token != null)
                 LoadTokenFromModel();
         }
@@ -231,7 +236,7 @@ namespace Discord.NET.SupportExtension.ViewModels {
                 SaveTokenToModel();
 
             string configLocation = ConfigHelper.GetConfigPath(this.currentProject);
-            streamHandler.WriteToFile(configLocation, model);
+            StreamHandler.WriteToFile(configLocation, model);
 
             ProjectHelper.AddExistingFile(this.currentProject, configLocation);
             logger.LogInformation(InteractionMessages.ConfigurationSavedTo(this.currentProject.Name));
@@ -255,7 +260,7 @@ namespace Discord.NET.SupportExtension.ViewModels {
         public bool CanClose() => true;
         private void CreateAESKeyFile(Identifier<AesKey> key) {
             try {
-                streamHandler.StartSaveFileDialog(key);
+                StreamHandler.StartSaveFileDialog(key);
             }
             catch (StreamHandlerException e) {
                 logger.LogError(e.ToString());
@@ -270,10 +275,10 @@ namespace Discord.NET.SupportExtension.ViewModels {
                     if (key == null)
                         return;
 
-                    model.Token = tokenService.EncryptToken(this.Token, model.TokenEncryptionMode.Value, key);
+                    model.Token = TokenService.EncryptToken(this.Token, model.TokenEncryptionMode.Value, key);
                     break;
                 case EncryptionMode.WindowsDataProtectionAPI:
-                    model.Token = tokenService.EncryptToken(this.Token, model.TokenEncryptionMode.Value);
+                    model.Token = TokenService.EncryptToken(this.Token, model.TokenEncryptionMode.Value);
                     break;
             }
 
@@ -286,10 +291,10 @@ namespace Discord.NET.SupportExtension.ViewModels {
                     if (key == null)
                         return;
 
-                    this.Token = tokenService.DecryptToken(model.Token, model.TokenEncryptionMode.Value, key);
+                    this.Token = TokenService.DecryptToken(model.Token, model.TokenEncryptionMode.Value, key);
                     break;
                 case EncryptionMode.WindowsDataProtectionAPI:
-                    this.Token = tokenService.DecryptToken(model.Token, model.TokenEncryptionMode.Value);
+                    this.Token = TokenService.DecryptToken(model.Token, model.TokenEncryptionMode.Value);
                     break;
             }
         }
@@ -312,7 +317,7 @@ namespace Discord.NET.SupportExtension.ViewModels {
         private void SetTokenModeDependent() {
             if (model.TokenEncryptionMode == EncryptionMode.AES && SaveToken) {
                 TokenAESEncryptionPanelVisibility = Visibility.Visible;
-                tokenKey = identifierFactory.CreateIdentifier(aesCryptoService.GenerateKey(256));
+                tokenKey = IdentifierFactory.CreateIdentifier(AesCryptoService.GenerateKey(256));
                 TokenAESKey = Convert.ToBase64String(tokenKey.Reference.Key);
                 model.TokenKeyIdentifier = tokenKey.Id;
             }
@@ -326,7 +331,7 @@ namespace Discord.NET.SupportExtension.ViewModels {
         private void SetDataModeDependent() {
             if (model.DataEncryptionMode == EncryptionMode.AES && EncryptData) {
                 DataAESEncryptionPanelVisibility = Visibility.Visible;
-                dataKey = identifierFactory.CreateIdentifier(aesCryptoService.GenerateKey(256));
+                dataKey = IdentifierFactory.CreateIdentifier(AesCryptoService.GenerateKey(256));
                 DataAESKey = Convert.ToBase64String(dataKey.Reference.Key);
                 model.DataKeyIdentifier = dataKey.Id;
             }
