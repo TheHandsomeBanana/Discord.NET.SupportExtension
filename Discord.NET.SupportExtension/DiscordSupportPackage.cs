@@ -47,6 +47,15 @@ namespace Discord.NET.SupportExtension {
 
         public static string EventLogPath = DiscordEnvironment.LogPath + "\\" + DateTime.Now.ToString("yyyy.MM.dd_HHmmss") + ".log";
         private readonly ILogger<DiscordSupportPackage> logger;
+
+        [Dependency(nameof(DiscordRestEntityService))]
+        public IDiscordEntityService EntityService { get; set; }
+        [Dependency]
+        public IAsyncStreamHandler StreamHandler { get; set; }
+        [Dependency]
+        public IServerCollectionHolder ServerHolder { get; set; }
+        
+        
         public DiscordSupportPackage() {
             UIHelper.Package = this;
 
@@ -86,6 +95,7 @@ namespace Discord.NET.SupportExtension {
         /// <param name="progress">A provider for progress updates.</param>
         /// <returns>A task representing the async work of package initialization, or an already completed task if there is none. Do not return null from this method.</returns>
         protected override async Task InitializeAsync(CancellationToken cancellationToken, IProgress<ServiceProgressData> progress) {
+            UnityBase.UnityContainer.BuildUp(this);
 
             IMenuCommandService commandService = await this.GetServiceAsync(typeof(IMenuCommandService)) as IMenuCommandService;
 
@@ -121,21 +131,17 @@ namespace Discord.NET.SupportExtension {
         }
 
         private async Task HandleCacheAsync(string projectName, string configPath) {
-            ILogger<DiscordSupportPackage> logger = UnityBase.UnityContainer.Resolve<ILoggerFactory>().GetOrCreateLogger<DiscordSupportPackage>();
-            IAsyncStreamHandler streamHandler = UnityBase.UnityContainer.Resolve<IAsyncStreamHandler>();
-            IDiscordEntityService entityService = UnityBase.UnityContainer.Resolve<IDiscordEntityService>(nameof(DiscordRestEntityService));
-            ConfigureServerImageModel model = await streamHandler.ReadFromFileAsync<ConfigureServerImageModel>(configPath);
+            ConfigureServerImageModel model = await StreamHandler.ReadFromFileAsync<ConfigureServerImageModel>(configPath);
 
-            InteractionHelper.MapDataEncryptToEntityService(entityService, model, logger, out bool cancel);
+            InteractionHelper.MapDataEncryptToEntityService(EntityService, model, logger, out bool cancel);
             if (cancel) {
                 logger.LogWarning(InteractionMessages.CouldNotRetrieveAesKey + ", " + InteractionMessages.ServerCollectionNotLoadedFor(projectName));
                 return;
             }
 
             try {
-                DiscordServerCollection serverCollection = await entityService.ReadFromFile(GetCachePath());
-                UnityBase.UnityContainer.Resolve<IServerCollectionHolder>()
-                    .Hold(projectName, serverCollection);
+                DiscordServerCollection serverCollection = await EntityService.ReadFromFile(GetCachePath());
+                ServerHolder.Hold(projectName, serverCollection);
 
                 logger.LogInformation(InteractionMessages.ServerCollectionLoadedFor(projectName));
             }
