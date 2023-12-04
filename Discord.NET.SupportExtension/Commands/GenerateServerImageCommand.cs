@@ -1,39 +1,20 @@
 ﻿using Discord.NET.SupportExtension.Helper;
 using Discord.NET.SupportExtension.Models;
 using Discord.NET.SupportExtension.Models.VMModels;
-using Discord.NET.SupportExtension.ViewModels;
-using Discord.NET.SupportExtension.Views;
-using EnvDTE;
-using HB.NETF.Common.DependencyInjection;
 using HB.NETF.Common.Exceptions;
 using HB.NETF.Discord.NET.Toolkit.Models.Collections;
 using HB.NETF.Discord.NET.Toolkit.Services.EntityService;
-using HB.NETF.Discord.NET.Toolkit.Services.EntityService.Holder;
 using HB.NETF.Discord.NET.Toolkit.Services.TokenService;
-using HB.NETF.Services.Data.Handler;
 using HB.NETF.Services.Data.Handler.Async;
 using HB.NETF.Services.Logging;
 using HB.NETF.Services.Logging.Factory;
-using HB.NETF.Services.Security.Cryptography.Keys;
-using HB.NETF.Services.Security.Cryptography.Settings;
 using HB.NETF.Unity;
 using HB.NETF.VisualStudio.Commands;
 using HB.NETF.VisualStudio.UI;
-using HB.NETF.VisualStudio.Workspace;
 using Microsoft.VisualStudio.Shell;
-using Microsoft.VisualStudio.Shell.Interop;
 using System;
-using System.Collections.Generic;
-using System.ComponentModel;
 using System.ComponentModel.Design;
-using System.Globalization;
 using System.IO;
-using System.IO.Ports;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
-using System.Windows.Documents;
-using System.Windows.Markup;
 using Unity;
 using Task = System.Threading.Tasks.Task;
 
@@ -60,7 +41,7 @@ namespace Discord.NET.SupportExtension.Commands {
             await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync(package.DisposalToken);
             Instance = new GenerateServerImageCommand(package, commandService, onException);
 
-            
+
         }
 
         protected override async Task ExecuteAsync(object sender, EventArgs e) {

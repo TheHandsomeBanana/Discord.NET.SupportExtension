@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Discord.NET.SupportExtension.Core {
     internal static class DiscordNameCollection {
@@ -26,7 +23,7 @@ namespace Discord.NET.SupportExtension.Core {
         public const string ITHREADCHANNEL = "Discord.IThreadChannel";
         public const string IPRIVATECHANNEL = "Discord.IPrivateChannel";
 
-        
+
         private static string[] names = {
             IDISCORDCLIENT,
             IGUILD,

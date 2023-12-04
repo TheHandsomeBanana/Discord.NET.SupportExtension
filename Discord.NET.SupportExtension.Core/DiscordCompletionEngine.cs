@@ -1,18 +1,11 @@
-﻿using Discord.NET.SupportExtension.Core.Analyser;
-using Discord.NET.SupportExtension.Core.Helper;
+﻿using Discord.NET.SupportExtension.Core.Helper;
 using Discord.NET.SupportExtension.Core.Interface;
 using Discord.NET.SupportExtension.Core.Interface.Analyser;
-using HB.NETF.Common.DependencyInjection;
 using HB.NETF.Common.Exceptions;
-using HB.NETF.Discord.NET.Toolkit.Models.Collections;
-using HB.NETF.Discord.NET.Toolkit.Models.Entities;
 using HB.NETF.Discord.NET.Toolkit.Services.EntityService.Holder;
 using Microsoft.CodeAnalysis;
 using System;
-using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using Unity;
 

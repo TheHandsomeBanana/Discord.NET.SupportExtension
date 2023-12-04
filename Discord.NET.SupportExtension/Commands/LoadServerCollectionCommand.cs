@@ -1,25 +1,19 @@
-﻿using HB.NETF.Common.DependencyInjection;
-using HB.NETF.Services.Data.Handler.Async;
-using HB.NETF.Services.Logging.Factory;
+﻿using Discord.NET.SupportExtension.Helper;
+using HB.NETF.Discord.NET.Toolkit.Models.Collections;
+using HB.NETF.Discord.NET.Toolkit.Services.EntityService;
+using HB.NETF.Discord.NET.Toolkit.Services.EntityService.Holder;
 using HB.NETF.Services.Logging;
+using HB.NETF.Services.Logging.Factory;
+using HB.NETF.Unity;
+using HB.NETF.VisualStudio.Commands;
 using HB.NETF.VisualStudio.UI;
+using HB.NETF.VisualStudio.Workspace;
 using Microsoft.VisualStudio.Shell;
 using System;
-using System.Collections.Generic;
 using System.ComponentModel.Design;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using HB.NETF.Discord.NET.Toolkit.Services.EntityService;
-using HB.NETF.VisualStudio.Workspace;
-using System.Windows.Forms;
-using HB.NETF.VisualStudio.Commands;
-using Discord.NET.SupportExtension.Helper;
-using HB.NETF.Discord.NET.Toolkit.Models.Collections;
-using HB.NETF.Discord.NET.Toolkit.Services.EntityService.Holder;
 using System.IO;
+using System.Threading.Tasks;
 using Unity;
-using HB.NETF.Unity;
 
 namespace Discord.NET.SupportExtension.Commands {
     internal sealed class LoadServerCollectionCommand : AsyncCommandBase {
@@ -59,7 +53,7 @@ namespace Discord.NET.SupportExtension.Commands {
                     UIHelper.ShowInfo(message);
                     logger.LogInformation(message);
                 }
-                catch(FileNotFoundException) {
+                catch (FileNotFoundException) {
                     logger.LogError(InteractionMessages.ImageNotFoundFor(currentProjectName));
                     UIHelper.ShowError(InteractionMessages.ImageNotFoundFor(currentProjectName));
                 }

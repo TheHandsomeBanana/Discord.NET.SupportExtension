@@ -1,10 +1,5 @@
-﻿using Discord;
-using Discord.Rest;
+﻿using Discord.Rest;
 using Discord.WebSocket;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Discord.NET.SupportExtension.TestCases.Channel {
@@ -35,7 +30,7 @@ namespace Discord.NET.SupportExtension.TestCases.Channel {
 
             IPrivateChannel socketPrivateChannel = await socketClient.GetPrivateChannelAsync(9992);
             IChannel socketChannel = socketClient.GetChannel(9991);
-            
+
         }
     }
 }

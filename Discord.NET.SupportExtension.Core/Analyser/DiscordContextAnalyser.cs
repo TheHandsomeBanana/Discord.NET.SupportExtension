@@ -1,22 +1,10 @@
 ﻿using Discord.NET.SupportExtension.Core.Interface;
 using Discord.NET.SupportExtension.Core.Interface.Analyser;
-using Discord.WebSocket;
-using HB.NETF.Code.Analysis.Analyser;
-using HB.NETF.Code.Analysis.Interface;
-using HB.NETF.Code.Analysis.Resolver;
-using HB.NETF.Common.DependencyInjection;
-using HB.NETF.Services.Logging;
-using HB.NETF.Services.Logging.Factory;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using Microsoft.CodeAnalysis.FindSymbols;
-using Microsoft.CodeAnalysis.Operations;
-using System;
 using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Discord.NET.SupportExtension.Core.Analyser {
@@ -44,7 +32,7 @@ namespace Discord.NET.SupportExtension.Core.Analyser {
         private bool InitiateAnalysis(SyntaxNode trigger) {
             if (trigger is BinaryExpressionSyntax)
                 return true;
-            
+
             if (trigger is ArgumentListSyntax || trigger is ArgumentSyntax)
                 return CheckMethodArgumentUsage(trigger);
 
@@ -73,7 +61,7 @@ namespace Discord.NET.SupportExtension.Core.Analyser {
 
             IMethodSymbol methodSymbol = SemanticModel.GetSymbolInfo(parentInvocation).Symbol as IMethodSymbol;
 
-            if(methodSymbol == null) { // Context can already be found while initiating
+            if (methodSymbol == null) { // Context can already be found while initiating
                 CheckForContext(parentInvocation);
                 return false;
             }
@@ -128,9 +116,9 @@ namespace Discord.NET.SupportExtension.Core.Analyser {
                 return;
 
             IMethodSymbol methodSymbol = SemanticModel.GetSymbolInfo(invocation).Symbol as IMethodSymbol;
-            if (methodSymbol.IsExtensionMethod && !methodSymbol.IsStatic) 
+            if (methodSymbol.IsExtensionMethod && !methodSymbol.IsStatic)
                 argumentIndex++;
-            
+
             SyntaxReference declaringMethodReference = methodSymbol?.DeclaringSyntaxReferences.FirstOrDefault();
             if (declaringMethodReference == null) { // Method chain stops here -> Resolve invocation
                 await ResolveNode(invocation);

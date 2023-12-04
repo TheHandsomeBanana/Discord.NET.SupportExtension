@@ -1,13 +1,9 @@
-﻿using Discord.NET.SupportExtension.Commands;
-using Discord.NET.SupportExtension.Helper;
+﻿using Discord.NET.SupportExtension.Helper;
+using Discord.NET.SupportExtension.Models;
 using Discord.NET.SupportExtension.Models.VMModels;
-using Discord.NET.SupportExtension.Views;
 using EnvDTE;
-using HB.NETF.Common;
-using HB.NETF.Common.DependencyInjection;
-using HB.NETF.Discord.NET.Toolkit;
+using HB.NETF.Discord.NET.Toolkit.Services.TokenService;
 using HB.NETF.Services.Data.Exceptions;
-using HB.NETF.Services.Data.Handler;
 using HB.NETF.Services.Data.Handler.Async;
 using HB.NETF.Services.Data.Identifier;
 using HB.NETF.Services.Logging;
@@ -15,31 +11,17 @@ using HB.NETF.Services.Logging.Factory;
 using HB.NETF.Services.Security.Cryptography.Interfaces;
 using HB.NETF.Services.Security.Cryptography.Keys;
 using HB.NETF.Services.Security.Cryptography.Settings;
-using HB.NETF.Services.Security.DataProtection;
+using HB.NETF.Unity;
 using HB.NETF.VisualStudio.Commands;
 using HB.NETF.VisualStudio.UI;
 using HB.NETF.VisualStudio.Workspace;
+using HB.NETF.WPF.Commands;
 using HB.NETF.WPF.ViewModels;
-using HB.NETF.WPF.Exceptions;
 using Microsoft.VisualStudio.Shell;
-using Microsoft.VisualStudio.Text.Editor;
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.IO;
-using System.Linq;
-using System.Security.RightsManagement;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Input;
-using static Microsoft.VisualStudio.Shell.RegistrationAttribute;
-using HB.NETF.WPF.Commands;
-using HB.NETF.Discord.NET.Toolkit.Services.TokenService;
-using Discord.NET.SupportExtension.Models;
 using Unity;
-using HB.NETF.Unity;
 
 namespace Discord.NET.SupportExtension.ViewModels {
     public class ConfigureServerImageViewModel : ViewModelBase, ICloseableWindow {
@@ -195,7 +177,7 @@ namespace Discord.NET.SupportExtension.ViewModels {
         public IAsyncStreamHandler StreamHandler { get; set; }
         [Dependency]
         public IDiscordTokenService TokenService { get; set; }
-        [Dependency] 
+        [Dependency]
         public IIdentifierFactory IdentifierFactory { get; set; }
 
         private readonly Project currentProject;

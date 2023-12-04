@@ -1,11 +1,6 @@
 ﻿using Discord.NET.SupportExtension.Core.Interface;
 using Discord.NET.SupportExtension.Core.Tests.ContextTests;
-using Discord.WebSocket;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Discord.NET.SupportExtension.Core.Tests.ContextDetectorTests {
@@ -117,8 +112,8 @@ namespace Discord.NET.SupportExtension.Core.Tests.ContextDetectorTests {
             completionContextTests.Add("ChannelLinq.cs")
                 .Add("0000", DiscordCompletionContext.GuildChannel) // IChannel restChannel = restGuild.GetChannelsAsync().Result.Where(e => e.Id == 0000).First();
                 .Add("0001", DiscordCompletionContext.GuildChannel) // ITextChannel restTextChannel = (await restGuild.GetChannelsAsync())
-                             //     .Where(e => e.GetChannelType().Value == ChannelType.Text)
-                             //     .FirstOrDefault(e => e.Id == 0001) as ITextChannel;
+                                                                    //     .Where(e => e.GetChannelType().Value == ChannelType.Text)
+                                                                    //     .FirstOrDefault(e => e.Id == 0001) as ITextChannel;
                 .Add("0002", DiscordCompletionContext.VoiceChannel) // IVoiceChannel restVoiceChannel = (await restGuild.GetVoiceChannelsAsync()).FirstOrDefault(e => e.Id == 0002);
                 .Add("9999", DiscordCompletionContext.GuildChannel) // IChannel socketChannel = socketGuild.Channels.FirstOrDefault(e => e.Id == 9999);
                 .Add("9998", DiscordCompletionContext.TextChannel); // ITextChannel socketTextChannel = socketGuild.TextChannels.GroupBy(e => e.Id).FirstOrDefault(e => e.Key == 9998).First();
@@ -139,7 +134,7 @@ namespace Discord.NET.SupportExtension.Core.Tests.ContextDetectorTests {
 
         [TestMethod]
         public async Task Channel_NegativeTests() {
-            
+
         }
         #endregion
     }

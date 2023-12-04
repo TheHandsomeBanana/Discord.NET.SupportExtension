@@ -2,9 +2,7 @@
 using Discord.NET.SupportExtension.Models.VMModels;
 using Discord.NET.SupportExtension.ViewModels;
 using Discord.NET.SupportExtension.Views;
-using HB.NETF.Common.DependencyInjection;
 using HB.NETF.Common.Exceptions;
-using HB.NETF.Services.Data.Handler;
 using HB.NETF.Services.Data.Handler.Async;
 using HB.NETF.Services.Logging;
 using HB.NETF.Services.Logging.Factory;
@@ -12,15 +10,10 @@ using HB.NETF.Unity;
 using HB.NETF.VisualStudio.Commands;
 using HB.NETF.VisualStudio.UI;
 using HB.NETF.VisualStudio.Workspace;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.VisualStudio.Shell;
-using Microsoft.VisualStudio.Shell.Interop;
 using System;
 using System.ComponentModel.Design;
-using System.Globalization;
 using System.IO;
-using System.Threading;
-using System.Threading.Tasks;
 using Unity;
 using Unity.Resolution;
 using Task = System.Threading.Tasks.Task;
@@ -68,7 +61,7 @@ namespace Discord.NET.SupportExtension.Commands {
                 ConfigureServerImageView view = new ConfigureServerImageView() { DataContext = container.Resolve<ConfigureServerImageViewModel>(new ParameterOverride("model", model)) };
                 UIHelper.Show(view);
             });
-           
+
         }
     }
 }

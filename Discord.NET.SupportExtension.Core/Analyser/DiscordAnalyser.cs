@@ -1,21 +1,13 @@
 ﻿using Discord.NET.SupportExtension.Core.Interface;
 using Discord.NET.SupportExtension.Core.Interface.Analyser;
-using HB.NETF.Code.Analysis;
-using HB.NETF.Code.Analysis.Interface;
-using HB.NETF.Common.DependencyInjection;
 using HB.NETF.Discord.NET.Toolkit.Models.Collections;
 using HB.NETF.Discord.NET.Toolkit.Models.Entities;
-using HB.NETF.Discord.NET.Toolkit.Services.EntityService;
 using HB.NETF.Discord.NET.Toolkit.Services.EntityService.Holder;
-using HB.NETF.Services.Logging;
-using HB.NETF.Services.Logging.Factory;
-using Humanizer.DateTimeHumanizeStrategy;
 using Microsoft.CodeAnalysis;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using Unity;
 

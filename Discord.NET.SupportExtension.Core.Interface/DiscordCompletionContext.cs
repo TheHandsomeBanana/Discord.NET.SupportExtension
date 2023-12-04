@@ -1,10 +1,4 @@
 ﻿using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Discord.NET.SupportExtension.Core.Interface {
     public readonly struct DiscordCompletionContext {
@@ -44,11 +38,11 @@ namespace Discord.NET.SupportExtension.Core.Interface {
         public static DiscordCompletionContext ThreadChannel => new DiscordCompletionContext(DiscordBaseCompletionContext.Channel, DiscordChannelContext.Thread);
         public static DiscordCompletionContext PrivateChannel => new DiscordCompletionContext(DiscordBaseCompletionContext.Channel, DiscordChannelContext.Private);
 
-        public static bool operator == (DiscordCompletionContext left, DiscordCompletionContext right) {
+        public static bool operator ==(DiscordCompletionContext left, DiscordCompletionContext right) {
             return left.ChannelContext == right.ChannelContext && left.BaseContext == right.BaseContext;
         }
 
-        public static bool operator != (DiscordCompletionContext left, DiscordCompletionContext right) {
+        public static bool operator !=(DiscordCompletionContext left, DiscordCompletionContext right) {
             return !(left == right);
         }
 

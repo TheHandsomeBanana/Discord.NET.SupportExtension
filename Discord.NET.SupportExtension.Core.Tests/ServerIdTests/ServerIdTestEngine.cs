@@ -1,5 +1,4 @@
 ﻿using Discord.NET.SupportExtension.Core.Analyser;
-using HB.NETF.Code.Analysis;
 using HB.NETF.Code.Analysis.Tests.Engine;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -7,8 +6,6 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection.Metadata;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Discord.NET.SupportExtension.Core.Tests.AnalyserTests {
@@ -20,7 +17,7 @@ namespace Discord.NET.SupportExtension.Core.Tests.AnalyserTests {
 
             IEnumerable<ulong> result = await serverIdAnalyser.Run(FindFittingParentNode());
 
-            foreach(ulong id in ids) {
+            foreach (ulong id in ids) {
                 if (!result.Contains(id))
                     Errors.Add($"[{document}] Teststring: {testString} | Testvalue {id} not found in ({string.Join(",", result)}).");
             }
@@ -35,9 +32,9 @@ namespace Discord.NET.SupportExtension.Core.Tests.AnalyserTests {
                 n = n.Parent;
             }
 
-            if(n is InvocationExpressionSyntax)
+            if (n is InvocationExpressionSyntax)
                 return n;
-            
+
             return SyntaxNode;
         }
     }

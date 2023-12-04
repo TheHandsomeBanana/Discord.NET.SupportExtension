@@ -1,26 +1,20 @@
 ﻿using Discord.NET.SupportExtension.Core.Interface;
 using Discord.NET.SupportExtension.MEF.CompletionSource;
 using HB.NETF.Common.DependencyInjection;
-using HB.NETF.Services.Logging.Factory;
 using HB.NETF.Services.Logging;
+using HB.NETF.Services.Logging.Factory;
+using HB.NETF.VisualStudio.Workspace;
 using Microsoft;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Completion;
-using Microsoft.VisualStudio.Text.Adornments;
+using Microsoft.CodeAnalysis.Options;
+using Microsoft.CodeAnalysis.Text;
+using Microsoft.VisualStudio.LanguageServices;
 using Microsoft.VisualStudio.Text.Editor;
-using Newtonsoft.Json.Linq;
 using System;
-using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.Diagnostics;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
-using HB.NETF.VisualStudio.Workspace;
-using Microsoft.VisualStudio.LanguageServices;
-using EnvDTE;
-using Microsoft.CodeAnalysis.Text;
-using Microsoft.CodeAnalysis.Options;
 
 namespace Discord.NET.SupportExtension.Mef.Roslyn.Completion {
     //[ExportCompletionProvider("DiscordCompletionProvider", LanguageNames.CSharp)]
@@ -53,7 +47,7 @@ namespace Discord.NET.SupportExtension.Mef.Roslyn.Completion {
                 SyntaxToken triggerToken = (await context.Document.GetSyntaxRootAsync(context.CancellationToken)).FindToken(context.Position);
 
                 DiscordCompletionItem[] completions = await engine.ProcessCompletionAsync(vsWorkspace.CurrentSolution, semanticModel, triggerToken);
-                
+
                 context.AddItems(completions.Select(e =>
                     CompletionItem.Create(e.DisplayText)
                 ));
@@ -65,7 +59,7 @@ namespace Discord.NET.SupportExtension.Mef.Roslyn.Completion {
                 stopwatch.Stop();
 
 
-                
+
             }
             catch (Exception ex) {
                 logger.LogCritical("Completion context engine failed. " + ex.ToString());

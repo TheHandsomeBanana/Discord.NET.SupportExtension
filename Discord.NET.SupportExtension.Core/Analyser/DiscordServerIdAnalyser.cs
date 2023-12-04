@@ -1,26 +1,13 @@
 ﻿using Discord.NET.SupportExtension.Core.Interface.Analyser;
-using HB.NETF.Code.Analysis;
-using HB.NETF.Code.Analysis.Interface;
-using HB.NETF.Code.Analysis.Resolver;
-using HB.NETF.Common.DependencyInjection;
-using HB.NETF.Common.Exceptions;
-using HB.NETF.Services.Logging;
-using HB.NETF.Services.Logging.Factory;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using Microsoft.CodeAnalysis.FindSymbols;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
-using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Reflection.Metadata;
-using System.Runtime.CompilerServices;
-using System.Text;
 using System.Threading.Tasks;
-using System.Xml.Linq;
 
 namespace Discord.NET.SupportExtension.Core.Analyser {
     internal class DiscordServerIdAnalyser : DiscordAnalyserBase, IDiscordServerIdAnalyser {

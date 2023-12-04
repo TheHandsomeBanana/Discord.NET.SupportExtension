@@ -1,15 +1,7 @@
 ﻿using Discord.NET.SupportExtension.Models.VMModels;
 using HB.NETF.WPF.Commands;
 using HB.NETF.WPF.ViewModels;
-using Microsoft.VisualStudio.Shell;
 using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
-using System.Runtime.Remoting.Contexts;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Input;
 
 namespace Discord.NET.SupportExtension.ViewModels {
     public class TokenEntryViewModel : ViewModelBase, ICloseableWindow {

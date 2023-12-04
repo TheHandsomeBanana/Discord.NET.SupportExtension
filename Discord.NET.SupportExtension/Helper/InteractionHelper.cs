@@ -9,10 +9,6 @@ using HB.NETF.Services.Security.Cryptography.Settings;
 using HB.NETF.Unity;
 using HB.NETF.VisualStudio.UI;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Unity;
 using Unity.Resolution;
 
@@ -74,7 +70,7 @@ namespace Discord.NET.SupportExtension.Helper {
             KeyEntryView view = new KeyEntryView() { DataContext = container.Resolve<KeyEntryViewModel>(new ParameterOverride("model", keyEntry)) };
             logger.LogInformation(InteractionMessages.AesRequestFor(name));
             UIHelper.Show(view);
-            if(keyEntry.IsCanceled) {
+            if (keyEntry.IsCanceled) {
                 logger.LogInformation(InteractionMessages.AesRequestCancelled);
                 return null;
             }

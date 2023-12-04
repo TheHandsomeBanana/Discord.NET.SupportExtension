@@ -1,5 +1,4 @@
 ﻿using Discord.NET.SupportExtension.Models.VMModels;
-using HB.NETF.Common.DependencyInjection;
 using HB.NETF.Common.Exceptions;
 using HB.NETF.Services.Data.Handler;
 using HB.NETF.Services.Data.Identifier;
@@ -11,12 +10,7 @@ using HB.NETF.WPF.Commands;
 using HB.NETF.WPF.ViewModels;
 using Microsoft.Win32;
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Input;
 using Unity;
 
 namespace Discord.NET.SupportExtension.ViewModels {

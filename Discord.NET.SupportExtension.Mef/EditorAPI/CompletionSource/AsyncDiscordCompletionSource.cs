@@ -1,35 +1,25 @@
-﻿using EnvDTE;
-using Microsoft.CodeAnalysis;
-using Microsoft.VisualStudio.ComponentModelHost;
-using Microsoft.VisualStudio.Language.Intellisense.AsyncCompletion.Data;
-using Microsoft.VisualStudio.Language.Intellisense.AsyncCompletion;
-using Microsoft.VisualStudio.LanguageServices;
-using Microsoft.VisualStudio.Shell;
-using Microsoft.VisualStudio.Text.Adornments;
-using Microsoft.VisualStudio.Text;
-using Microsoft;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
-using Microsoft.VisualStudio.Language.Intellisense;
-using Microsoft.VisualStudio.TextManager.Interop;
-using System.Collections.Immutable;
-using Discord.NET.SupportExtension.Core.Interface;
-using HB.NETF.Common.DependencyInjection;
+﻿using Discord.NET.SupportExtension.Core.Interface;
+using Discord.NET.SupportExtension.Mef;
+using EnvDTE;
 using HB.NETF.Services.Logging;
 using HB.NETF.Services.Logging.Factory;
-using Microsoft.VisualStudio.Core.Imaging;
-using Discord.NET.SupportExtension.Mef;
-using HB.NETF.VisualStudio.Workspace;
-using Microsoft.VisualStudio.Text.Editor;
-using Microsoft.VisualStudio.Text.Classification;
-using Microsoft.VisualStudio.Text.Operations;
-using HB.NETF.Code.Analysis.Models;
 using HB.NETF.Unity;
+using HB.NETF.VisualStudio.Workspace;
+using Microsoft;
+using Microsoft.CodeAnalysis;
+using Microsoft.VisualStudio.Core.Imaging;
+using Microsoft.VisualStudio.Language.Intellisense.AsyncCompletion;
+using Microsoft.VisualStudio.Language.Intellisense.AsyncCompletion.Data;
+using Microsoft.VisualStudio.LanguageServices;
+using Microsoft.VisualStudio.Shell;
+using Microsoft.VisualStudio.Text;
+using Microsoft.VisualStudio.Text.Adornments;
+using System;
+using System.Collections.Immutable;
+using System.Diagnostics;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using Unity;
 
 namespace Discord.NET.SupportExtension.MEF.CompletionSource {
@@ -50,7 +40,7 @@ namespace Discord.NET.SupportExtension.MEF.CompletionSource {
             catch {
                 return default;
             }
-            
+
             ILoggerFactory loggerFactory = supportPackageContainer.Resolve<ILoggerFactory>();
             if (loggerFactory == null) // Package not loaded => Nullref
                 return default;
@@ -59,7 +49,7 @@ namespace Discord.NET.SupportExtension.MEF.CompletionSource {
             IDiscordCompletionEngine engine = supportPackageContainer.Resolve<IDiscordCompletionEngine>();
 
             try {
-                if(token.IsCancellationRequested) {
+                if (token.IsCancellationRequested) {
                     logger.LogInformation("Completion cancelled");
                     return default;
                 }

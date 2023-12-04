@@ -1,9 +1,4 @@
-﻿using HB.NETF.Code.Analysis.Tests.Engine;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Threading.Tasks;
 
 namespace Discord.NET.SupportExtension.Core.Tests.AnalyserTests {

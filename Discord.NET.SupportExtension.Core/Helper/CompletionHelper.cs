@@ -1,16 +1,8 @@
 ﻿using Discord.NET.SupportExtension.Core.Interface;
-using HB.NETF.Common.DependencyInjection;
 using HB.NETF.Discord.NET.Toolkit.Models.Collections;
 using HB.NETF.Discord.NET.Toolkit.Models.Entities;
-using HB.NETF.Discord.NET.Toolkit.Services.EntityService;
-using HB.NETF.Discord.NET.Toolkit.Services.EntityService.Holder;
 using Microsoft.VisualStudio.Language.StandardClassification;
 using Microsoft.VisualStudio.Text.Adornments;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Discord.NET.SupportExtension.Core.Helper {
     internal static class CompletionHelper {
@@ -27,25 +19,25 @@ namespace Discord.NET.SupportExtension.Core.Helper {
             }
 
             ClassifiedTextElement serverTextElement = new ClassifiedTextElement(
-                new ClassifiedTextRun(PredefinedClassificationTypeNames.Keyword, "Server"),
-                new ClassifiedTextRun(PredefinedClassificationTypeNames.Identifier, parent != null ? parent.Id.ToString() : item.Id.ToString()),
-                new ClassifiedTextRun(PredefinedClassificationTypeNames.Text, parent != null ? parent.Name : item.Name)
+                new ClassifiedTextRun(PredefinedClassificationTypeNames.Type, "Server: "),
+                new ClassifiedTextRun(PredefinedClassificationTypeNames.Identifier, (parent != null ? parent.Name : item.Name) + " "),
+                new ClassifiedTextRun(PredefinedClassificationTypeNames.Number, parent != null ? parent.Id.ToString() : item.Id.ToString())
             );
 
             ContainerElement description;
             if (item.Type != DiscordEntityType.Server) {
                 description = new ContainerElement(ContainerElementStyle.Stacked,
-                    new ContainerElement(ContainerElementStyle.Wrapped, serverTextElement),
                     new ContainerElement(ContainerElementStyle.Wrapped,
                         new ClassifiedTextElement(
-                            new ClassifiedTextRun(PredefinedClassificationTypeNames.Keyword, item.Type.ToString()),
-                            new ClassifiedTextRun(PredefinedClassificationTypeNames.Identifier, item.Id.ToString()),
-                            new ClassifiedTextRun(PredefinedClassificationTypeNames.Text, item.Name)
+                            new ClassifiedTextRun(PredefinedClassificationTypeNames.Type, $"{item.Type}: "),
+                            new ClassifiedTextRun(PredefinedClassificationTypeNames.Identifier, item.Name + " "),
+                            new ClassifiedTextRun(PredefinedClassificationTypeNames.Number, $"{item.Id}")
                         )
-                    )
+                    ),
+                    new ContainerElement(ContainerElementStyle.Wrapped, serverTextElement)
                 );
             }
-            else 
+            else
                 description = new ContainerElement(ContainerElementStyle.Wrapped, serverTextElement);
 
             return new DiscordCompletionItem {

@@ -1,32 +1,21 @@
 ﻿using Discord.NET.SupportExtension.Commands;
 using Discord.NET.SupportExtension.Helper;
 using Discord.NET.SupportExtension.Models.VMModels;
-using EnvDTE;
-using HB.NETF.Common;
-using HB.NETF.Common.DependencyInjection;
 using HB.NETF.Discord.NET.Toolkit;
 using HB.NETF.Discord.NET.Toolkit.Models.Collections;
 using HB.NETF.Discord.NET.Toolkit.Services.EntityService;
 using HB.NETF.Discord.NET.Toolkit.Services.EntityService.Holder;
-using HB.NETF.Services.Data.Handler;
 using HB.NETF.Services.Data.Handler.Async;
 using HB.NETF.Services.Logging;
 using HB.NETF.Services.Logging.Factory;
-using HB.NETF.Services.Security.Cryptography;
-using HB.NETF.Services.Security.Cryptography.Interfaces;
-using HB.NETF.Services.Security.Cryptography.Keys;
-using HB.NETF.Services.Security.Cryptography.Settings;
 using HB.NETF.Unity;
 using HB.NETF.VisualStudio.UI;
 using HB.NETF.VisualStudio.Workspace;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 using System;
 using System.ComponentModel.Design;
-using System.Drawing.Text;
 using System.IO;
-using System.IO.Packaging;
 using System.Runtime.InteropServices;
 using System.Threading;
 using Unity;
@@ -70,7 +59,7 @@ namespace Discord.NET.SupportExtension {
                 new HB.NETF.Services.Serialization.UnitySetup());
 
             IUnityContainer container = UnityBase.CreateChildContainer(nameof(DiscordSupportPackage)); // Add child container for Unity
-            UnityBase.Boot(container, 
+            UnityBase.Boot(container,
                 new UnitySetup(),
                 new Core.UnitySetup());
 
@@ -83,7 +72,7 @@ namespace Discord.NET.SupportExtension {
             this.logger = loggerFactory.GetOrCreateLogger<DiscordSupportPackage>();
         }
 
-        
+
 
         public static string GetCachePath() => DiscordEnvironment.CachePath + "\\" + SolutionHelper.GetCurrentProject().Name + DiscordEnvironment.CacheExtension;
 
@@ -104,13 +93,13 @@ namespace Discord.NET.SupportExtension {
             // Do any initialization that requires the UI thread after switching to the UI thread.
             await this.JoinableTaskFactory.SwitchToMainThreadAsync(cancellationToken);
             UIHelper.InitOutputLog("Discord Support Extension");
-            
+
             Task initConfig = GenerateServerImageConfigurationCommand.InitializeAsync(this, commandService, OnException);
             Task initGenerate = GenerateServerImageCommand.InitializeAsync(this, commandService, OnException);
             Task initLoad = LoadServerCollectionCommand.InitializeAsync(this, commandService, OnException);
             await Task.WhenAll(initConfig, initGenerate, initLoad);
 
-            
+
             // Safe Package Load
             try {
                 string projectName = SolutionHelper.GetCurrentProject().Name;
@@ -121,7 +110,7 @@ namespace Discord.NET.SupportExtension {
                 else
                     logger.LogInformation(InteractionMessages.ConfigurationNotFoundFor(projectName) + ", " + InteractionMessages.ServerCollectionNotLoaded);
             }
-            catch(Exception ex) {
+            catch (Exception ex) {
                 logger.LogError(ex.Message);
             }
         }
@@ -147,7 +136,7 @@ namespace Discord.NET.SupportExtension {
                 DiscordServerCollection serverCollection = await entityService.ReadFromFile(GetCachePath());
                 UnityBase.UnityContainer.Resolve<IServerCollectionHolder>()
                     .Hold(projectName, serverCollection);
-                
+
                 logger.LogInformation(InteractionMessages.ServerCollectionLoadedFor(projectName));
             }
             catch {

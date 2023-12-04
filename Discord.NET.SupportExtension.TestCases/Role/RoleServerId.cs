@@ -1,9 +1,5 @@
 ﻿using Discord.NET.SupportExtension.TestCases.Guild;
 using Discord.Rest;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Discord.NET.SupportExtension.TestCases.Role {
@@ -21,7 +17,7 @@ namespace Discord.NET.SupportExtension.TestCases.Role {
 
 
             IRole socketRole1 = ServerBase.SocketGuild1.GetRole(9999); // guild id = 9999
-            
+
             IGuild socketGuild = ServerBase.SocketGuild2;
             IRole socketRole2 = socketGuild.GetRole(9998); // guild id = 9998
 

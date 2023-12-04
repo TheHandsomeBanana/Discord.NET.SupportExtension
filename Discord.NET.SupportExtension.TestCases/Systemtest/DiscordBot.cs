@@ -1,15 +1,9 @@
-﻿using Discord;
-using Discord.WebSocket;
-using System;
+﻿using Discord.WebSocket;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace Discord.NET.SupportExtension.TestCases.SystemTest
-{
-    public class DiscordBot
-    {
+namespace Discord.NET.SupportExtension.TestCases.SystemTest {
+    public class DiscordBot {
         private DiscordSocketClient client;
 
         public DiscordBot() {
@@ -17,9 +11,13 @@ namespace Discord.NET.SupportExtension.TestCases.SystemTest
         }
 
         public void Run() {
-            IGuild server = client.GetGuild(948571888148443156);
+            IGuild server = client.GetGuild(id: 948571888148443156 /* Banana-Land (Server) */);
 
-            IChannel channel = server.GetTextChannelAsync(1157751183822311496).Result; // Allgemein Channel
+            IChannel channel = server.GetCategoriesAsync().Result.First(e => e.Id == 948893874049409024 /* Albion (Category [Banana-Land]) */);
+
+            IEnumerable<IStageChannel> channels = server.GetChannelsAsync().Result.Cast<IStageChannel>();
+
+
 
         }
     }
