@@ -45,7 +45,8 @@ namespace Discord.NET.SupportExtension {
     [ProvideAutoLoad(UIContextGuids.SolutionExists, PackageAutoLoadFlags.BackgroundLoad)] // Auto load if solution exists
     public sealed class DiscordSupportPackage : AsyncPackage {
 
-        public static string EventLogPath = DiscordEnvironment.LogPath + "\\" + DateTime.Now.ToString("yyyy.MM.dd_HHmmss") + ".log";
+        public static string EventLogPath = DiscordEnvironment.LogPath + "\\" + DateTime.Now.ToString("yyyy.MM.dd") + ".log";
+
         private readonly ILogger<DiscordSupportPackage> logger;
 
         [Dependency(nameof(DiscordRestEntityService))]
@@ -75,7 +76,7 @@ namespace Discord.NET.SupportExtension {
 
             ILoggerFactory loggerFactory = UnityBase.UnityContainer.Resolve<ILoggerFactory>();
             loggerFactory.InvokeLoggingBuilder(b => b
-               .AddTarget(EventLogPath)
+               .AddTarget(EventLogPath, LogSeverity.Warning)
                .AddTarget(UIHelper.OutputWindowFunc));
 
             this.logger = loggerFactory.GetOrCreateLogger<DiscordSupportPackage>();

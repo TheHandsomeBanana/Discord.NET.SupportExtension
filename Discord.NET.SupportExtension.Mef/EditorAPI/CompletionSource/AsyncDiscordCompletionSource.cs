@@ -34,12 +34,9 @@ namespace Discord.NET.SupportExtension.MEF.CompletionSource {
         public async Task<CompletionContext> GetCompletionContextAsync(IAsyncCompletionSession session, CompletionTrigger trigger, SnapshotPoint triggerLocation, SnapshotSpan applicableToSpan, CancellationToken token) {
             IUnityContainer supportPackageContainer;
 
-            try {
-                supportPackageContainer = UnityBase.GetChildContainer("DiscordSupportPackage");
-            }
-            catch {
+            supportPackageContainer = UnityBase.GetChildContainer("DiscordSupportPackage");
+            if (supportPackageContainer == null)
                 return default;
-            }
 
             ILoggerFactory loggerFactory = supportPackageContainer.Resolve<ILoggerFactory>();
             if (loggerFactory == null) // Package not loaded => Nullref
@@ -66,7 +63,7 @@ namespace Discord.NET.SupportExtension.MEF.CompletionSource {
                 DiscordCompletionItem[] completions = await engine.ProcessCompletionAsync(vsWorkspace.CurrentSolution, semanticModel, triggerToken);
 
                 if (completions.Length > 0)
-                    logger.LogInformation($"{completions.Length} completions added in {stopwatch.ElapsedMilliseconds} ms.");
+                    logger.LogInformation($"[{document.Project} | {document.Name}] {completions.Length} completions added in {stopwatch.ElapsedMilliseconds} ms.");
 
                 stopwatch.Stop();
                 return new CompletionContext(completions.Select(e => {

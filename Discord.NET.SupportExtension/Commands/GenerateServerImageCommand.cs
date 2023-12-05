@@ -26,6 +26,8 @@ namespace Discord.NET.SupportExtension.Commands {
 
         [Dependency]
         public IAsyncStreamHandler StreamHandler { get; set; }
+        [Dependency]
+        public ILoggerFactory LoggerFactory { get; set; }
 
         private readonly IUnityContainer container;
         private readonly ILogger<GenerateServerImageCommand> logger;
@@ -33,7 +35,7 @@ namespace Discord.NET.SupportExtension.Commands {
             container = UnityBase.GetChildContainer(nameof(DiscordSupportPackage));
             container.BuildUp(this);
 
-            logger = container.Resolve<ILoggerFactory>().GetOrCreateLogger<GenerateServerImageCommand>();
+            logger = LoggerFactory.GetOrCreateLogger<GenerateServerImageCommand>();
         }
 
         public static GenerateServerImageCommand Instance { get; private set; }

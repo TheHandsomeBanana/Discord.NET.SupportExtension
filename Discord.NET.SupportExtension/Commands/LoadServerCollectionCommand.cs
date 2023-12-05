@@ -2,12 +2,14 @@
 using HB.NETF.Discord.NET.Toolkit.Models.Collections;
 using HB.NETF.Discord.NET.Toolkit.Services.EntityService;
 using HB.NETF.Discord.NET.Toolkit.Services.EntityService.Holder;
+using HB.NETF.Services.Data.Exceptions;
 using HB.NETF.Services.Logging;
 using HB.NETF.Services.Logging.Factory;
 using HB.NETF.Unity;
 using HB.NETF.VisualStudio.Commands;
 using HB.NETF.VisualStudio.UI;
 using HB.NETF.VisualStudio.Workspace;
+using Microsoft.CodeAnalysis.Elfie.Diagnostics;
 using Microsoft.VisualStudio.Shell;
 using System;
 using System.ComponentModel.Design;
@@ -53,13 +55,12 @@ namespace Discord.NET.SupportExtension.Commands {
                     UIHelper.ShowInfo(message);
                     logger.LogInformation(message);
                 }
-                catch (FileNotFoundException) {
+                catch(StreamHandlerException se) when (se.InnerException is FileNotFoundException) {
                     logger.LogError(InteractionMessages.ImageNotFoundFor(currentProjectName));
                     UIHelper.ShowError(InteractionMessages.ImageNotFoundFor(currentProjectName));
                 }
                 catch (Exception ex) {
                     logger.LogError(ex.ToString());
-                    UIHelper.ShowError(InteractionMessages.ServerCollectionNotLoadedFor(currentProjectName));
                 }
             });
         }
