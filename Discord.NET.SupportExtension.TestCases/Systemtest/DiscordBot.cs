@@ -18,6 +18,7 @@ namespace Discord.NET.SupportExtension.TestCases.SystemTest {
             IEnumerable<IStageChannel> channels = server.GetChannelsAsync().Result.Cast<IStageChannel>();
 
 
+            channels.First(e => e.Id == 948893874049409024 /* Albion (Category [Banana-Land]) */);
 
         }
     }
