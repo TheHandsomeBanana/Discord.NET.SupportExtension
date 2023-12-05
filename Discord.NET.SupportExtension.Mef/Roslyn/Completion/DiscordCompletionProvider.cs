@@ -3,6 +3,7 @@ using Discord.NET.SupportExtension.MEF.CompletionSource;
 using HB.NETF.Common.DependencyInjection;
 using HB.NETF.Services.Logging;
 using HB.NETF.Services.Logging.Factory;
+using HB.NETF.Unity;
 using HB.NETF.VisualStudio.Workspace;
 using Microsoft;
 using Microsoft.CodeAnalysis;
@@ -15,6 +16,7 @@ using System;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
+using Unity;
 
 namespace Discord.NET.SupportExtension.Mef.Roslyn.Completion {
     //[ExportCompletionProvider("DiscordCompletionProvider", LanguageNames.CSharp)]
@@ -24,15 +26,19 @@ namespace Discord.NET.SupportExtension.Mef.Roslyn.Completion {
 
         public DiscordCompletionProvider() {
             vsWorkspace = WorkspaceHelper.VisualStudioWorkspace;
+            UnityBase.UnityContainer.BuildUp(this);
         }
 
+        [Dependency("DiscordSupportPackage")]
+        public IUnityContainer UnityContainer { get; set; }
+
         public override async Task ProvideCompletionsAsync(CompletionContext context) {
-            ILoggerFactory loggerFactory = DIContainer.GetService<ILoggerFactory>();
+            ILoggerFactory loggerFactory = UnityContainer.Resolve<ILoggerFactory>();
             if (loggerFactory == null) // Package not loaded => Nullref
                 return;
 
             ILogger<AsyncDiscordCompletionSource> logger = loggerFactory.GetOrCreateLogger<AsyncDiscordCompletionSource>();
-            IDiscordCompletionEngine engine = DIContainer.GetService<IDiscordCompletionEngine>();
+            IDiscordCompletionEngine engine = UnityContainer.Resolve<IDiscordCompletionEngine>();
 
             try {
                 if (context.CancellationToken.IsCancellationRequested) {
