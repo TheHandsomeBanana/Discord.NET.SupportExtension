@@ -1,25 +1,27 @@
-﻿using Discord.WebSocket;
+﻿using Discord.Rest;
+using Discord.WebSocket;
 using System.Collections.Generic;
 using System.Linq;
 
 namespace Discord.NET.SupportExtension.TestCases.SystemTest {
     public class DiscordBot {
         private DiscordSocketClient client;
-
+        private DiscordRestClient restClient;
         public DiscordBot() {
             client = new DiscordSocketClient();
         }
 
         public void Run() {
-            IGuild server = client.GetGuild(id: 948571888148443156 /* Banana-Land (Server) */);
+            IGuild server = client.GetGuild(948571888148443156 /* Banana-Land (Server) */);
 
-            IChannel channel = server.GetCategoriesAsync().Result.First(e => e.Id == 948893874049409024 /* Albion (Category [Banana-Land]) */);
+            server.GetRole(948587247408668682 /* Banana King 🍌👑 (Role [Banana-Land]) */);
 
-            IEnumerable<IStageChannel> channels = server.GetChannelsAsync().Result.Cast<IStageChannel>();
+            IGuild server2 = GetServerById(948571888148443156 /* Banana-Land (Server) */);
+        }
 
 
-            channels.First(e => e.Id == 948893874049409024 /* Albion (Category [Banana-Land]) */);
-
+        public IGuild GetServerById(ulong id) {
+            return client.GetGuild(id);
         }
     }
 }

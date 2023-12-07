@@ -2,6 +2,7 @@
 using Discord.NET.SupportExtension.Core.Interface;
 using Discord.NET.SupportExtension.Core.Interface.Analyser;
 using HB.NETF.Common.Exceptions;
+using HB.NETF.Discord.NET.Toolkit.Models.Collections;
 using HB.NETF.Discord.NET.Toolkit.Services.EntityService.Holder;
 using Microsoft.CodeAnalysis;
 using System;
@@ -23,8 +24,12 @@ namespace Discord.NET.SupportExtension.Core {
             Project project = solution.Projects.FirstOrDefault(e => e.Documents.Any(f => f.FilePath == token.SyntaxTree.FilePath))
                 ?? throw new InternalException($"Project from {token.SyntaxTree.FilePath} not found.");
 
+            DiscordServerCollection serverCollection = ServerHolder.Get(project.Name);
+            if (serverCollection.Keys.Count == 0)
+                return completionItems;
+
             DiscordAnalyser.Initialize(solution, project, semanticModel);
-            completionItems = (await DiscordAnalyser.Run(token.Parent)).Select(e => CompletionHelper.ToCompletionItem(e, ServerHolder.Get(project.Name))).ToArray();
+            completionItems = (await DiscordAnalyser.Run(token.Parent)).Select(e => CompletionHelper.ToCompletionItem(e, serverCollection)).ToArray();
 
             return completionItems;
         }
