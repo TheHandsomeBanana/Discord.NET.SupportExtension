@@ -15,6 +15,7 @@ namespace Discord.NET.SupportExtension.ViewModels {
             set {
                 model.Token = value;
                 OnPropertyChanged(nameof(TokenText));
+                FinishCommand.OnCanExecuteChanged();
             }
         }
         #endregion
@@ -25,7 +26,7 @@ namespace Discord.NET.SupportExtension.ViewModels {
         public TokenEntryViewModel(TokenEntryModel model) {
             this.model = model;
             this.ExitCommand = new RelayCommand(Exit, null);
-            this.FinishCommand = new RelayCommand(Finish, o => model.Token != null);
+            this.FinishCommand = new RelayCommand(Finish, o => model.Token != null && model.Token.Length == 70);
         }
 
         private void Finish(object obj) {

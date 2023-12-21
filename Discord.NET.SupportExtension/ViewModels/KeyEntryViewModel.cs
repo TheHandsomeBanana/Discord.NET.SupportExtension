@@ -48,7 +48,7 @@ namespace Discord.NET.SupportExtension.ViewModels {
 
         private readonly KeyEntryModel model;
         [Dependency]
-        private readonly IStreamHandler streamHandler;
+        public IStreamHandler StreamHandler { get; set; }
         private readonly ILogger<DiscordSupportPackage> logger;
         public KeyEntryViewModel(KeyEntryModel model) {
             ExitCommand = new RelayCommand(Exit, null);
@@ -75,7 +75,7 @@ namespace Discord.NET.SupportExtension.ViewModels {
 
         private void Extract(object o) {
             try {
-                model.Key = streamHandler.ReadFromFile<Identifier<AesKey>>(KeyPath);
+                model.Key = StreamHandler.ReadFromFile<Identifier<AesKey>>(KeyPath);
                 Close?.Invoke();
             }
             catch (InternalException ex) {
