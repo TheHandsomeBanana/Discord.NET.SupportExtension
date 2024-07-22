@@ -2,26 +2,21 @@
 using Discord.WebSocket;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
+using System.Xml.Linq;
 
 namespace Discord.NET.SupportExtension.TestCases.SystemTest {
     public class DiscordBot {
-        private DiscordSocketClient client;
-        private DiscordRestClient restClient;
+        private DiscordSocketClient discordSocketClient;
         public DiscordBot() {
-            client = new DiscordSocketClient();
+            discordSocketClient = new DiscordSocketClient();
         }
 
-        public void Run() {
-            IGuild server = client.GetGuild(948571888148443156 /* Banana-Land (Server) */);
+        public async Task Run() {
+            SocketGuild extensionTestServer
+                = discordSocketClient.GetGuild(1157751183184760953 /* Discord.NET Support Extension Testserver (Server) */);
 
-            server.GetRole(948587247408668682 /* Banana King 🍌👑 (Role [Banana-Land]) */);
-
-            IGuild server2 = GetServerById(948571888148443156 /* Banana-Land (Server) */);
         }
 
-
-        public IGuild GetServerById(ulong id) {
-            return client.GetGuild(id);
-        }
     }
 }

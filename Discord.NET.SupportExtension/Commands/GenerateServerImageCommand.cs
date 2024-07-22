@@ -51,7 +51,7 @@ namespace Discord.NET.SupportExtension.Commands {
             string currentConfigPath = ConfigHelper.GetConfigPath();
             string currentCachePath = DiscordSupportPackage.GetCachePath();
 
-            await Package.JoinableTaskFactory.RunAsync((Func<Task>)(async () => {
+            await Package.JoinableTaskFactory.RunAsync(async () => {
                 ConfigureServerImageModel model = new ConfigureServerImageModel();
 
                 DateTime startedAt = DateTime.Now;
@@ -109,7 +109,7 @@ namespace Discord.NET.SupportExtension.Commands {
                     model.RunLog.Add(new RunLogEntry() { StartedAt = startedAt, FinishedAt = finishedAt, Status = status });
                     await this.StreamHandler.WriteToFileAsync<ConfigureServerImageModel>(currentConfigPath, model);
                 }
-            }));
+            });
         }
 
         private void OnTimeout() {

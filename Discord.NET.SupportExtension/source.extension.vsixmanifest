@@ -22,6 +22,5 @@
         <Asset Type="Microsoft.VisualStudio.VsPackage" d:Source="Project" d:ProjectName="%CurrentProject%" Path="|%CurrentProject%;PkgdefProjectOutputGroup|" />
         <Asset Type="Microsoft.VisualStudio.MefComponent" d:Source="Project" d:ProjectName="%CurrentProject%.Mef" Path="|Discord.NET.SupportExtension.Mef|" />
         <Asset Type="Microsoft.VisualStudio.Assembly" d:Source="Project" d:ProjectName="%CurrentProject%.Core" Path="|Discord.NET.SupportExtension.Core|" AssemblyName="|Discord.NET.SupportExtension.Core;AssemblyName|" />
-        <Asset Type="Microsoft.VisualStudio.Analyzer" d:Source="Project" d:ProjectName="%CurrentProject%.Mef" Path="|Discord.NET.SupportExtension.Mef|" />
     </Assets>
 </PackageManifest>

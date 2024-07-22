@@ -1,113 +1,29 @@
 {
   "SaveToken": true,
   "EncryptData": false,
-  "TokenEncryptionMode": 1,
+  "TokenEncryptionMode": 0,
   "DataEncryptionMode": null,
-  "TokenKeyIdentifier": "d751e16c-a983-49e8-b903-3455c01e943e",
+  "TokenKeyIdentifier": null,
   "DataKeyIdentifier": null,
-  "Token": "32S3JtJ0EdnKZbPlDH1qDvni6Nr6GUUfgnGMzh3ShkynVhAFKrKVUQuj9vXZkhKzbyFafhhRa/49iKOlYXt/H0a7YLSMASeSP5F+bJ9Z3JY=",
+  "Token": "AQAAANCMnd8BFdERjHoAwE/Cl+sBAAAA3HachGGSJkiriawRT6EaDgAAAAACAAAAAAAQZgAAAAEAACAAAACsNydK/LlMEhUs1IP7mmsYypG5X75x8FeUilAzILks3wAAAAAOgAAAAAIAACAAAABg49oHzNNGrDnszK6o6tmTh2Ozis3nutBNS6Wcp9TvaVAAAACtFxYXIIFYK1KuqYCqZ/UpPIW6+y+f2Y4MRGZfS6rJ9D6jMiC/Xor2GQ5VRPRwgIMYSpmQ4jVKD/iGvsWXFMZBM0+RuS5EH4/OPLD/Zulrp0AAAACsOznvKc9r8etlK7DsTqIlVvV3+XgyawVED3jgzeYL6C5ikvnndwWmrlwvxtfFlMS7I01Wq/Z1HITeuuDC9KJc",
   "RunLog": [
     {
-      "StartedAt": "2023-11-13T18:33:38.3480744+01:00",
-      "FinishedAt": "2023-11-13T18:34:08.9090773+01:00",
+      "StartedAt": "2024-02-25T00:44:07.7688202+01:00",
+      "FinishedAt": "2024-02-25T00:46:02.3152078+01:00",
       "Status": 1,
-      "Duration": "00:00:30.5610029"
+      "Duration": "00:01:54.5463876"
     },
     {
-      "StartedAt": "2023-11-13T18:37:14.0133787+01:00",
-      "FinishedAt": "2023-11-13T18:37:17.6338796+01:00",
-      "Status": 1,
-      "Duration": "00:00:03.6205009"
+      "StartedAt": "2024-07-16T10:25:01.7563613+02:00",
+      "FinishedAt": "2024-07-16T10:25:02.0640946+02:00",
+      "Status": 0,
+      "Duration": "00:00:00.3077333"
     },
     {
-      "StartedAt": "2023-11-14T17:25:05.749925+01:00",
-      "FinishedAt": "2023-11-14T17:25:12.8114097+01:00",
+      "StartedAt": "2024-07-16T10:26:00.1176473+02:00",
+      "FinishedAt": "2024-07-16T10:26:02.8642689+02:00",
       "Status": 1,
-      "Duration": "00:00:07.0614847"
-    },
-    {
-      "StartedAt": "2023-11-14T18:40:06.5637657+01:00",
-      "FinishedAt": "2023-11-14T18:40:22.5517109+01:00",
-      "Status": 1,
-      "Duration": "00:00:15.9879452"
-    },
-    {
-      "StartedAt": "2023-11-16T13:10:58.0906621+01:00",
-      "FinishedAt": "2023-11-16T13:11:02.1243101+01:00",
-      "Status": 1,
-      "Duration": "00:00:04.0336480"
-    },
-    {
-      "StartedAt": "2023-11-24T18:02:55.9640514+01:00",
-      "FinishedAt": "2023-11-24T18:03:00.9633142+01:00",
-      "Status": 1,
-      "Duration": "00:00:04.9992628"
-    },
-    {
-      "StartedAt": "2023-11-24T18:03:36.8800774+01:00",
-      "FinishedAt": "2023-11-24T18:03:40.6755083+01:00",
-      "Status": 1,
-      "Duration": "00:00:03.7954309"
-    },
-    {
-      "StartedAt": "2023-11-24T18:05:07.7803867+01:00",
-      "FinishedAt": "2023-11-24T18:05:11.5181457+01:00",
-      "Status": 1,
-      "Duration": "00:00:03.7377590"
-    },
-    {
-      "StartedAt": "2023-12-02T20:10:25.6136932+01:00",
-      "FinishedAt": "2023-12-02T20:11:21.6927573+01:00",
-      "Status": 1,
-      "Duration": "00:00:56.0790641"
-    },
-    {
-      "StartedAt": "2023-12-02T20:11:30.941465+01:00",
-      "FinishedAt": "2023-12-02T20:11:44.0268057+01:00",
-      "Status": 1,
-      "Duration": "00:00:13.0853407"
-    },
-    {
-      "StartedAt": "2023-12-02T20:12:11.4751083+01:00",
-      "FinishedAt": "2023-12-02T20:12:24.5023512+01:00",
-      "Status": 1,
-      "Duration": "00:00:13.0272429"
-    },
-    {
-      "StartedAt": "2023-12-03T22:11:49.6690089+01:00",
-      "FinishedAt": "2023-12-03T22:12:03.5311046+01:00",
-      "Status": 1,
-      "Duration": "00:00:13.8620957"
-    },
-    {
-      "StartedAt": "2023-12-04T21:11:45.5128058+01:00",
-      "FinishedAt": "2023-12-04T21:11:54.9783742+01:00",
-      "Status": 1,
-      "Duration": "00:00:09.4655684"
-    },
-    {
-      "StartedAt": "2023-12-05T11:43:18.7735769+01:00",
-      "FinishedAt": "2023-12-05T11:43:23.5777144+01:00",
-      "Status": 1,
-      "Duration": "00:00:04.8041375"
-    },
-    {
-      "StartedAt": "2023-12-05T11:43:33.4859081+01:00",
-      "FinishedAt": "2023-12-05T11:43:40.1968334+01:00",
-      "Status": 1,
-      "Duration": "00:00:06.7109253"
-    },
-    {
-      "StartedAt": "2023-12-07T20:08:01.1358051+01:00",
-      "FinishedAt": "2023-12-07T20:08:07.0589197+01:00",
-      "Status": 1,
-      "Duration": "00:00:05.9231146"
-    },
-    {
-      "StartedAt": "2023-12-21T15:50:08.0307016+01:00",
-      "FinishedAt": "2023-12-21T15:50:14.8558159+01:00",
-      "Status": 1,
-      "Duration": "00:00:06.8251143"
+      "Duration": "00:00:02.7466216"
     }
   ]
 }
