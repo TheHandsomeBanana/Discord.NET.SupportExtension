@@ -1,0 +1,84 @@
+\documentclass[11pt]{article}
+
+% ----------------------------------------------------------------------------------------
+% -- Imports
+% ----------------------------------------------------------------------------------------
+\usepackage{fancyhdr}
+\usepackage{url}
+\usepackage[utf8]{inputenc}
+\usepackage{graphicx}
+\usepackage{lastpage}
+\usepackage[a4paper, top=36mm,bottom=40mm,left=32mm,right=32mm]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage{tabularx}
+\usepackage{longtable}
+\usepackage{colortbl}
+\usepackage{fancyvrb}
+\usepackage{pdfpages}
+\usepackage{xcolor}
+\usepackage{listings}
+\usepackage[hidelinks]{hyperref}
+\usepackage{wrapfig}
+\usepackage{caption}
+\usepackage{bookmark}
+\usepackage{acronym}
+\usepackage{float}
+\usepackage[backend=biber, style=authoryear, natbib=true]{biblatex}
+
+\addbibresource{../common/references.bib}
+
+% Set spacing between entries
+\setlength\bibitemsep{2.0\itemsep}
+
+
+
+% Bold volume numbers
+\DeclareFieldFormat[article]{volume}{\mkbibbold{#1}}
+
+% Consistent URL font
+\DeclareFieldFormat{url}{\url{#1}}
+
+
+\input{../common/commands}
+\input{../common/listings}
+
+\AtBeginEnvironment{listing}{\setcounter{listing}{\value{lstlisting}}}
+\AtEndEnvironment{listing}{\stepcounter{lstlisting}}
+
+\lstset{style=CSharp}
+
+\pagestyle{fancy}
+\setlength\headheight{40pt} 
+
+% Header
+\lhead{\leftmark}
+\chead{}
+\rhead{\includegraphics[height=35pt]{../common/img/logo.png}}
+
+\begin{document}
+	
+\includepdf[pages=-]{front/frontpage}
+\include{front/acknowledgement}
+\include{front/abstract}
+\include{front/kurzfassung}
+\tableofcontents
+\newpage 
+
+% Abbildungsverzeichnis
+\listoffigures
+
+% Codesnippetverzeichnis
+\lstlistoflistings
+
+\include{sections/introduction}
+\include{sections/foundation}
+\include{sections/implementation}
+\include{sections/results} 
+\include{sections/closing}
+
+% References
+\printbibliography
+
+%%%-----------------------------------------------------------------------------
+\end{document}
+%%%-----------------------------------------------------------------------------

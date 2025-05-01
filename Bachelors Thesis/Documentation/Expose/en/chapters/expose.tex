@@ -1,0 +1,71 @@
+\chapter{Exposé}
+
+\section{Introduction}
+
+Developing Discord bots can be exhausting and time consuming, but there are several ways to make it more comfortable.
+The following scenario will handle the creation of an extension for Visual Studio. This extension prototype will ease up the coding process for Discord bots, by adapting the IntelliSense process for unique identifiers of discord entities.
+
+\subsection{What is Discord?}
+
+"Discord is a voice, video, and text chat app that's used by tens of millions of people ages 13+ to talk and hang out with their communities and friends" \cite{whatisdiscord}. \\\\
+Discord has its own vocabulary, for a better understanding some terms are explained.\\
+Servers are the spaces on Discord. They are made by specific communities and friend groups. The vast majority of servers are small and invitation-only. Some larger servers are public. Any user can start a new server for free and invite their friends to it.\\
+Discord servers are organized into text and voice channels, which are usually dedicated to specific topics and can have different rules. \cite{whatisdiscord}\\\\
+It is important to note, that each of these entities in Discord have a unique identifier, that can be used to access the identified entity through the Discord-API. 
+
+\subsection{What are Discord bots?}
+A Discord bot is a program or script designed to run on Discord that can perform a variety of functions and automate tasks within Discord servers. These functions mainly contain of 
+\begin{enumerate}
+	\item Moderation: Bots can help manage and moderate Discord servers by enforcing rules, detecting and handling inappropriate content, and issuing warnings or punishments to users who violate server guidelines.
+	\item Automation: Bots can automate repetitive tasks, such as welcoming new members, assigning roles based on certain criteria, and cleaning up messages or channels.
+	\item Information Retrieval: Bots can fetch information from external sources or APIs and provide it within the Discord server. This can include weather updates, news, or data from specific websites.
+	\item Fun and Games: Many Discord bots are created for entertainment purposes. They can offer games, quizzes, or other interactive elements to keep server members engaged.
+	\item Music: Some bots are designed specifically for playing music in voice channels. They can queue up songs, adjust volume, and provide a music listening experience for server members.
+	\item Custom Commands: Server owners can create custom commands that trigger specific actions or responses from the bot. This allows for a high degree of customization based on the server's needs.
+	\item Integration with External Services: Bots can integrate with external services and platforms, allowing users to interact with those services directly from Discord. For example, bots can interact with Google Calendar, GitHub, or other APIs. \cite{agnihotri2022discord}
+\end{enumerate}
+
+\subsection{What is Discord.Net?}
+Discord.Net is an asynchronous and multi-platform .NET Library used to interface with the Discord API. It provides a set of tools and abstractions to make this task easier for developers. The key features include:
+\begin{itemize}
+	\item DiscordSocketClient: This is a class that represents the connection to the Discord gateway and provides various events.
+	\item CommandService: Discord.Net includes a command framework that simplifies the process of creating and handling commands in a bot.
+	\item WebSocket and REST API Handling: Discord.Net handles the communication with the Discord API not only through WebSocket connections, but also through REST API calls that don't require real time communication.
+	\item Entities: Discord.Net represents Discord objects (users, channels, guilds, messages etc.) as classes. \cite{discorddotnet}
+\end{itemize}
+
+\subsection{What is a Visual Studio Extension?}
+Extensions serve as add-ons enabling you to personalize and enrich your Visual Studio experience by introducing new features or integrating existing tools. Extensions vary in complexity but share a common goal: to boost productivity and align with your workflow. In theory, every part of Visual Studio can be extended, practice shows what most people like to extend are commands, menus and toolbars, windows, IntelliSense and projects. There are also many project templates provided for these scenarios. \cite{whatisvsextension}
+
+\subsubsection{Extension task}
+The Visual Studio extension prototype is capable of analysing the programmers code on the fly and provide instant IntelliSense support for unique identifiers of Discord entities, for Discord.Net (This can be extended for other .NET wrappers for Discord development). The data, that is provided for the IntelliSense interaction, can also be generated dynamically inside Visual Studio.
+
+
+\section{State of the Art}
+\subsection{Discord.Net}
+To generate the data dynamically inside Visual Studio, Discord's API needs to be accessed. The Discord.Net wrapper will not only be the target of the extension, but is also used to build a connection to the API and retrieve the required data. There are many other wrappers for Discord for many different languages like D++ for \textit{C++} or discord.py for \textit{Python}. There is also another wrapper for .NET called DSharpPlus, but its way less popular and not very well documented, so the preferred choice for .NET is Discord.Net.
+
+\subsection{Roslyn}
+The .NET Compiler Platform aka. MS Roslyn is used for C\# and VB to enable building tools and extensions to perform routine programming tasks like source code compilation, code analysis, code refactoring and code generation. Roslyn is divided into multiple programming layers that expose public APIs to write customized tools. These APIs contain of 4 layers:
+\begin{itemize}
+	\item Code Analysis: Core syntax and semantic representation.
+	\item Workspaces: Set of logically related source files in projects and solutions.
+	\item Features: IDE features build on top of the Code Analysis and Workspace API like IntelliSense.
+	\item Visual Studio: Visual Studio workspace and project system. \cite{vasani2017roslyn}
+\end{itemize}
+
+\subsection{Editor API}
+To interact with the IntelliSense API, Visual Studio provides an Editor API \cite{asynccompletionapi} that comes with various functionalities. Roslyn also provides functionality to interact with completions, but it's not as technically mature as the Editor API. Besides these scenario, where the implementation is language and IDE specific, there exists a protocol for standardizing messages, so language specific domains are not necessary, called Language Server Protocol. Software development tools communicate with the language server using this protocol over JSON-RPC. \cite{lsp} This would usually be the preferred choice to implement language extensions, but in this case scenario, the language support is specifically for Discord.Net, so the Editor API provides more than enough functionality.
+
+
+\section{Methodology}
+To fulfill the requirements for this Visual Studio Extension, several utilities, provided by Microsoft, are necessary.
+To analyze code, the VS Solution needs to be loaded. That can be achieved either for testing purposes via MSBuild, or via the ComponentModel service provided by VisualStudio, that contains the VisualStudioWorkspace with all items like projects and documents. The containing code inside the projects can then be processed via MS Roslyn.
+"The .NET Compiler Platform SDK provides the tools you need to create custom diagnostics (analyzers), code fixes, code refactoring, and diagnostic suppressors that target C\# or Visual Basic code." \cite{tutorialfirstanalyser}\\\\
+To provide custom IntelliSense items, so called completion items, the Editor API is used. 
+"Completion in VS uses MEF to discover extensions. Specifically, VS is looking for exports of type \textit{IAsyncCompletionSourceProvider},  \textit{IAsyncCompletionItemManagerProvider}, \textit{IAsyncCompletionCommitManagerProvider} and \textit{ICompletionPresenterProvider}." \cite{asynccompletionapi}\\\\
+MEF stands for Managed Extensibility Framework, which is a library for the development of lightweight and extensible applications. It allows developers to discover and use extensions with no configuration required and lets them easily encapsulte code to avoid fragile hard dependencies. MEF also allows applications to be reused not only inside, but across different applications. It is an integral part of the .NET Framework 4 and available wherever the .NET Framework is used, whether its for WPF, ASP.NET or any other application.\cite{mef} 
+
+
+\section{Expected Results}
+The Visual Studio Extension prototype will provide 3 commands for configuring data generation, generating data from Discord and loading the data per project. It will also analyze the developers code and provides the context specific data to the completion API, which leads to beeing suggested as IntelliSense item. These items will consist of static discord entity ids.

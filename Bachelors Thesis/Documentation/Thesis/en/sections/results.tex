@@ -1,0 +1,54 @@
+\section{Results}
+\label{sec:Results}
+To demonstrate the full results process, the following section also presents the exact way in which these results were achieved. That includes the creation of a new project and the data generation for the Discord bot named \textit{Main Banana Man}.
+
+\includeImgScale{0.8}{../../assets/ShowcaseNewProject.png}{New project for showcase}{fig:showcaseNewProject}
+Figure \ref{fig:showcaseNewProject} represents the new project containing a \textit{DiscordBot.cs} file and the installed \textit{Discord.Net} NuGet packages.
+
+\includeBasicImg{../../assets/DiscordDevBot.png}{The created bot with its token}{fig:showcaseDiscordDevBot}
+Figure \ref{fig:showcaseDiscordDevBot} shows the bot that was created on \url{https://discord.com/developers/applications/}. The process of creating a bot in the API is not explained in detail, but can be found on various websites. YouTube and many others offer a large amount of tutorials for this. Just to name one, a good explanation can be found on \url{https://www.ionos.com/digitalguide/server/know-how/creating-discord-bot/}. The created bot contains a token that is required to build a connection to the Discord API. This token can also be seen in Figure \ref{fig:showcaseDiscordDevBot}. It is also important that this token is not exposed to the public, because anybody will be able to connect to the API using this bot. If the token is exposed either way, it can be reset with the \textit{Reset Token} button as seen in Figure \ref{fig:showcaseDiscordDevBot}.
+\includeBasicImg{../../assets/DiscordServerShowcase.png}{Small overview of the server}{fig:showcaseDiscordServer}
+Figure \ref{fig:showcaseDiscordServer} shows the Discord desktop application. On the right side the user list is displayed. As can be seen, the bot \textit{Main Banana Man} is part of the server. On the left side the server list, the current logged in user is part of, can be seen. The \textit{Main Banana Man} bot is part of the 2 servers at the top, which are also highlighted in Figure \ref{fig:showcaseDiscordServer}. The first one is called \textit{Discord.NET Support Extension Testserver} and the second one is called \textit{Banana Land}. This means that the data for these 2 servers can be generated, provided that the bot has the necessary read permissions. 
+
+\includeBasicImg{../../assets/ConfigureServerImageCommandHighlighted.png}{Highlighted Server Image Configuration command}{fig:showcaseConfigurationCommandHighlighted}
+As seen in Figure \ref{fig:showcaseConfigurationCommandHighlighted} the next step is to configure the data generation.
+
+\includeBasicImg{../../assets/ShowcaseConfigureServerImage.png}{Configured Data Generation}{fig:showcaseConfigureServerImage}
+Looking Figure \ref{fig:showcaseConfigureServerImage}, the configuration is done. It can be now saved using the \textit{Save} button for later data generation, or the data can directly be generated using the \textit{Generate} button. The configuration is saved either way. So the next step is to actually generate the data.
+
+\includeBasicImg{../../assets/GeneratedImageCommandHighlighted.png}{Highlighted Server Image Generation command}{fig:showcaseGenerateServerImageHighlighted}
+To generate the data, the project is right clicked and the command \textit{Generate Server Image} is executed.
+
+\includeBasicImg{../../assets/ShowcaseGenerateServerImage.png}{Log for data generation}{fig:showcaseGenerateServerImage}
+Figure \ref{fig:showcaseGenerateServerImage} shows the output log after the \textit{Generate Server Image} command was executed. Also a message box is shown containing the information about the executions result state. When generating new data, it is automatically loaded so there is no need to explicitly call the \textit{Load Server Collection} command for this project. But this is only the case when Visual Studio is not closed. When reopening Visual Studio, executing this command is required. Now that the data was successfully generated, it is used to provide code completion.
+
+\paragraphWithLabel{Server completion items}{p:serverCompletions}
+\includeImgScale{0.52}{../../assets/IntelliSenseServerResultSuggestion.png}{Completion items for getting a server}{fig:intelliSenseServerResultSuggestion}
+Figure \ref{fig:intelliSenseServerResultSuggestion} displays the possible completion items for this context. In this case, the found context is \textit{Server}, so each server found in the generated data (Paragraph \ref{p:GenerateServerImageCommand}) is going to be provided as completion item. When looking back at Figure \ref{fig:showcaseDiscordServer}, the 2 suggestions are based on the servers the bot is part of. This action's responsible component \textit{IAsyncCompletionSource} is described in Listing \ref{lst:discordCompletionSource}.
+
+\includeBasicImg{../../assets/IntelliSenseServerResultCommitted.png}{Committed server completion item}{fig:intelliSenseServerResultCommitted}
+Figure \ref{fig:intelliSenseServerResultCommitted} shows how the selected completion item is committed into the editor. This action's responsible component \textit{IAsyncCompletionCommitManager} is described in Listing \ref{lst:discordCompletionCommitManager}.
+\newpage
+\paragraphWithLabel{User completion items}{p:userCompletions}
+\includeImgScale{0.52}{../../assets/IntelliSenseUserResultSuggestion.png}{Completion items for getting a user that is part of the given server}{fig:intelliSenseUserResultSuggestion}
+It is important to note, that when the given context is not \textit{Server}, like in this case \textit{User}, not every user found in the generated data is taken and provided as completion item. The \textit{Server Id Analyser} mentioned in Subsection \ref{ssec:CodeAnalyzer} determines on which server-variable the \textit{GetUserAsync} method is called. So for this example, when requesting the user completion items, the algorithm knows that this method is called on the \textit{extensionTestServer} variable and will proceed to get the id connected with this variable, which is the static value inside the \textit{GetGuild} method. If the algorithm is unable to find a server id, it will provide all users found in the generated data. But as seen in Figure \ref{fig:intelliSenseUserResultSuggestion}, the users are filtered correctly, since Figure \ref{fig:showcaseDiscordServer} shows that these 2 users are part of the server.
+
+\includeBasicImg{../../assets/IntelliSenseUserResultCommitted.png}{Committed user completion item}{fig:intelliSenseUserResultCommitted}
+Figure \ref{fig:intelliSenseUserResultCommitted} shows how the selected completion item is committed into the editor.
+
+\paragraphWithLabel{Channel completion items}{p:channelCompletions}
+When again taking a look at the Discord Server (Figure \ref{fig:showcaseDiscordServer}), there are 6 channels visible. 2 text channels \textit{Allgemein} and \textit{chitchat}, 2 voice channels \textit{Allgemein} and \textit{chitchat}, and the 2 category channels that contain the voice and text channels \textit{Textkanaele} and \textit{Sprachkanaele}. 
+Since \textit{Channel} is a supported context, these entities will also be suggested as completion item.
+
+\includeImgScale{0.52}{../../assets/IntelliSenseTextChannel.png}{Completion items for getting a text channel that is part of the given server}{fig:intelliSenseTextChannel}
+
+\includeImgScale{0.52}{../../assets/IntelliSenseVoiceChannel.png}{Completion items for getting a voice channel that is part of the given server}{fig:intelliSenseVoiceChannel}
+
+\includeImgScale{0.52}{../../assets/IntelliSenseCategoryChannel.png}{Completion items for getting a category channel that is part of the given server}{fig:intelliSenseCategoryChannel}
+
+Figure \ref{fig:intelliSenseTextChannel}, \ref{fig:intelliSenseVoiceChannel} and \ref{fig:intelliSenseCategoryChannel} show the suggestions for text, voice and category channels. As mentioned, when looking at the Discord server (Figure \ref{fig:showcaseDiscordServer}), there are the 6 channels existent.
+
+\paragraphWithLabel{Completion items when using LINQ}{p:linqCompletions}
+More complex coding scenarios are also supported, like when using LINQ.
+\includeBasicImg{../../assets/IntelliSenseRoleResultLinq.png}{Role suggestions in LINQ method}{fig:intelliSenseRoleResultLinq}
+As shown in Figure \ref{fig:intelliSenseRoleResultLinq}, when using Linq methods the context is determined and the suggestions are provided correctly.

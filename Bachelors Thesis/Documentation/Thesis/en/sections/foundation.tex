@@ -1,0 +1,358 @@
+\section{Foundation}
+\label{sec:Foundation}
+  
+To achieve the wanted capabilities for the Visual Studio Extension, multiple technologies are required. First a core understanding of how Visual Studio Extensions are developed and what features and possibilities they bring to the table is necessary. To effectively implement this process, it's essential to first set up a way to retrieve data from the Discord API. Since it's common to develop just one bot per \csharp project, it makes sense to trigger the process for each individual project. The way of implementation will be explained in more detail later. This data is then used for code completion utilizing the Editor API. Additionally, using the said API requires working with the Managed Extensibility Framework (MEF), since the Editor API depends on it. An important step in this process is figuring out exactly when and what type of data should be made available for code completion, and this is where MS Roslyn comes in, offering precise code analysis to make these determinations.
+
+\includeBasicImg{../../assets/Workflow\_Full.png}{Workflow overview to acquire the wanted solution}{fig:full-architecture}
+
+To clarify Figure \ref{fig:full-architecture} in a more detailed manner, imagine a user who is coding in Visual Studio and has installed an extension that provides the necessary features mentioned in the Introduction (Section \ref{sec:Introduction}). This extension includes various Commands that can be accessed by right clicking a project. For interacting with the Editor API, a separate project is created and then added to the main project as a MEF component. For reference, it would also be possible to create the MEF components in the main project, but in terms of readability and maintainability it makes sense to put them in a seperate project. And that is where the user's code is analyzed using MS Roslyn. The details of these steps are thoroughly explained in the following sections.
+\newpage
+
+
+\subsection{Visual Studio Extension Development}
+\label{ssec:VisualStudioExtensionDevelopmentArchitecture}
+To participate in Visual Studio Extensibility (VSIX), the workload needs to be installed.
+\includeBasicImg{../../assets/VisualStudioInstallerVSIX.png}{Visual Studio Installer}{fig:visualStudioInstaller} 
+The types of extensions are quite varied. They can range from supporting new languages not included in Visual Studio, to productivity tools that enhance the core IDE experience, to domain-specific designers for specific scenarios like data design or cloud support. In Visual Studio, many different parts can be extended with the most common features to be commands, menus, toolbars, windows, IntelliSense, and projects \citep{whatisvsextension}. For example, there exists the Visual Studio Marketplace, where many Extensions are available for free or are even open sourced.
+\newpage
+ 
+\subsubsection{Anatomy}
+\label{sssec:VSIXAnatomy}
+\paragraph{File Structure}\mbox{}\\
+\label{p:AnatomyFileStructure}
+\includeImgNoWidth{../../assets/VSIXFileStructure.png}{File structure of a VSIX Project}{fig:vsix-filestructure}
+Figure \ref{fig:vsix-filestructure} shows the file structure of an extension project. The manifest file\\ (\textit{source.extension.vsixmanifest}) is the primary and an XML based file that provides essential information about the extension to Visual Studio. It registers all the components of the extension and is the only required file in a VSIX project.
+
+\includeBasicImg{../../assets/VSIXManifestMain.png}{Design view of the .vsixmanifest file}{fig:vsixmanifest-main} 
+Figure \ref{fig:vsixmanifest-main} shows the contents of the Manifest for a Visual Studio Extension. This context menu pops up after double clicking on the file, so editing is made easier. 
+\includeBasicImg{../../assets/VSIXManifestAssets.png}{.vsixmanifest file assets}{fig:vsixmanifest-assets}
+As mentioned in Section \ref{sec:Foundation} the interaction with the Editor API requires the usage of the MEF. That leads to the creation of a second project that will be imported to the main project as a MEF component. So a new asset is required, that goes with the source, type and path, as in this case the source is a \textit{project}, the type is a \textit{MefComponent} and the Path refers to the second project \textit{Discord.NET.SupportExtension.Mef} which is illustrated in Figure \ref{fig:vsixmanifest-assets}. \citep{vsixCookbook}
+
+\includeImgNoWidth{../../assets/VSIXvsctProperties.png}{Properties of a VSIX Command Table file}{fig:vsixvsctproperties} 
+
+Commands within the extension are defined in the command table (\textit{DiscordSupportPackage.vsct} in Figure \ref{fig:vsix-filestructure}), another XML file. This file includes definitions for button commands, menus, and keyboard shortcuts. Figure \ref{fig:vsixvsctproperties} shows that its contents are compiled as an Assembly Resource, which Visual Studio utilizes to build its command table menu structure. However, this file only declares components and does not manage command executions. The Package.cs file (\textit{DiscordSupportPackage.cs} in Figure \ref{fig:vsix-filestructure}), serves as the primary entry point for most extensions. This file typically contains command handlers, tool windows, options pages, services, and other components. \citep{vsixCookbook}
+
+\paragraphWithLabel{Compilation}{p:VSIXAnatomyCompilation}
+The project is compiled into a \textit{.vsix} file, which can be found in either the \textit{/bin/debug} or \textit{/bin/release} folder, depending on the build configuration set for the current solution. The workload for Visual Studio extension development includes specialized MSBuild targets and tasks specifically designed for managing VSIX projects. During the build process of the VSIX project, it is automatically deployed to the Experimental Instance of Visual Studio. \citep{vsixCookbook}
+
+\paragraphWithLabel{Experimental Instance}{p:VSIXAnatomyExperimentalInstance}
+To protect the main Visual Studio development environment from potential alterations by untested applications, the Visual Studio SDK offers an experimental space for testing and experimentation. This enables the possibility to develop new applications using the regular Visual Studio interface, but they are run in a separate, isolated Experimental Instance. This ensures that the main development environment remains unaffected. Furthermore, every application equipped with a VSIX package automatically launches the Visual Studio Experimental Instance in debug mode when the application is run.
+
+\subsubsection{Commands}
+\label{sssec:VisualStudioCommands}
+A Visual Studio Command provides functionality that can be executed within the IDE. They can range from simple tasks like adding a new file to a project, to more complex tasks like executing test collections. Commands can be triggered in various ways like through menu items, toolbar buttons, keyboard shortcuts or even programmatically. They are meant to impact the general Visual Studio experience by boosting efficiency through automating manual operations.
+
+\paragraphWithLabel{Definition}{p:CommandsDefinition}
+Every button in every menu is a command. To add commands to an extension, they need to be defined in the command table.
+\newpage
+\begin{lstlisting}[language=XML, caption={Custom command group definition}, label={lst:customCommandSymbolDefinitions}]
+<Symbols>
+	<!-- This is the package guid. -->
+	<GuidSymbol name="guidCustomExtensionPackage" value="{ad9143c7-5915-47e5-a9ac-d46c387072db}" />
+	
+	<GuidSymbol name="CustomGroup" value="{119bf355-ef7f-4cdf-af9a-8fe6b13c8658}">
+		<IDSymbol name="CSharpProjectMenuGroup" value="0x100" />
+	</GuidSymbol>
+	
+	<GuidSymbol name="CommandSet" value="{c97d316c-21f9-4def-9731-4d63790b08fd}">
+		<IDSymbol name="CustomCommand" value="0x0100" />
+	</GuidSymbol>
+	
+	...
+<\Symbols>
+\end{lstlisting}
+Listing \ref{lst:customCommandSymbolDefinitions} displays how the symbols are defined for further usage in the command table. These symbols will now be used inside this file with a settable priority tag that determines the ordering of groups or items within the same parent menu or toolbar.
+\begin{lstlisting}[language=XML, caption={Custom command group definition}, label={lst:customCommandCustomGroup}]
+<Groups>
+	<Group guid="CustomGroup" id="CSharpProjectMenuGroup" priority="0x003" />
+</Groups>
+\end{lstlisting}
+Listing \ref{lst:customCommandCustomGroup} shows how to use the Group that was defined in Listing \ref{lst:customCommandSymbolDefinitions}. This acts as parent element for other components.
+\begin{lstlisting}[language=XML, caption={Custom command button definition}, label={lst:customCommandButtonDefinition}]
+<Buttons>
+	<Button guid="CommandSet" id="CustomCommand" priority="0x0100" type="Button">
+		<Parent guid="CustomGroup" id="CSharpProjectMenuGroup" />
+		<Icon guid="guidImages" id="bmpPic1" />
+		<Strings>
+			<ButtonText>Click me</ButtonText>
+		</Strings>
+	</Button>
+</Buttons>
+\end{lstlisting}
+In Listing \ref{lst:customCommandButtonDefinition} the required buttons are defined with a parent element, an icon and a text that is displayed on the button. The icon is defined as a Bitmap, which is not mandatory for this showcase.
+\begin{lstlisting}[language=XML, caption={Command placement}, label={lst:customCommandCommandPlacement}]
+<CommandPlacements>
+	<!-- Project Context -->
+	<CommandPlacement guid="CustomGroup" id="CSharpProjectMenuGroup" priority="0x004">
+		<Parent guid="guidSHLMainMenu" id="IDM_VS_CTXT_PROJNODE" />
+	</CommandPlacement>
+</CommandPlacements>
+\end{lstlisting}
+Everything inside the \textit{CustomGroup} is placed at the provided parent element, in this case, the project context menu, as shown in \ref{lst:customCommandCommandPlacement}.
+\includeImgNoWidth{../../assets/VSIXCustomExtensionResult.png}{Result of the command definition}{fig:vsix-commanddefinition}
+After defining the command and coherent elements, the Click-Me button will appear on top of all other buttons when right clicking on a project as shown in Figure \ref{fig:vsix-commanddefinition}, considering that the just implemented extension is installed.
+
+\paragraphWithLabel{Execution}{p:Execution}
+Now that the command is defined in the command table, the invocation logic must be created. Every command is accessed via a GUID and ID from Visual Studio (the ones defined in the command table as displayed in Listing \ref{lst:customCommandSymbolDefinitions}). Keep in mind, that if multiple commands are used, creating a base class might be a wise decision.
+\begin{lstlisting}[style=CSharp, caption={Possible command base}, label={lst:commandBase}]
+public abstract class CommandBase {
+	protected AsyncPackage Package { get; }
+	protected abstract Guid CommandSet { get; }
+	protected abstract int CommandId { get; }
+	
+	protected CommandBase(AsyncPackage package, IMenuCommandService commandService) {
+		this.Package = package ?? throw new ArgumentNullException(nameof(package)); ;
+		if (commandService == null) throw new ArgumentNullException(nameof(commandService));
+		
+		CommandID menuCommandId = new CommandID(CommandSet, CommandId);
+		OleMenuCommand menuCommand = new OleMenuCommand(this.Execute, menuCommandId);
+		
+		commandService.AddCommand(menuCommand);
+	}
+	
+	protected abstract void Execute(object sender, EventArgs e);
+	protected IAsyncServiceProvider AsyncServiceProvider => Package;
+	protected IServiceProvider ServiceProvider => Package;
+}
+\end{lstlisting}
+Listing \ref{lst:commandBase} shows a possible base class for commands in Visual Studio. It covers the necessary values that are required by a command that include the \textit{CommandSet} and  \textit{CommandId} which are required for the command to be mapped correctly. Code line 11 shows that the \textit{Execute} Method is passed as event handler to the menu command, so it cannot be async without loosing the execution state. There exists a well known workaround, for which it also makes sense to create a base class.
+\begin{lstlisting}[style=CSharp, caption={Base class for async command handling}, label={lst:asyncCommandBase}]
+public abstract class AsyncCommandBase : CommandBase {
+	private readonly Action<Exception> onException;
+	private bool isRunning = false;
+	
+	protected AsyncCommandBase(AsyncPackage package, IMenuCommandService commandService, Action<Exception> onException) : base(package, commandService) {
+		this.onException = onException;
+	}
+	
+	protected override async void Execute(object sender, EventArgs e) {
+		try {
+			if (isRunning)
+				throw new CommandException($"Command {this.GetType().Name} is already running.");
+			
+			isRunning = true;
+			await ExecuteAsync(sender, e);
+		}
+		catch (Exception ex) {
+			onException?.Invoke(ex);
+		}
+		
+		isRunning = false;
+	}
+	
+	protected abstract Task ExecuteAsync(object sender, EventArgs e);
+}
+\end{lstlisting}
+Listing \ref{lst:asyncCommandBase} shows said workaround. Asynchronous methods with void as return type are a very bad practice, because the execution results in \textit{Fire and Forget}. This workaround provides a Delegate that will be invoked if an exception occurs while command execution.
+
+\begin{lstlisting}[style=CSharp, caption={Custom command}, label={lst:customCommandLogic}]
+internal sealed class CustomCommand : AsyncCommandBase {
+	protected override Guid CommandSet => PackageGuids.CommandSet;
+	protected override int CommandId => PackageIds.CustomCommand;
+		
+	internal CustomCommand(AsyncPackage package, IMenuCommandService commandService, Action<Exception> onException) : base(package, commandService, onException) {
+		// Initialization work
+	}
+	
+	public static CustomCommand Instance { get; private set; }
+	public static async Task InitializeAsync(AsyncPackage package, IMenuCommandService commandService, Action<Exception> onException) {
+		Instance = new CustomCommand(package, commandService, onException);
+	}
+	
+	protected override async Task ExecuteAsync(object sender, EventArgs e) {
+		// Command Execution
+	}
+}
+\end{lstlisting}
+After creating these classes, the final command class can look like Listing \ref{lst:customCommandLogic} displays.
+The \textit{PackageGuids} class is generated using the command table, so it provides the required GUIDs and IDs for all defined commands. It appears in certain scenarios, that the \textit{PackageGuids.cs} file is not generated, in this case the \textit{CommandSet} and \textit{CommandId} can simply be created inside the command by copying the values from the command table (in this case the values seen in Listing \ref{lst:customCommandSymbolDefinitions}).
+\newpage 
+\begin{lstlisting}[style=CSharp, caption={Calling command's InitializeAsync in package initialization}, label={lst:packageInitializeAsync}]
+protected override async Task InitializeAsync(CancellationToken cancellationToken, IProgress<ServiceProgressData> progress) {
+	IMenuCommandService commandService = await this.GetServiceAsync(typeof(IMenuCommandService)) as IMenuCommandService;
+	await CustomCommand.InitializeAsync(this, commandService, OnException);
+} 
+\end{lstlisting}
+It is important to call the Initialization method \textit{InitializeAsync} from inside the package class (\textit{DiscordSupportPackage.cs} from Figure \ref{fig:vsix-filestructure}) to create the Singleton instance of said command like Listing \ref{lst:packageInitializeAsync} shows.
+\citep{vsixCookbook}
+
+\subsubsection{Displaying Custom Windows}
+When working with custom commands, the display of a custom implemented window with i.e. WPF might be required.
+The \textit{IVsUIShell} provides said functionality.
+\begin{lstlisting}[style=CSharp, caption={Displaying a custom window}, label={lst:displayingCustomWindow}]
+public static void Show(System.Windows.Window window) {
+	// Is required since the Visual Studio Shell should only be used on the main thread
+	ThreadHelper.ThrowIfNotOnUIThread();
+	
+	IVsUIShell uiShell = (IVsUIShell)Package.GetGlobalService(typeof(SVsUIShell));
+	Assumes.Present(uiShell);
+	
+	uiShell.GetDialogOwnerHwnd(out IntPtr hwnd);
+	WindowHelper.ShowModal(window, hwnd);
+}
+\end{lstlisting}
+Listing \ref{lst:displayingCustomWindow} shows how to access the \textit{IVsUIShell}, which always needs to happen on the main thread, and opening a new custom window using the \textit{WindowHelper} class.
+
+\newpage
+\subsubsection{Logging}
+Besides opening custom windows, it is important to keep the user of the extension updated about what is happening in the background. Especially when operations take a long time. This can happen via creating log files, but a much more suited approach is to create a new \textit{IVsOutputWindowPane} that will then receive the log statements.
+\begin{lstlisting}[style=CSharp, caption={Displaying a custom window}, label={lst:displayingCustomWindow}]
+private static IVsOutputWindowPane pane;
+public static void InitOutputLog(string paneName) {
+	ThreadHelper.ThrowIfNotOnUIThread();
+	
+	IVsOutputWindow logWindow = AsyncPackage.GetGlobalService(typeof(SVsOutputWindow)) as IVsOutputWindow;
+	Guid guid = Guid.NewGuid();
+	logWindow.CreatePane(ref guid, paneName, 1, 1);
+	logWindow.GetPane(ref guid, out pane);
+}
+
+public static void OutputWindowFunc(LogStatement obj) {
+	Func<Task> logTask = new Func<Task>(async () => {
+		await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
+		pane.OutputStringThreadSafe(obj.ToString() + "\n");
+	});
+	
+	ThreadHelper.JoinableTaskFactory.Run(logTask);
+}
+\end{lstlisting}
+Listing \ref{lst:displayingCustomWindow} shows how the pane is created using the \textit{IVsOutputWindow} and can then be accessed by loggers to provide logs to the created output window pane. It is also important to not invoke tasks by hand, but let the \textit{ThreadHelper.JoinableTaskFactory} handle task execution to avoid deadlocks.
+\includeBasicImg{../../assets/CustomOutputWindowPane.png}{Custom output window pane}{fig:customOutputWindowPane} 
+For instance Figure \ref{fig:customOutputWindowPane} shows that there exists a new \textit{IVsOutputWindowPane} called "Discord Support Extension" that provides context specific information.
+\newpage
+\subsection{Roslyn}
+\label{ssec:RoslynArchitecture}
+Microsoft's Roslyn, also known as the .NET Compiler Platform SDK, represents a significant change in how .NET handles compilation and provides extensive APIs for various compilation phases. Roslyn is essentially a set of services built around two key principles: Extensibility and Maintainability. This design allows for layers above and integration with third party plugins, offering well documented and supported public APIs. External developers can leverage these services to do a variety of innovative things. Some of these can be crafting their own tools tailored to any specific layer of programming tasks or
+developing simple plugins like diagnostic analyzers, code fixes, refactorings, and IntelliSense providers for certain layers \citep{vasani2017roslyn}. Roslyn plays an essential role to achieve the wanted goal with the Visual Studio Extension, because it enables the analysis of a users code during the coding process. This is required because the completions pushed to the Editor API are context dependent, so it is important that the context is determined live while the user is coding.
+
+\subsubsection{Compiler phases}
+\label{sssec:RoslynCompilerPhases}
+Roslyn deconstructs the compiler into distinct phases and exposes managed APIs for each phase, making language compilers a service \citep{roslynIntroduction}. The .NET Compiler Platform SDK is a set of tools that simplifies building \csharp and VB compilers, following steps from analyzing text to creating executable code. It provides tools for each step to work with the code being compiled \citep{dotnetCompilerPlatformSDK}.
+
+\includeBasicImgUrl{../../assets/compiler-pipeline-lang.png}{Compiler pipeline functional areas}{fig:compilerPipeline}{https://learn.microsoft.com/en-us/dotnet/csharp/roslyn-sdk/media/compiler-api-model/compiler-pipeline-lang-svc.png}{2024-01-07}
+
+Figure \ref{fig:compilerPipeline} indicates that upon the Compiler Pipeline the Compiler API and Language Service are built. To analyse ones code, the Compiler API is required to access syntax trees and the Symbol API which contains the semantic information.
+
+\subsubsection{Code Analysis}
+\label{sssec:RoslynCodeAnalysis}
+Code analysis in general is a big topic, but in this scenario, where the users code is analysed after the IntelliSense process is triggered, there are only a few key concepts required. These concepts consist of Workspaces, Syntax and Semantics, so a core understanding of how these things work is required.
+
+\paragraphWithLabel{Workspaces and Solutions}{p:RoslynWorkspaces}
+Workspaces are essential for code analysis and refactoring across entire solutions. It organizes project information into a unified object model, allowing easy access to important compiler elements like syntax trees and semantic models, without file parsing or dependency management. Within an IDE, workspaces reflect real-time changes, updating the model as users proceed to make updates like writing code or changing properties \citep{roslynWorkspace}. Even though workspaces can change with each key press, the solution model can be worked with independently. Solutions are immutable models containing projects and documents, allowing for sharing without conflicts or duplication. Once a solution instance is obtained from the Workspace.CurrentSolution property, it remains unaltered. Modifications to solutions involve creating new instances based on existing ones and applying these changes back to the workspace. Projects within the solution model contain source code documents, parsing and compilation settings, and references, facilitating direct access to compilations. Documents in the model represent individual source files, from which text, syntax tree, and semantic model can be accessed. \citep{roslynWorkspace}
+
+\begin{lstlisting}[style=CSharp, caption={Roslyn Workspace}, label={lst:roslynWorkspace}]
+IComponentModel componentModel = (IComponentModel)Package.GetGlobalService(typeof(SComponentModel));
+VisualStudioWorkspace workspace = componentModel.GetService<Microsoft.VisualStudio.LanguageServices.VisualStudioWorkspace>();
+
+Solution solution = workspace.CurrentSolution;
+
+foreach (Project project in solution.Projects) {
+	Console.WriteLine($"Project: {project.Name}");
+	
+	foreach (Document document in project.Documents) {
+		Console.WriteLine($"\tDocument: {document.Name}");
+	}
+}
+\end{lstlisting}
+Listing \ref{lst:roslynWorkspace} shows how to access Visual Studio's workspace and getting a snapshot of the current solution that is open inside the workspace.
+\paragraphWithLabel{Syntax}{p:RoslynSyntax}
+Syntax Trees provide a detailed, hierarchical representation of source code's structure, essential for analyzing and manipulating code in tools like IDEs. They are immutable, ensuring thread safety and full fidelity, meaning they represent every piece of source text, including whitespaces and comments. Syntax Nodes within these trees represent the syntactic constructs like expressions or statements. They are interconnected which means they are forming the tree's structure. Syntax Tokens are the smallest elements, representing keywords, identifiers, and punctuation, playing a key role in the tree's construction and the interpretation of the code's syntax. Syntax Trivia covers more unimportant text like spaces or comments. Spans indicate the text range of nodes or tokens. Syntax Kinds are used to categorize syntax elements, supporting their identification. \citep{roslynSyntax}
+
+\paragraphWithLabel{Example}{p:RoslynSyntaxExample}
+\begin{lstlisting}[style=CSharp, caption={Syntax Example}, label={lst:roslynSyntaxExample}]
+SyntaxTree tree = CSharpSyntaxTree.ParseText(@"
+public class CustomClass {
+	public void CustomMethod() {
+	}
+}");
+
+CompilationUnitSyntax root = tree.GetRoot() as CompilationUnitSyntax;
+
+foreach (ClassDeclarationSyntax classDeclaration in root.DescendantNodes().OfType<ClassDeclarationSyntax>()) {
+	Console.WriteLine($"Class: {classDeclaration.Identifier.ValueText}");
+	
+	foreach (MethodDeclarationSyntax methodDeclaration in classDeclaration.DescendantNodes().OfType<MethodDeclarationSyntax>()) {
+		Console.WriteLine($"Method: {methodDeclaration.Identifier.ValueText}");
+	}
+}
+\end{lstlisting}
+Listing \ref{lst:roslynSyntaxExample} shows a string representing valid \csharp syntax that is used to create a \textit{SyntaxTree}. Then the root is accessed to iterate through the descendant nodes to identify classes and methods, which identifier values are printed to the console.
+\begin{lstlisting}[caption={Syntax Example Output}, label={lst:roslynSyntaxExampleOutput}]
+	Class: CustomClass
+	Method: CustomMethod
+\end{lstlisting}
+Listing \ref{lst:roslynSyntaxExampleOutput} shows the output of the executed Listing \ref{lst:roslynSyntaxExample}.
+
+\paragraphWithLabel{Compilation and Symbols}{p:RoslynCompilation}
+The Semantic model in compilation extends beyond syntax, interpreting elements like types and variables, essential for understanding code without direct access to its source, such as in libraries. It represents a deep layer of analysis, connecting names in code to their meanings and behaviors through symbols, each signifying a unique element like a class or method, derived from compiler insights or imported metadata. Symbols and the Semantic model provide a comprehensive framework for navigating and interpreting code's logical structure, essential for tasks like type checking and resolving references within a compilation's immutable context. \citep{roslynSemantics}
+\paragraphWithLabel{Example}{p:RoslynSemanticExample}
+\begin{lstlisting}[style=CSharp, caption={Semantics Example}, label={lst:roslynSemanticsExample}]
+SyntaxTree tree = CSharpSyntaxTree.ParseText(@"
+public class CustomClass {
+	public void CustomMethod(int customParameter) {
+	}
+}");
+
+SyntaxNode root = tree.GetRoot();
+Compilation compilation = CSharpCompilation.Create("CustomCompilation")
+.AddReferences(MetadataReference.CreateFromFile(typeof(object).Assembly.Location))
+.AddSyntaxTrees(tree);
+
+SemanticModel model = compilation.GetSemanticModel(tree);
+MethodDeclarationSyntax methodDeclaration = root.DescendantNodes().OfType<MethodDeclarationSyntax>().First();
+IMethodSymbol symbol = model.GetDeclaredSymbol(methodDeclaration);
+
+Console.WriteLine($"Method: {symbol.Name}");
+foreach (IParameterSymbol parameter in symbol.Parameters) {
+	Console.WriteLine($"Parameter: {parameter.Name}, Type: {parameter.Type}");
+}
+\end{lstlisting}
+Listing \ref{lst:roslynSemanticsExample} shows a string representing valid \csharp syntax that is used to create a \textit{SyntaxTree} and builds the compilation based on that tree. Then the compilation is used to acquire a \textit{SemanticModel}, that is then used to get the symbol from the first found \textit{MethodDeclarationSyntax}. All parameters are iterated and its name and type are printed to the console.
+\newpage
+\begin{lstlisting}[caption={Semantics Example Output}, label={lst:roslynSemanticsExampleOutput}]
+	Method: CustomMethod
+	Parameter: customParameter, Type: System.Int32
+\end{lstlisting}
+Listing \ref{lst:roslynSemanticsExampleOutput} shows the output of the executed Listing \ref{lst:roslynSemanticsExample}.
+
+\subsubsection{Syntax Visualizer in Visual Studio}
+\label{ssec:SyntaxVisualizer}``The Syntax Visualizer enables inspection of the syntax tree for the \csharp or Visual Basic code file in the current active editor window inside the Visual Studio IDE. The visualizer can be launched by clicking on View > Other Windows > Syntax Visualizer. You can also use the Quick Launch toolbar in the upper right corner. Type "syntax", and the command to open the Syntax Visualizer should appear`` \citep{syntaxVisualizer}
+\includeBasicImgUrl{../../assets/visualize-csharp.png}{Syntax Visualizer}{fig:syntaxVisualizer}{https://learn.microsoft.com/en-us/dotnet/csharp/roslyn-sdk/media/syntax-visualizer/visualize-csharp.png}{2024-01-07}
+
+\newpage
+\subsection{Editor API}
+\label{ssec:EditorAPIArchitecture}
+The Microsoft Visual Studio Editor API contains open source layers of the Visual Studio editor, including public API definitoins and implementations for text model, logic and editor operations. It is designed for extensibility creators to integrate with Visual Studio \citep{vseditorapi}.
+
+\subsubsection{Async Completion API}
+\label{ssec:AsyncCompletionApi}
+The Async Completion API is a subcomponent of the Editor API focusing on asynchronous operations to enhance IntelliSense features. The most important one for this use case being the addition of completion items using the \textit{IAsyncCompletionSourceProvider} with an \textit{IAsyncCompletionSource} as well as handling how these items will be committed to the text buffer utilizing the \textit{IAsyncCompletionCommitManagerProvider} with an \textit{IAsyncCompletionCommitManager}. Visual Studio uses the Managed Extensibility Framework to discover and instantiate components that inherit from interfaces like \textit{IAsyncCompletionSourceProvider} and \textit{IAsyncCompletionCommitManagerProvider}. MEF scans the assembly metadata for exported components marked with specific attributes indicating their purpose and capabilities. When Visual Studio requires these services, MEF composes the parts together, linking the providers to the editor based on the exported metadata. This mechanism allows for a decoupled, extensible architecture where extensions can be developed and integrated seamlessly into the Visual Studio environment, enhancing the editing and coding experience without direct modification to the core IDE. \citep{asynccompletionapi}
+
+\newpage
+\subsection{Managed Extensibility Framework}
+\label{ssec:ManagedExtensibilityFramework}
+The Managed Extensibility Framework (MEF) is a tool designed to build extensible and lightweight applications. Since MEF is used by Visual Studio like mentioned in Subsection \ref{ssec:AsyncCompletionApi}, a basic understanding of how exporting with MEF works is required. It is basically a dependency injection (DI) container but differs from other containers in its focus on extensibility and part discovery. Unlike traditional DI containers designed mainly for dependency management within an application, MEF aims to make applications extendable by allowing parts to be added or removed without requiring changes to the core application. It uses a catalog and composition model to discover and compose parts at runtime, which makes it ideal for applications that require incorporate extensions or plugins.
+
+\paragraphWithLabel{Composition container}{p:compositionContainer}
+At the heart of the MEF composition model lies the composition container, serving as the repository for all available parts and leading their composition. Composition is the matching up of imports to exports.
+\paragraphWithLabel{Imports and Exports}{p:importsAndExports}
+\begin{lstlisting}[style=CSharp, caption={ICustomHandler for MEF example}, label={lst:customHandlerMefExample}]
+public interface ICustomHandler {
+	string Handle(string input);
+}
+\end{lstlisting}
+Listing \ref{lst:customHandlerMefExample} shows the design of an interface that is required for later usage.
+
+\begin{lstlisting}[style=CSharp, caption={CustomHandler export for MEF example}, label={lst:customHandlerExportMefExample}]
+	[Export(typeof(ICustomHandler))]
+	class CustomHandler : ICustomHandler {
+	}
+\end{lstlisting}
+Listing \ref{lst:customHandlerExportMefExample} shows how the Export attribute is used. For a successful match between an import and an export, both must share the same contract. If an export is associated with a different contract, such as \textit{typeof(CustomHandler)}, it won't match an import looking for a different contract, leading to the import not being fulfilled. The contract must be an exact match.
+
+\newpage
+\begin{lstlisting}[style=CSharp, caption={ICustomHandler import for MEF example}, label={lst:customHandlerImportMefExample}]
+[Import(typeof(ICustomHandler))]
+public ICustomHandler customHandler;
+\end{lstlisting}
+Listing \ref{lst:customHandlerImportMefExample} displays how to import an exported component. In MEF, every import is associated with a contract that determines which exports it matches with. This contract can be an explicit string or automatically generated based on a type, like the \textit{ICustomHandler} interface in this context. Any export that declares a matching contract can fulfill this import. The contract is not necessarily tied to the type of the importing object. Even though the object type might be \textit{ICustomHandler}, the contract can differ. By default, MEF uses the type of the import to determine the contract, unless explicitly specified otherwise.

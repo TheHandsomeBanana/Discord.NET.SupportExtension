@@ -1,0 +1,101 @@
+<mxfile host="Electron" modified="2024-02-24T21:36:29.789Z" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/22.1.16 Chrome/120.0.6099.109 Electron/28.1.0 Safari/537.36" etag="lxfuM6HbgzpSbq6Mg4_L" version="22.1.16" type="device">
+  <diagram name="Page-1" id="3F4W-9ZEy4QPFvYt3P2J">
+    <mxGraphModel dx="1185" dy="683" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="pFkXaJ_y_Po0-VnhIq-5-3" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="pFkXaJ_y_Po0-VnhIq-5-1" target="pFkXaJ_y_Po0-VnhIq-5-2">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="200" y="250" />
+              <mxPoint x="200" y="250" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="pFkXaJ_y_Po0-VnhIq-5-1" value="IDiscordCompletionEngine" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="120" y="200" width="150" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="pFkXaJ_y_Po0-VnhIq-5-2" value="ProcessCompletionsAsync(Solution, SemanticModel, SyntaxToken)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="1">
+          <mxGeometry x="110" y="280" width="390" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="pFkXaJ_y_Po0-VnhIq-5-4" value="Since the data is generated / stored per project (using a dictionary), the current project is required and then used to read the generated data for this project.&amp;nbsp;" style="shape=note;whiteSpace=wrap;html=1;backgroundOutline=1;darkOpacity=0.05;size=16;fillColor=#ffe6cc;strokeColor=#d79b00;" vertex="1" parent="1">
+          <mxGeometry x="280" y="180" width="250" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="pFkXaJ_y_Po0-VnhIq-5-13" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;" edge="1" parent="1" source="pFkXaJ_y_Po0-VnhIq-5-10" target="pFkXaJ_y_Po0-VnhIq-5-12">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="180" y="410" />
+              <mxPoint x="180" y="410" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="pFkXaJ_y_Po0-VnhIq-5-15" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="pFkXaJ_y_Po0-VnhIq-5-10" target="pFkXaJ_y_Po0-VnhIq-5-2">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="180" y="310" />
+              <mxPoint x="180" y="310" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="pFkXaJ_y_Po0-VnhIq-5-17" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="pFkXaJ_y_Po0-VnhIq-5-10" target="pFkXaJ_y_Po0-VnhIq-5-16">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="pFkXaJ_y_Po0-VnhIq-5-10" value="DiscordAnalyser" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="120" y="330" width="120" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="pFkXaJ_y_Po0-VnhIq-5-12" value="Initialize(Solution, Project, SemanticModel)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="1">
+          <mxGeometry x="110" y="390" width="240" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="pFkXaJ_y_Po0-VnhIq-5-20" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="pFkXaJ_y_Po0-VnhIq-5-16" target="pFkXaJ_y_Po0-VnhIq-5-19">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="425" y="430" />
+              <mxPoint x="180" y="430" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="pFkXaJ_y_Po0-VnhIq-5-22" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="pFkXaJ_y_Po0-VnhIq-5-16" target="pFkXaJ_y_Po0-VnhIq-5-21">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="425" y="430" />
+              <mxPoint x="330" y="430" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="pFkXaJ_y_Po0-VnhIq-5-16" value="Run(SyntaxNode)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="1">
+          <mxGeometry x="365" y="390" width="120" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="pFkXaJ_y_Po0-VnhIq-5-19" value="ContextAnalyser" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="120" y="450" width="120" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="pFkXaJ_y_Po0-VnhIq-5-21" value="ServerIdAnalyser" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="270" y="450" width="120" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="pFkXaJ_y_Po0-VnhIq-5-26" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=1;entryDx=0;entryDy=0;fillColor=#ffe6cc;strokeColor=#d79b00;" edge="1" parent="1" source="pFkXaJ_y_Po0-VnhIq-5-23" target="pFkXaJ_y_Po0-VnhIq-5-19">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="180" y="510" />
+              <mxPoint x="180" y="510" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="pFkXaJ_y_Po0-VnhIq-5-23" value="Tries to evaluate the context (Server, User, Role, Channel). If the context is Server or no context is found, the ServerIdAnalyser is not called, hence there is no need to specify the server for appropriate filtering." style="shape=note;whiteSpace=wrap;html=1;backgroundOutline=1;darkOpacity=0.05;size=9;fillColor=#ffe6cc;strokeColor=#d79b00;" vertex="1" parent="1">
+          <mxGeometry x="115" y="520" width="250" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="pFkXaJ_y_Po0-VnhIq-5-25" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.754;entryY=-0.004;entryDx=0;entryDy=0;entryPerimeter=0;fillColor=#ffe6cc;strokeColor=#d79b00;" edge="1" parent="1" source="pFkXaJ_y_Po0-VnhIq-5-4" target="pFkXaJ_y_Po0-VnhIq-5-2">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="pFkXaJ_y_Po0-VnhIq-5-28" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=1;entryDx=0;entryDy=0;fillColor=#ffe6cc;strokeColor=#d79b00;" edge="1" parent="1" source="pFkXaJ_y_Po0-VnhIq-5-27" target="pFkXaJ_y_Po0-VnhIq-5-21">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="330" y="505" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="pFkXaJ_y_Po0-VnhIq-5-27" value="Tries to find a server id from the triggerLocation as starting point, which is then used to filter the generated data." style="shape=note;whiteSpace=wrap;html=1;backgroundOutline=1;darkOpacity=0.05;size=9;fillColor=#ffe6cc;strokeColor=#d79b00;" vertex="1" parent="1">
+          <mxGeometry x="410" y="450" width="120" height="110" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

@@ -1,0 +1,59 @@
+<mxfile host="Electron" modified="2023-12-21T15:18:07.406Z" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/22.1.11 Chrome/114.0.5735.289 Electron/25.9.8 Safari/537.36" etag="uzEcIv2Wb4hykPgRy7B7" version="22.1.11" type="device">
+  <diagram name="Page-1" id="MPYqpl_aQjiWpt9MDq_A">
+    <mxGraphModel dx="980" dy="562" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="r8sS8Ag7rBc_APJZNHbJ-1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" parent="1" source="r8sS8Ag7rBc_APJZNHbJ-4" target="r8sS8Ag7rBc_APJZNHbJ-6" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="r8sS8Ag7rBc_APJZNHbJ-2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" parent="1" source="r8sS8Ag7rBc_APJZNHbJ-4" target="r8sS8Ag7rBc_APJZNHbJ-5" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="415" y="310" />
+              <mxPoint x="295" y="310" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="r8sS8Ag7rBc_APJZNHbJ-3" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" parent="1" source="r8sS8Ag7rBc_APJZNHbJ-4" target="r8sS8Ag7rBc_APJZNHbJ-7" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="415" y="310" />
+              <mxPoint x="535" y="310" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="r8sS8Ag7rBc_APJZNHbJ-4" value="Commands" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+          <mxGeometry x="360" y="260" width="110" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="r8sS8Ag7rBc_APJZNHbJ-5" value="Configure Data Image" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+          <mxGeometry x="240" y="340" width="110" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="r8sS8Ag7rBc_APJZNHbJ-6" value="Generate Image" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+          <mxGeometry x="360" y="340" width="110" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="r8sS8Ag7rBc_APJZNHbJ-7" value="Load Data" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+          <mxGeometry x="480" y="340" width="110" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="WQ2PVq-MjPX7pinH6-8D-1" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" edge="1" parent="1" source="r8sS8Ag7rBc_APJZNHbJ-8" target="r8sS8Ag7rBc_APJZNHbJ-5">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="r8sS8Ag7rBc_APJZNHbJ-8" value="Configure data image generation with settings like bot-token saving and data encryption" style="shape=note;whiteSpace=wrap;html=1;backgroundOutline=1;darkOpacity=0.05;size=18;fillColor=#fff2cc;strokeColor=#d6b656;" parent="1" vertex="1">
+          <mxGeometry x="240" y="390" width="110" height="110" as="geometry" />
+        </mxCell>
+        <mxCell id="WQ2PVq-MjPX7pinH6-8D-2" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" edge="1" parent="1" source="r8sS8Ag7rBc_APJZNHbJ-10" target="r8sS8Ag7rBc_APJZNHbJ-6">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="r8sS8Ag7rBc_APJZNHbJ-10" value="Connect to the discord api via a provided bot-token, and pull all required data" style="shape=note;whiteSpace=wrap;html=1;backgroundOutline=1;darkOpacity=0.05;size=18;fillColor=#fff2cc;strokeColor=#d6b656;" parent="1" vertex="1">
+          <mxGeometry x="360" y="390" width="110" height="110" as="geometry" />
+        </mxCell>
+        <mxCell id="WQ2PVq-MjPX7pinH6-8D-3" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" edge="1" parent="1" source="r8sS8Ag7rBc_APJZNHbJ-11" target="r8sS8Ag7rBc_APJZNHbJ-7">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="r8sS8Ag7rBc_APJZNHbJ-11" value="Load data for specific project, so it can be used by Completion Engine / Code Analyser&amp;nbsp;" style="shape=note;whiteSpace=wrap;html=1;backgroundOutline=1;darkOpacity=0.05;size=18;fillColor=#fff2cc;strokeColor=#d6b656;" parent="1" vertex="1">
+          <mxGeometry x="480" y="390" width="110" height="110" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

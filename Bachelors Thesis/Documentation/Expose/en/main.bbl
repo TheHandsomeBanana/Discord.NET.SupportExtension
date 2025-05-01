@@ -1,0 +1,292 @@
+% $ biblatex auxiliary file $
+% $ biblatex bbl format version 3.1 $
+% Do not modify the above lines!
+%
+% This is an auxiliary file used by the 'biblatex' package.
+% This file may safely be deleted. It will be recreated by
+% biber as required.
+%
+\begingroup
+\makeatletter
+\@ifundefined{ver@biblatex.sty}
+  {\@latex@error
+     {Missing 'biblatex' package}
+     {The bibliography requires the 'biblatex' package.}
+      \aftergroup\endinput}
+  {}
+\endgroup
+
+
+\refsection{0}
+  \datalist[entry]{nty/global//global/global}
+    \entry{agnihotri2022discord}{article}{}
+      \name{author}{3}{}{%
+        {{hash=6ed8384eb5d7abbf521906afb9cb3822}{%
+           family={Agnihotri},
+           familyi={A\bibinitperiod},
+           given={Advait},
+           giveni={A\bibinitperiod}}}%
+        {{hash=a19d55c7ad53b648cc25ed5d58f55ecd}{%
+           family={Gautam},
+           familyi={G\bibinitperiod},
+           given={Harshit},
+           giveni={H\bibinitperiod}}}%
+        {{hash=31ae78574998e81f61e6c944aa186e10}{%
+           family={Singh},
+           familyi={S\bibinitperiod},
+           given={Hari},
+           giveni={H\bibinitperiod}}}%
+      }
+      \list{publisher}{1}{%
+        {Jaypee University of Information Technology, Solan, HP}%
+      }
+      \strng{namehash}{49d02b4e0496c5aa314f11a928529255}
+      \strng{fullhash}{49d02b4e0496c5aa314f11a928529255}
+      \strng{bibnamehash}{49d02b4e0496c5aa314f11a928529255}
+      \strng{authorbibnamehash}{49d02b4e0496c5aa314f11a928529255}
+      \strng{authornamehash}{49d02b4e0496c5aa314f11a928529255}
+      \strng{authorfullhash}{49d02b4e0496c5aa314f11a928529255}
+      \field{sortinit}{A}
+      \field{sortinithash}{2f401846e2029bad6b3ecc16d50031e2}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{title}{Discord Bot}
+      \field{year}{2022}
+    \endentry
+    \entry{vasani2017roslyn}{book}{}
+      \name{author}{1}{}{%
+        {{hash=b2cccd8eabbedfd558e086451501e4b4}{%
+           family={Vasani},
+           familyi={V\bibinitperiod},
+           given={Manish},
+           giveni={M\bibinitperiod}}}%
+      }
+      \list{publisher}{1}{%
+        {Packt Publishing Ltd}%
+      }
+      \strng{namehash}{b2cccd8eabbedfd558e086451501e4b4}
+      \strng{fullhash}{b2cccd8eabbedfd558e086451501e4b4}
+      \strng{bibnamehash}{b2cccd8eabbedfd558e086451501e4b4}
+      \strng{authorbibnamehash}{b2cccd8eabbedfd558e086451501e4b4}
+      \strng{authornamehash}{b2cccd8eabbedfd558e086451501e4b4}
+      \strng{authorfullhash}{b2cccd8eabbedfd558e086451501e4b4}
+      \field{sortinit}{V}
+      \field{sortinithash}{afb52128e5b4dc4b843768c0113d673b}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{title}{Roslyn Cookbook}
+      \field{year}{2017}
+    \endentry
+    \entry{whatisdiscord}{online}{}
+      \name{author}{1}{}{%
+        {{hash=8f5cc6430613f1c12f36965050bb7197}{%
+           family={Discord},
+           familyi={D\bibinitperiod}}}%
+      }
+      \strng{namehash}{8f5cc6430613f1c12f36965050bb7197}
+      \strng{fullhash}{8f5cc6430613f1c12f36965050bb7197}
+      \strng{bibnamehash}{8f5cc6430613f1c12f36965050bb7197}
+      \strng{authorbibnamehash}{8f5cc6430613f1c12f36965050bb7197}
+      \strng{authornamehash}{8f5cc6430613f1c12f36965050bb7197}
+      \strng{authorfullhash}{8f5cc6430613f1c12f36965050bb7197}
+      \field{sortinit}{D}
+      \field{sortinithash}{6f385f66841fb5e82009dc833c761848}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{langid}{english}
+      \field{title}{What is Discord?}
+      \field{urlday}{8}
+      \field{urlmonth}{7}
+      \field{urlyear}{2023}
+      \field{urldateera}{ce}
+      \verb{urlraw}
+      \verb https://discord.com/safety/360044149331-what-is-discord
+      \endverb
+      \verb{url}
+      \verb https://discord.com/safety/360044149331-what-is-discord
+      \endverb
+    \endentry
+    \entry{discorddotnet}{online}{}
+      \name{author}{1}{}{%
+        {{hash=7495892ae13bc06d5aa6c3c1f69b156e}{%
+           family={Discord.Net},
+           familyi={D\bibinitperiod}}}%
+      }
+      \strng{namehash}{7495892ae13bc06d5aa6c3c1f69b156e}
+      \strng{fullhash}{7495892ae13bc06d5aa6c3c1f69b156e}
+      \strng{bibnamehash}{7495892ae13bc06d5aa6c3c1f69b156e}
+      \strng{authorbibnamehash}{7495892ae13bc06d5aa6c3c1f69b156e}
+      \strng{authornamehash}{7495892ae13bc06d5aa6c3c1f69b156e}
+      \strng{authorfullhash}{7495892ae13bc06d5aa6c3c1f69b156e}
+      \field{sortinit}{D}
+      \field{sortinithash}{6f385f66841fb5e82009dc833c761848}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{langid}{english}
+      \field{title}{Discord.Net}
+      \field{urlday}{23}
+      \field{urlmonth}{11}
+      \field{urlyear}{2023}
+      \field{urldateera}{ce}
+      \verb{urlraw}
+      \verb https://discordnet.dev/
+      \endverb
+      \verb{url}
+      \verb https://discordnet.dev/
+      \endverb
+    \endentry
+    \entry{lsp}{online}{}
+      \name{author}{1}{}{%
+        {{hash=140864078aeca1c7c35b4beb33c53c34}{%
+           family={Microsoft},
+           familyi={M\bibinitperiod}}}%
+      }
+      \strng{namehash}{140864078aeca1c7c35b4beb33c53c34}
+      \strng{fullhash}{140864078aeca1c7c35b4beb33c53c34}
+      \strng{bibnamehash}{140864078aeca1c7c35b4beb33c53c34}
+      \strng{authorbibnamehash}{140864078aeca1c7c35b4beb33c53c34}
+      \strng{authornamehash}{140864078aeca1c7c35b4beb33c53c34}
+      \strng{authorfullhash}{140864078aeca1c7c35b4beb33c53c34}
+      \field{extraname}{1}
+      \field{sortinit}{M}
+      \field{sortinithash}{4625c616857f13d17ce56f7d4f97d451}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{langid}{english}
+      \field{title}{Language Server Protocol}
+      \field{urlday}{10}
+      \field{urlmonth}{9}
+      \field{urlyear}{2023}
+      \field{urldateera}{ce}
+      \verb{urlraw}
+      \verb https://learn.microsoft.com/de-de/visualstudio/extensibility/language-server-protocol?view=vs-2022
+      \endverb
+      \verb{url}
+      \verb https://learn.microsoft.com/de-de/visualstudio/extensibility/language-server-protocol?view=vs-2022
+      \endverb
+    \endentry
+    \entry{mef}{online}{}
+      \name{author}{1}{}{%
+        {{hash=140864078aeca1c7c35b4beb33c53c34}{%
+           family={Microsoft},
+           familyi={M\bibinitperiod}}}%
+      }
+      \strng{namehash}{140864078aeca1c7c35b4beb33c53c34}
+      \strng{fullhash}{140864078aeca1c7c35b4beb33c53c34}
+      \strng{bibnamehash}{140864078aeca1c7c35b4beb33c53c34}
+      \strng{authorbibnamehash}{140864078aeca1c7c35b4beb33c53c34}
+      \strng{authornamehash}{140864078aeca1c7c35b4beb33c53c34}
+      \strng{authorfullhash}{140864078aeca1c7c35b4beb33c53c34}
+      \field{extraname}{2}
+      \field{sortinit}{M}
+      \field{sortinithash}{4625c616857f13d17ce56f7d4f97d451}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{langid}{english}
+      \field{title}{Managed Extensibility Framework}
+      \field{urlday}{10}
+      \field{urlmonth}{9}
+      \field{urlyear}{2023}
+      \field{urldateera}{ce}
+      \verb{urlraw}
+      \verb https://learn.microsoft.com/en-us/dotnet/framework/mef/
+      \endverb
+      \verb{url}
+      \verb https://learn.microsoft.com/en-us/dotnet/framework/mef/
+      \endverb
+    \endentry
+    \entry{tutorialfirstanalyser}{online}{}
+      \name{author}{1}{}{%
+        {{hash=140864078aeca1c7c35b4beb33c53c34}{%
+           family={Microsoft},
+           familyi={M\bibinitperiod}}}%
+      }
+      \strng{namehash}{140864078aeca1c7c35b4beb33c53c34}
+      \strng{fullhash}{140864078aeca1c7c35b4beb33c53c34}
+      \strng{bibnamehash}{140864078aeca1c7c35b4beb33c53c34}
+      \strng{authorbibnamehash}{140864078aeca1c7c35b4beb33c53c34}
+      \strng{authornamehash}{140864078aeca1c7c35b4beb33c53c34}
+      \strng{authorfullhash}{140864078aeca1c7c35b4beb33c53c34}
+      \field{extraname}{3}
+      \field{sortinit}{M}
+      \field{sortinithash}{4625c616857f13d17ce56f7d4f97d451}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{langid}{english}
+      \field{title}{Tutorial: Write your first analyzer and code fix}
+      \field{urlday}{10}
+      \field{urlmonth}{9}
+      \field{urlyear}{2023}
+      \field{urldateera}{ce}
+      \verb{urlraw}
+      \verb https://learn.microsoft.com/en-us/dotnet/csharp/roslyn-sdk/tutorials/how-to-write-csharp-analyzer-code-fix
+      \endverb
+      \verb{url}
+      \verb https://learn.microsoft.com/en-us/dotnet/csharp/roslyn-sdk/tutorials/how-to-write-csharp-analyzer-code-fix
+      \endverb
+    \endentry
+    \entry{whatisvsextension}{online}{}
+      \name{author}{1}{}{%
+        {{hash=140864078aeca1c7c35b4beb33c53c34}{%
+           family={Microsoft},
+           familyi={M\bibinitperiod}}}%
+      }
+      \strng{namehash}{140864078aeca1c7c35b4beb33c53c34}
+      \strng{fullhash}{140864078aeca1c7c35b4beb33c53c34}
+      \strng{bibnamehash}{140864078aeca1c7c35b4beb33c53c34}
+      \strng{authorbibnamehash}{140864078aeca1c7c35b4beb33c53c34}
+      \strng{authornamehash}{140864078aeca1c7c35b4beb33c53c34}
+      \strng{authorfullhash}{140864078aeca1c7c35b4beb33c53c34}
+      \field{extraname}{4}
+      \field{sortinit}{M}
+      \field{sortinithash}{4625c616857f13d17ce56f7d4f97d451}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{langid}{english}
+      \field{title}{Visual Studio Extension}
+      \field{urlday}{23}
+      \field{urlmonth}{11}
+      \field{urlyear}{2023}
+      \field{urldateera}{ce}
+      \verb{urlraw}
+      \verb https://learn.microsoft.com/en-us/visualstudio/extensibility/starting-to-develop-visual-studio-extensions?view=vs-2022
+      \endverb
+      \verb{url}
+      \verb https://learn.microsoft.com/en-us/visualstudio/extensibility/starting-to-develop-visual-studio-extensions?view=vs-2022
+      \endverb
+    \endentry
+    \entry{asynccompletionapi}{online}{}
+      \name{author}{1}{}{%
+        {{hash=2590300a0c95617dd9b06993b435dc07}{%
+           family={Wieczorek},
+           familyi={W\bibinitperiod},
+           given={Amadeusz},
+           giveni={A\bibinitperiod}}}%
+      }
+      \strng{namehash}{2590300a0c95617dd9b06993b435dc07}
+      \strng{fullhash}{2590300a0c95617dd9b06993b435dc07}
+      \strng{bibnamehash}{2590300a0c95617dd9b06993b435dc07}
+      \strng{authorbibnamehash}{2590300a0c95617dd9b06993b435dc07}
+      \strng{authornamehash}{2590300a0c95617dd9b06993b435dc07}
+      \strng{authorfullhash}{2590300a0c95617dd9b06993b435dc07}
+      \field{sortinit}{W}
+      \field{sortinithash}{4315d78024d0cea9b57a0c6f0e35ed0d}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{langid}{english}
+      \field{title}{Async Completion API}
+      \field{urlday}{10}
+      \field{urlmonth}{9}
+      \field{urlyear}{2023}
+      \field{urldateera}{ce}
+      \verb{urlraw}
+      \verb https://github.com/microsoft/vs-editor-api/issues/9
+      \endverb
+      \verb{url}
+      \verb https://github.com/microsoft/vs-editor-api/issues/9
+      \endverb
+    \endentry
+  \enddatalist
+\endrefsection
+\endinput
+

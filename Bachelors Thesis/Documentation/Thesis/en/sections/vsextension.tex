@@ -1,0 +1,339 @@
+\section{Building the Visual Studio Extension}
+\label{sec:VSExtension}
+Now that the necessary information was provided in Section \ref{sec:Foundation} (Foundation), this Section deals with the built Visual Studio Extension through some code examples and explanations. However, as it is not possible to explain the entire extension, only the most important things are mentioned. The fully functional Visual Studio extension and therefore also the complete code is available on Github: \url{https://github.com/TheHandsomeBanana/Discord.NET.SupportExtension}.\\\\
+The following Subsections are going to show only the key concepts of how to create a project that is capable of the described features. These include the
+\begin{enumerate}
+	\item creation of a new Visual Studio extension project
+	\item specific descriptions of the required commands. The core implemention of a command is shown in Subsection \ref{ssec:VSCommands}. It also shows how to connect to the Discord API using the \textit{Discord.Net} NuGet package.
+	\item explanations of the MEF components used to interact with the Editor API.
+	\item explanations of how the analysers built with Roslyn function, without diving into source code.
+\end{enumerate}
+
+
+\subsection{Creating a new Visual Studio Extension Project}
+\label{ssec:NewExtensionProject}
+\includeBasicImg{../../assets/CreateNewVsixProject.png}{References of the newly created Visual Studio Project}{fig:vsix-newproject} 
+To create a new Visual Studio Extension, it is not required to start from scratch, there already exists a template as Figure \ref{fig:vsix-newproject} shows.
+
+\includeImgNoWidth{../../assets/VSIXCustomExtensionReferences.png}{References of the newly created Visual Studio Project}{fig:vsix-custom-references} 
+The necessary NuGet packages for extension development are already referenced by default in this template as Figure \ref{fig:vsix-custom-references} shows.
+
+\newpage
+\subsection{Commands in Project-Context}
+\label{ssec:VSCommands}
+As already mentioned in Section \ref{sec:Foundation} there are 3 commands required for this use case. These commands build the core of the data generation, that is then furtherly processed for completion through the Editor API.
+\includeImgScale{0.5}{../../assets/WorkflowCommandsThin.png}{Commands displayed}{fig:workflow-commands} 
+\includeImgNoWidth{../../assets/CommandsMenu.png}{Commands in project context}{fig:commands-projectcontext} 
+Figure \ref{fig:commands-projectcontext} and \ref{fig:workflow-commands} show the 3 required commands. The \textit{Configure Server Image} command is used to open a custom implemented window that enables configuration possibilities to the user. \textit{Generate Server Image} will trigger the data generation process, which is going to connect to the Discord API and load the required entities. The \textit{Load Server Collection} command reads the generated data based on the project to make it usable for the completion process.
+
+\paragraphWithLabel{Configure Server Image}{p:ConfigureServerImageCommand}
+Since the data for the IntelliSense process should be cached to keep performance up to track, a way to get this data from the API by executing this command is required. To acquire said functionality, a custom window is implemented that takes the users bot token and additional settings like encryption methods, which can then be used to download all servers data that this bot is part of. 
+
+\includeBasicImg{../../assets/ConfigureServerImageCommandClean.png}{Command that configures how the data will be generated}{fig:configureServerImageCommandClean}
+Figure \ref{fig:configureServerImageCommandClean} shows the custom window that is used to configure the data generation process. It is possible to save the token, which will then be stored using the selected cryptography mode. Supported ways to encrypt and decrypt the token are the Windows Data protection API (DPAPI) and AES. Same is possible for the downloaded data.  When clicking \textit{Save}, the configurations data is saved as JSON and added to the project as a new file called \textit{DiscordServerImageConfig.json}. 
+
+\begin{lstlisting}[caption={DiscordServerImageConfig.json}, label={lst:discordServerImageConfig}]
+{
+	"SaveToken": true,
+	"EncryptData": false,
+	"TokenEncryptionMode": null,
+	"DataEncryptionMode": null,
+	"TokenKeyIdentifier": "",
+	"DataKeyIdentifier": null,
+	"Token": "",
+	"RunLog": []
+}	
+\end{lstlisting}
+Listing \ref{lst:discordServerImageConfig} shows how the configuration looks like in JSON format. When extending this whole process, it definitely makes sense to use a database instead of storing information like a run-log inside the configuration file. 
+
+\paragraphWithLabel{Generate Server Image}{p:GenerateServerImageCommand}
+To generate the server image, the bot token is used to connect to Discord's API and load the required data.
+\begin{lstlisting}[style=CSharp, caption={Load data from the Discord API}, label={lst:generateDataSnippet}]
+// This service is used to first login with the provided token and then download the data from the Discord API
+IDiscordEntityService entityService = container.Resolve<IDiscordEntityService>(nameof(DiscordRestEntityService));
+try {
+	...
+	// Connect to the Discord API
+	await entityService.Connect(token);
+	if (entityService.Ready) {
+		DiscordServerCollection serverCollection = await entityService.LoadEntities();
+		
+		// The loaded data will be saved to a directory inside appdata
+		await entityService.SaveToFile(currentCachePath, serverCollection);
+		
+		...
+	}
+	await entityService.Disconnect();
+}
+finally {
+	await entityService.DisposeAsync();
+}
+\end{lstlisting}
+Listing \ref{lst:generateDataSnippet} represents a snippet of the Generate Server Image command, where the \textit{IDiscordEntityService} is used to download the required data using the provided bot token. This service is a custom implementation utilizing Discord.Net's functionality to connect to the Discord API and access servers, channels, users and so on through a client that is either REST or Socket based.
+\begin{lstlisting}[style=CSharp, caption={Implementation of the DiscordRestEntityService}, label={lst:discordRestEntityService}]
+public class DiscordRestEntityService : DiscordBaseEntityService, IDiscordEntityService {
+	
+	public DiscordRestEntityService(ILoggerFactory loggerFactory, IAsyncStreamHandler streamHandler) : base(loggerFactory, streamHandler) {
+		// Create a new client, this class is provided by the Discord.Net
+		Client = new DiscordRestClient(new DiscordRestConfig() {
+			DefaultRetryMode = RetryMode.AlwaysRetry
+		});
+	}
+
+	public async Task Connect(string token) {		
+		((DiscordRestClient)Client).LoggedIn += Client_Ready;
+		// The login is handled in a seperate thread according to Discord.Net's documentation, so the method returns before the login has been completed. Because of this we need to add an event handler to the LoggedIn property.
+		await ((DiscordRestClient)Client).LoginAsync(TokenType.Bot, token); 
+		
+		// This is a simple workaround to wait until the connection is build.
+		// This is required or else the client will not be ready after the Connect method has been called.
+		Stopwatch sw = Stopwatch.StartNew();
+		while (!Ready && sw.ElapsedMilliseconds <= Timeout) { } 
+		sw.Stop();
+	}
+
+	// Set ready to true to break the while loop in Connect
+	protected Task Client_Ready() {
+		Ready = true;
+		return Task.CompletedTask;
+	}
+	
+	public async Task<DiscordServerCollection> LoadEntities() {	
+		// use the client to load all accessible servers and its data
+		IEnumerable<DiscordServer> servers = await Task.WhenAll((await ((DiscordRestClient)Client).GetGuildsAsync()) // GetGuildsAsync loads all accesible servers asynchronously
+		.Select(async e => new DiscordServer() {
+			Id = e.Id,
+			Name = e.Name,
+			ParentId = null,
+			Type = DiscordEntityType.Server,
+			UserCollection = await GetUsers(e), // Map users found in data to custom model
+			ChannelCollection = await GetChannels(e), // Map channels found in data to custom model
+			RoleCollection = await GetRoles(e) // map roles found in data to custom model
+		}));
+		
+		return new DiscordServerCollection(servers);
+	}
+}
+\end{lstlisting}
+Listing \ref{lst:discordRestEntityService} shows a snippet of the REST-based \textit{IDiscordEntityService} where a new \textit{DiscordRestClient} provided by \textit{Discord.Net} is created and used to access all servers asynchronously (\textit{GetGuildsAsync()}). The data is then mapped to custom models (\textit{DiscordServer}, \textit{DiscordUser}, ...) that contain only relevant data for the completion items. The generated data is saved to a file inside the \textit{AppData/Local} folder.
+\newpage
+\begin{lstlisting}[caption={Generated data}, label={lst:generatedDiscordData}]
+{
+	"1157751183184760953": {
+		"Type": 0,
+		"UserCollection": {
+			"270995861826306049": {
+				"Type": 1,
+				"Id": 270995861826306049,
+				"Name": ".handsomebanana",
+				"ParentId": 1157751183184760953
+			},
+			"948672754272583721": {
+				"Type": 1,
+				"Id": 948672754272583721,
+				"Name": "Main Banana Man",
+				"ParentId": 1157751183184760953
+			}
+		},
+		"RoleCollection": {
+			"1157751183184760953": {
+				"Type": 2,
+				"Id": 1157751183184760953,
+				"Name": "@everyone",
+				"ParentId": 1157751183184760953
+			}
+		},
+		"ChannelCollection": {
+			"1157751183822311494": {
+				"Type": 3,
+				"ChannelType": 2,
+				"Id": 1157751183822311494,
+				"Name": "Textkanaele",
+				"ParentId": 1157751183184760953
+			},
+			"1157751183822311495": {
+				"Type": 3,
+				"ChannelType": 2,
+				"Id": 1157751183822311495,
+				"Name": "Sprachkanaele",
+				"ParentId": 1157751183184760953
+			}
+		},
+		"Id": 1157751183184760953,
+		"Name": "Discord.NET Support Extension Testserver",
+		"ParentId": null
+	}
+}
+\end{lstlisting}
+Listing \ref{lst:generatedDiscordData} shows what the generated data looks like. As seen in this example the bot used to generate this data is called \textit{Main Banana Man} which is also part of the user collection.
+\paragraphWithLabel{Load Server Collection}{p:LoadServerCollectionCommand}
+The data structure to hold the data in memory is based on a dictionary that has a project as key and contains the data as value. Executing this command will put the generated data for the project into the dictionary. On startup the currently selected or active project is used if the required data exists. For every other project, the \textit{Load Server Collection} command comes in handy, to dynamically load the required data used for completion items. This is also useful if the user develops several Discord bots at the same time, because only the required data for code completion will be provided while coding.
+
+\subsection{MEF Components Project}
+\label{ssec:MEFExtension}
+This project contains the MEF components, which utilize functionality from the Async Completion Api mentioned in Subsection \ref{ssec:AsyncCompletionApi}. These components are responsible for taking the generated data, explained in Subsection \ref{ssec:VSCommands}, and providing it as completion items for the Editor API.
+
+\includeBasicImg{../../assets/Workflow\_MEF.png}{Workflow for the MEF Project}{fig:workflow-mef} 
+Figure \ref{fig:workflow-mef} shows the basic structure, the \textit{MEF Extension} resembling the project containing the MEF components, which include the \textit{IAsyncCompletionSourceProvider} and \textit{IAsyncCompletionCommitManagerProvider}.
+
+\paragraphWithLabel{Completion Source}{p:completionSource}
+\begin{lstlisting}[style=CSharp, caption={Discord Completion Source Provider}, label={lst:discordCompletionSourceProvider}]
+[Export(typeof(IAsyncCompletionSourceProvider))]
+[ContentType("CSharp")]
+[Name("Discord Source Provider")]
+public class AsyncDiscordCompletionSourceProvider : IAsyncCompletionSourceProvider {
+	public IAsyncCompletionSource GetOrCreate(ITextView textView) {
+		return new AsyncDiscordCompletionSource();
+	}
+\end{lstlisting}
+Listing \ref{lst:discordCompletionSourceProvider} shows that classes inheriting from \textit{IAsyncCompletionSourceProvider} implement the method \textit{GetOrCreate(ITextView textView)}, that returns an \textit{IAsyncCompletionSource}. That return value contains the added completion items that are pushed into the editor (which is done by Visual Studio). ``When the user interacts with Visual Studio, e.g. by typing, the editor will see if it is appropriate to begin a completion session`` \citep{asynccompletionapiissue}.
+
+\begin{lstlisting}[style=CSharp, caption={Discord Completion Source}, label={lst:discordCompletionSource}]
+public class AsyncDiscordCompletionSource : IAsyncCompletionSource {
+	public async Task<CompletionContext> GetCompletionContextAsync(IAsyncCompletionSession session, CompletionTrigger trigger, SnapshotPoint triggerLocation, SnapshotSpan applicableToSpan, CancellationToken token) {
+		...
+		
+		// This engine is a custom implementation that performs code analysis and is part of a DI container from which the instance is resolved.
+		IDiscordCompletionEngine engine = supportPackageContainer.Resolve<IDiscordCompletionEngine>();
+		
+		try {
+			...
+			// The documentIdentifier is set in InitializeCompletion(..)
+			Microsoft.CodeAnalysis.Document document = vsWorkspace.CurrentSolution.GetDocument(documentIdentifier);
+			
+			...
+			
+			SemanticModel semanticModel = await document.GetSemanticModelAsync(token);
+			SyntaxToken triggerToken = (await document.GetSyntaxRootAsync(token)).FindToken(triggerLocation);
+			
+			// The engine starts the required code analysers that will build completions based on the analysed code
+			DiscordCompletionItem[] completions = await engine.ProcessCompletionAsync(vsWorkspace.CurrentSolution, semanticModel, triggerToken);
+			
+			...	
+			// The CompletionContext takes an ImmutableArray of CompletionItem, so the just now created DiscordCompletionItem[] is mapped to a CompletionItem[].
+			return new CompletionContext(completions.Select(e => {
+				CompletionItem ci = new CompletionItem(/* Mapping of completion items*/);
+				ci.Properties.AddProperty("description", e.Description); // The discription called in GetDescriptionAsync(..)
+				return ci;
+			}).ToImmutableArray());
+		}
+		catch (Exception ex) {
+			...
+		}
+		
+		return default;
+	}
+	
+	public async Task<object> GetDescriptionAsync(IAsyncCompletionSession session, CompletionItem item, CancellationToken token) {
+		// The discription of an item displayed in the IntelliSense completion list
+	}
+	
+	public CompletionStartData InitializeCompletion(CompletionTrigger trigger, SnapshotPoint triggerLocation, CancellationToken token) {
+		// Initialization work i.e. setting the current document that is analysed in GetCompletionContextAsync(..)
+		// Also defines if this completion source (this class) participates in completion (which means GetCompletionContext(..) will be called)
+	}
+}
+\end{lstlisting}
+In Listing \ref{lst:discordCompletionSourceProvider} a new \textit{AsyncDiscordCompletionSource} is created. The API will then proceed to call the methods defined in the \textit{IAsyncCompletionSource} interface if IntelliSense is triggered.  ``We will attempt to get completion items by asynchronously calling GetCompletionContextAsync where you provide completion items`` \citep{asynccompletionapiissue}.
+As shown in Listing \ref{lst:discordCompletionSource}, the methods inside \textit{AsyncDiscordCompletionSource}, \textit{GetCompletionContextAsync}, \textit{GetDescriptionAsync} and \textit{InitializeCompletion} are implemented based on this use case and are explained each as comment in the Listing.
+
+\paragraphWithLabel{Completion Commit Manager}{p:completionCommitManager}
+\begin{lstlisting}[style=CSharp, caption={Discord Completion Commit Manager Provider}, label={lst:discordCompletionCommitManagerProvider}]
+[Export(typeof(IAsyncCompletionCommitManagerProvider))]
+[ContentType("CSharp")]
+[TextViewRole(PredefinedTextViewRoles.Editable)]
+[Order(Before = "default")]
+[Name("Discord Commit Provider")]
+public class AsyncDiscordCompletionCommitManagerProvider : IAsyncCompletionCommitManagerProvider {
+	public IAsyncCompletionCommitManager GetOrCreate(ITextView textView) {
+		return new AsyncDiscordCompletionCommitManager();
+	}
+}
+\end{lstlisting}
+Similar as in Listing \ref{lst:discordCompletionSourceProvider}, Listing \ref{lst:discordCompletionCommitManagerProvider} shows that classes inheriting from \textit{IAsyncCompletionCommitManagerProvider} implement the method \textit{GetOrCreate(ITextView textView)}, that returns an \textit{IAsyncCompletionCommitManager}. That return value contains the logic responsible for committing completion items into the editor. ``We use this interface to determine under which circumstances to commit (insert the completion text into the text buffer and close the completion UI) a completion item.`` \citep{asynccompletionapiissue}
+
+\begin{lstlisting}[style=CSharp, caption={Discord Completion Commit Manager}, label={lst:discordCompletionCommitManager}]
+public class AsyncDiscordCompletionCommitManager : IAsyncCompletionCommitManager {
+	public IEnumerable<char> PotentialCommitCharacters => ".".ToCharArray();
+	
+	public bool ShouldCommitCompletion(IAsyncCompletionSession session, SnapshotPoint location, char typedChar, CancellationToken token) {
+		return false; // No custom commit characters should commit the completion item into the editor
+	}
+	
+	public CommitResult TryCommit(IAsyncCompletionSession session, ITextBuffer buffer, CompletionItem item, char typedChar, CancellationToken token) {
+		// If the item type matches, insert the currently selected completion item with all required information into the textbuffer
+		if (item.Source is AsyncDiscordCompletionSource) {
+			buffer.Replace(session.ApplicableToSpan.GetSpan(buffer.CurrentSnapshot), item.InsertText + $" /* {item.DisplayText} ({item.Suffix}) */");
+			return CommitResult.Handled;
+		}
+		
+		return CommitResult.Unhandled;
+	}
+}
+\end{lstlisting}
+In Listing \ref{lst:discordCompletionCommitManagerProvider} a new \textit{AsyncDiscordCompletionCommitManager} is created. This class is responsible for managing how the completion items added by the \textit{AsyncDiscordCompletionSource} (from Listing \ref{lst:discordCompletionSource}) are committed into the editor. ``When we first create the completion session, we access the PotentialCommitCharacters property that returns characters that potentially commit completion when user types them. We access this property, therefore it should return a preallocated array. Typically, the commit characters include space and other token delimeters such as ., (, ).`` \citep{asynccompletionapi}\\
+It is also stated, that tab and enter are handled seperately. So if a character is a commit character, it needs to be added to the mentioned \textit{PotentialCommitCharacters}. \citep{asynccompletionapi}
+
+\subsection{Code Analyser}
+\label{ssec:CodeAnalyzer}
+In Listing \ref{lst:discordCompletionSource} the current document is available through working with the Development Tools Environment (DTE). The DTE is used to access many different kinds of features within Visual Studio. Therefore the currently open document id is accessible, which is then utilized to access the current document. This information is crucial to get the semantic model, which is also mandatory for analysing the users code. The method \textit{GetCompletionContextAsync} from Listing \ref{lst:discordCompletionSource} provides a \textit{SnapshotPoint} as parameter. With a \textit{SnapshotPoint} and the available document, the \textit{SyntaxToken}, where IntelliSense has been triggered, can be acquired.
+\begin{lstlisting}[style=CSharp, caption={Getting the semantic model and syntax token}, label={lst:semanticModelAndSyntaxToken}]
+SemanticModel semanticModel = await document.GetSemanticModelAsync(token);
+SyntaxToken triggerToken = (await document.GetSyntaxRootAsync(token)).FindToken(triggerLocation);
+\end{lstlisting}
+
+Listing \ref{lst:semanticModelAndSyntaxToken} shows the above mentioned logic. The \textit{document} represents the file that is currently open in the editor and the \textit{triggerLocation} contains information about where in the currently open file IntelliSense was triggered. This is always where the cursor position. The \textit{token} is a \textit{CancellationToken}, which is a good practice to use when writing asynchronous code. The semantic model and syntax token are then used to get the necessary information about the users current state of code.
+
+\paragraphWithLabel{Workflow}{p:workflowRoslyn}
+\includeImgScale{0.4}{../../assets/Workflow\_Roslyn.png}{Workflow for the implemented code analyser using Roslyn}{fig:workflow-roslyn} 
+
+Figure \ref{fig:workflow-roslyn} displays a structure of 3 analysers, the \textit{Discord Analyser} that collects information through the sub analysers \textit{Discord Context Analyser} and \textit{Discord Server Id Analyser}. The \textit{Discord Analyser} is called by the \textit{IDiscordCompletionEngine}. The use of which is shown at Listing \ref{lst:discordCompletionSource}.
+
+\includeImgScale{0.4}{../../assets/WorkflowCodeAnalyserThin.png}{Analysis worklow with the IDiscordCompletionEngine as starting point}{fig:workflowCodeAnalyser} 
+Figure \ref{fig:workflowCodeAnalyser} shows the analysis process that is started every time the IntelliSense is triggered. In this scenario, the \textit{IDiscordCompletionEngine} calls \textit{ProcessCompletionsAsync}. Since the generated data is stored per project using a dictionary, the current project is required and used to read the generated data for this project. It also creates the \textit{DiscordAnalyser} that utilizes the \textit{ContextAnalyser} and the \textit{ServerIdAnalyser}. The \textit{ContextAnalyser} tries to evaluate the context, which consists of \textit{Server}, \textit{User}, \textit{Role} and \textit{Channel}. If the context is \textit{Server} or no context is found, the \textit{ServerIdAnalyser} is not called, hence there is no need to specify the server for appropriate filtering. The \textit{ServerIdAnalyser} tries to find a server id from the \textit{triggerLocation} as starting point, which is then used to filter the generated data. Since Roslyn maintains the compiler API (Figure \ref{fig:compilerPipeline}), there is access to a big variety of classes that represent different types of code.
+
+\paragraphWithLabel{Syntax Showcase}{p:syntaxShowcase}
+\begin{lstlisting}[style=CSharp, caption={Code snippet from the context analyser}, label={lst:contextAnalyserExample}]
+...
+private async Task ResolveNode(SyntaxNode node) {
+	switch (node) {
+		case InvocationExpressionSyntax invocation:
+		CheckForContext(invocation);
+		break;
+		case BinaryExpressionSyntax binary when binary.Kind() == SyntaxKind.EqualsExpression || binary.Kind() == SyntaxKind.NotEqualsExpression:
+		await ResolveNode(binary.Left);
+		break;
+		case MemberAccessExpressionSyntax memberAccess:
+		await ResolveNode(memberAccess.Expression);
+		break;
+		case ConditionalAccessExpressionSyntax conditionalAccess:
+		await ResolveNode(conditionalAccess.Expression);
+		break;
+		case IdentifierNameSyntax identifier:
+		CheckForContext(identifier);
+		break;
+		case SwitchStatementSyntax switchStatement:
+		await ResolveNode(switchStatement.Expression);
+		break;
+		case ArgumentSyntax argument:
+		await ResolveArgument(argument);
+		break;
+		case ArgumentListSyntax argumentList:
+		await ResolveNode(argumentList.Parent);
+		break;
+	}
+}
+\end{lstlisting}
+For instance when taking a look at Listing \ref{lst:contextAnalyserExample}, there are many different classes used that represent a \csharp \textit{SyntaxNode}, like an \textit{InvocationExpressionSyntax} in line 4, which stands for a method call. When utilizing these things, the users code can be queried efficiently. But it is again important to state, that this analysis process is called each time IntelliSense will trigger. To not negatively impact the users coding experience with bad performance, it is important that the algorithms analysing code are fast.
+
+\newpage
+\paragraphWithLabel{Example of Context Detection}{p:contextDetection}
+\includeBasicImg{../../assets/ContextDeterminationExample.png}{Example of how the current context can be determined}{fig:contextDetermination}
+
+Figure \ref{fig:contextDetermination} shows a code snippet where a server is retrieved using a \textit{DiscordSocketClient} (this is the \textit{discordSocketClient} variable's type). The goal is to find out whether the cursor is at a position where an id can be provided, and if so, what kind of id is required (\textit{Server, User, ..}). When IntelliSense triggers between the \textit{GetGuild()} method parentheses, so where the cursor is positioned, the \textit{DiscordContextAnalyser} starts analysing. First the type of the parameter is checked. Discord uses so called Snowflake IDs for their entities, which represent an unsigned long in \csharp. As seen in the Figure, the type matches. After the parameter type is confirmed, the methods return type is checked and if that also matches, the completion items are prepared and provided as suggestions. This is only a simple scenario, code can become more complex which can complicate the analysis, like for example when using LINQ.
+
+\newpage
+\paragraphWithLabel{Example of Server Id Resolving}{p:serverIdResolve}
+\includeBasicImg{../../assets/ServerIdResolvementExample.png}{Example of how the correct server id is resolved}{fig:serverIdResolve}
+
+Figure \ref{fig:serverIdResolve} shows how a server id is successfully resolved. If the context detection is successful, which in this case is \textit{User}, the \textit{DiscordServerIdAnalyser} starts analysing. The context detection provides the \textit{SyntaxNode} the context was detected on, but only if a context was found. In this Figure the determined \textit{SyntaxNode} is \textit{GetUser()} which represents an \textit{InvocationExpressionSyntax}. Then the variable \textit{guild}, where that method is called on, is checked. The variable \textit{guild} in Line 32 is of type \textit{IdentifierNameSyntax}, that contains the declaring syntax reference which is used to get the variable declaration in Line 29. This \textit{SyntaxNode} is of type \textit{VariableDeclaratorSyntax} and contains a property representing the initializer. So now the initializer is checked and from there on the server id is successfully resolved by checking the \textit{GetGuild} methods return type and its parameter. This is again a very simple example, since code can become more complex quickly, which can also complicate the analysis. For this reason it is important to always check the termination conditions before jumping right into development. Also it is recommended to get familiar with syntax and semantics using the Syntax Visualizer introduced in Subsection \ref{ssec:SyntaxVisualizer}.

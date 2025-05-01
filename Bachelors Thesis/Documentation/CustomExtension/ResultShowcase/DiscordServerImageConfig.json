@@ -1,0 +1,17 @@
+{
+  "SaveToken": true,
+  "EncryptData": false,
+  "TokenEncryptionMode": 0,
+  "DataEncryptionMode": null,
+  "TokenKeyIdentifier": null,
+  "DataKeyIdentifier": null,
+  "Token": "AQAAANCMnd8BFdERjHoAwE/Cl+sBAAAA6GSb4CBqpke6Po3josNagQAAAAACAAAAAAAQZgAAAAEAACAAAABRUUlA8igAUGk1kWl6W97HfyjsvRCnjGyNWKhZSt1pYwAAAAAOgAAAAAIAACAAAAB88C1pxQcuGGvQdEedX+leQ8VNN3kEygFWtJ5aHBU7/1AAAACF9syvhYugkPPhYQVgx3rpz4+Klm4SVuhf/4hUYWlqTGN0R1Hm5DNSosd4cwJOfbEHJyOIBH5F09HefwdaKplAQLjT+Cg2H6MvtyZbsJaatUAAAACiaQwwn+IgbQ7yCKzCzRPlIDpvoMVa7Em+rBpW+DeLoIBCKcrqUXSxMSjUaE/snkQzAXDUWiGSCOIchcnUZsg+",
+  "RunLog": [
+    {
+      "StartedAt": "2024-02-28T02:45:13.6153399+01:00",
+      "FinishedAt": "2024-02-28T02:46:39.125383+01:00",
+      "Status": 1,
+      "Duration": "00:01:25.5100431"
+    }
+  ]
+}

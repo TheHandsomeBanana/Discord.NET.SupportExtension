@@ -1,0 +1,71 @@
+\boolfalse {citerequest}\boolfalse {citetracker}\boolfalse {pagetracker}\boolfalse {backtracker}\relax 
+\defcounter {refsection}{0}\relax 
+\contentsline {figure}{\numberline {1}{\ignorespaces Workflow overview to acquire the wanted solution}}{12}{figure.caption.9}%
+\defcounter {refsection}{0}\relax 
+\contentsline {figure}{\numberline {2}{\ignorespaces Visual Studio Installer}}{13}{figure.caption.10}%
+\defcounter {refsection}{0}\relax 
+\contentsline {figure}{\numberline {3}{\ignorespaces File structure of a VSIX Project}}{14}{figure.caption.12}%
+\defcounter {refsection}{0}\relax 
+\contentsline {figure}{\numberline {4}{\ignorespaces Design view of the .vsixmanifest file}}{14}{figure.caption.13}%
+\defcounter {refsection}{0}\relax 
+\contentsline {figure}{\numberline {5}{\ignorespaces .vsixmanifest file assets}}{15}{figure.caption.14}%
+\defcounter {refsection}{0}\relax 
+\contentsline {figure}{\numberline {6}{\ignorespaces Properties of a VSIX Command Table file}}{15}{figure.caption.15}%
+\defcounter {refsection}{0}\relax 
+\contentsline {figure}{\numberline {7}{\ignorespaces Result of the command definition}}{18}{figure.caption.19}%
+\defcounter {refsection}{0}\relax 
+\contentsline {figure}{\numberline {8}{\ignorespaces Custom output window pane}}{22}{figure.caption.21}%
+\defcounter {refsection}{0}\relax 
+\contentsline {figure}{\numberline {9}{\ignorespaces Compiler pipeline functional areas}}{23}{figure.caption.22}%
+\defcounter {refsection}{0}\relax 
+\contentsline {figure}{\numberline {10}{\ignorespaces Syntax Visualizer}}{27}{figure.caption.28}%
+\defcounter {refsection}{0}\relax 
+\contentsline {figure}{\numberline {11}{\ignorespaces References of the newly created Visual Studio Project}}{31}{figure.caption.31}%
+\defcounter {refsection}{0}\relax 
+\contentsline {figure}{\numberline {12}{\ignorespaces References of the newly created Visual Studio Project}}{32}{figure.caption.32}%
+\defcounter {refsection}{0}\relax 
+\contentsline {figure}{\numberline {13}{\ignorespaces Commands displayed}}{33}{figure.caption.33}%
+\defcounter {refsection}{0}\relax 
+\contentsline {figure}{\numberline {14}{\ignorespaces Commands in project context}}{33}{figure.caption.34}%
+\defcounter {refsection}{0}\relax 
+\contentsline {figure}{\numberline {15}{\ignorespaces Command that configures how the data will be generated}}{34}{figure.caption.36}%
+\defcounter {refsection}{0}\relax 
+\contentsline {figure}{\numberline {16}{\ignorespaces Workflow for the MEF Project}}{38}{figure.caption.39}%
+\defcounter {refsection}{0}\relax 
+\contentsline {figure}{\numberline {17}{\ignorespaces Workflow for the implemented code analyser using Roslyn}}{42}{figure.caption.43}%
+\defcounter {refsection}{0}\relax 
+\contentsline {figure}{\numberline {18}{\ignorespaces Analysis worklow with the IDiscordCompletionEngine as starting point}}{43}{figure.caption.44}%
+\defcounter {refsection}{0}\relax 
+\contentsline {figure}{\numberline {19}{\ignorespaces Example of how the current context can be determined}}{45}{figure.caption.47}%
+\defcounter {refsection}{0}\relax 
+\contentsline {figure}{\numberline {20}{\ignorespaces Example of how the correct server id is resolved}}{46}{figure.caption.49}%
+\defcounter {refsection}{0}\relax 
+\contentsline {figure}{\numberline {21}{\ignorespaces New project for showcase}}{47}{figure.caption.50}%
+\defcounter {refsection}{0}\relax 
+\contentsline {figure}{\numberline {22}{\ignorespaces The created bot with its token}}{48}{figure.caption.51}%
+\defcounter {refsection}{0}\relax 
+\contentsline {figure}{\numberline {23}{\ignorespaces Small overview of the server}}{48}{figure.caption.52}%
+\defcounter {refsection}{0}\relax 
+\contentsline {figure}{\numberline {24}{\ignorespaces Highlighted Server Image Configuration command}}{49}{figure.caption.53}%
+\defcounter {refsection}{0}\relax 
+\contentsline {figure}{\numberline {25}{\ignorespaces Configured Data Generation}}{49}{figure.caption.54}%
+\defcounter {refsection}{0}\relax 
+\contentsline {figure}{\numberline {26}{\ignorespaces Highlighted Server Image Generation command}}{49}{figure.caption.55}%
+\defcounter {refsection}{0}\relax 
+\contentsline {figure}{\numberline {27}{\ignorespaces Log for data generation}}{50}{figure.caption.56}%
+\defcounter {refsection}{0}\relax 
+\contentsline {figure}{\numberline {28}{\ignorespaces Completion items for getting a server}}{50}{figure.caption.58}%
+\defcounter {refsection}{0}\relax 
+\contentsline {figure}{\numberline {29}{\ignorespaces Committed server completion item}}{51}{figure.caption.59}%
+\defcounter {refsection}{0}\relax 
+\contentsline {figure}{\numberline {30}{\ignorespaces Completion items for getting a user that is part of the given server}}{52}{figure.caption.61}%
+\defcounter {refsection}{0}\relax 
+\contentsline {figure}{\numberline {31}{\ignorespaces Committed user completion item}}{53}{figure.caption.62}%
+\defcounter {refsection}{0}\relax 
+\contentsline {figure}{\numberline {32}{\ignorespaces Completion items for getting a text channel that is part of the given server}}{53}{figure.caption.64}%
+\defcounter {refsection}{0}\relax 
+\contentsline {figure}{\numberline {33}{\ignorespaces Completion items for getting a voice channel that is part of the given server}}{54}{figure.caption.65}%
+\defcounter {refsection}{0}\relax 
+\contentsline {figure}{\numberline {34}{\ignorespaces Completion items for getting a category channel that is part of the given server}}{54}{figure.caption.66}%
+\defcounter {refsection}{0}\relax 
+\contentsline {figure}{\numberline {35}{\ignorespaces Role suggestions in LINQ method}}{55}{figure.caption.68}%

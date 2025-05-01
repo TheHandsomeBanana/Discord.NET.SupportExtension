@@ -1,0 +1,38 @@
+\boolfalse {citerequest}\boolfalse {citetracker}\boolfalse {pagetracker}\boolfalse {backtracker}\relax 
+\babel@toc {english}{}\relax 
+\babel@toc {ngerman}{}\relax 
+\babel@toc {english}{}\relax 
+\defcounter {refsection}{0}\relax 
+\contentsline {chapter}{Abstract}{ii}{chapter*.2}%
+\defcounter {refsection}{0}\relax 
+\contentsline {chapter}{\numberline {1}Exposé}{1}{chapter.1}%
+\defcounter {refsection}{0}\relax 
+\contentsline {section}{\numberline {1}Introduction}{1}{section.1.1}%
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {1.1}What is Discord?}{1}{subsection.1.1.1}%
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {1.2}What are Discord bots?}{1}{subsection.1.1.2}%
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {1.3}What is Discord.Net?}{2}{subsection.1.1.3}%
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {1.4}What is a Visual Studio Extension?}{2}{subsection.1.1.4}%
+\defcounter {refsection}{0}\relax 
+\contentsline {subsubsection}{Extension task}{2}{subsection.1.1.4}%
+\defcounter {refsection}{0}\relax 
+\contentsline {section}{\numberline {2}State of the Art}{3}{section.1.2}%
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {2.1}Discord.Net}{3}{subsection.1.2.1}%
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {2.2}Roslyn}{3}{subsection.1.2.2}%
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {2.3}Editor API}{3}{subsection.1.2.3}%
+\defcounter {refsection}{0}\relax 
+\contentsline {section}{\numberline {3}Methodology}{3}{section.1.3}%
+\defcounter {refsection}{0}\relax 
+\contentsline {section}{\numberline {4}Expected Results}{4}{section.1.4}%
+\defcounter {refsection}{0}\relax 
+\contentsline {chapter}{References}{5}{chapter*.3}%
+\defcounter {refsection}{0}\relax 
+\contentsline {section}{Literature}{5}{section*.4}%
+\defcounter {refsection}{0}\relax 
+\contentsline {section}{Online sources}{5}{section*.5}%

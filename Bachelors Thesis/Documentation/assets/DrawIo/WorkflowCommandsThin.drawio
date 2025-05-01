@@ -1,0 +1,41 @@
+<mxfile host="Electron" modified="2024-02-27T22:40:45.635Z" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/22.1.16 Chrome/120.0.6099.109 Electron/28.1.0 Safari/537.36" etag="mI5_jl8wBVGXJunGykjx" version="22.1.16" type="device">
+  <diagram name="Page-1" id="MPYqpl_aQjiWpt9MDq_A">
+    <mxGraphModel dx="1430" dy="825" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="r8sS8Ag7rBc_APJZNHbJ-1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" parent="1" source="r8sS8Ag7rBc_APJZNHbJ-4" target="r8sS8Ag7rBc_APJZNHbJ-6" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="r8sS8Ag7rBc_APJZNHbJ-2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" parent="1" source="r8sS8Ag7rBc_APJZNHbJ-4" target="r8sS8Ag7rBc_APJZNHbJ-5" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="415" y="310" />
+              <mxPoint x="295" y="310" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="r8sS8Ag7rBc_APJZNHbJ-3" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" parent="1" source="r8sS8Ag7rBc_APJZNHbJ-4" target="r8sS8Ag7rBc_APJZNHbJ-7" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="415" y="310" />
+              <mxPoint x="535" y="310" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="r8sS8Ag7rBc_APJZNHbJ-4" value="Commands" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+          <mxGeometry x="360" y="260" width="110" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="r8sS8Ag7rBc_APJZNHbJ-5" value="Configure Server Image" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+          <mxGeometry x="240" y="340" width="110" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="r8sS8Ag7rBc_APJZNHbJ-6" value="Generate Server Image" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+          <mxGeometry x="360" y="340" width="110" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="r8sS8Ag7rBc_APJZNHbJ-7" value="Load Server Collection" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+          <mxGeometry x="480" y="340" width="110" height="30" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
